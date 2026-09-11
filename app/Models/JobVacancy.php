@@ -100,6 +100,14 @@ class JobVacancy extends Model
     }
 
     /**
+     * Get the route key for the model.
+     */
+    public function getRouteKeyName(): string
+    {
+        return 'code';
+    }
+
+    /**
      * Periode rekrutmen tempat lowongan ini bernaung.
      */
     public function recruitmentPeriod(): BelongsTo
@@ -112,7 +120,7 @@ class JobVacancy extends Model
      */
     public function qualifications(): HasMany
     {
-        return $this->hasMany(VacancyQualification::class);
+        return $this->hasMany(VacancyQualification::class)->orderBy('sort_order');
     }
 
     /**
@@ -120,7 +128,7 @@ class JobVacancy extends Model
      */
     public function documentRequirements(): HasMany
     {
-        return $this->hasMany(VacancyDocumentRequirement::class);
+        return $this->hasMany(VacancyDocumentRequirement::class)->orderBy('sort_order');
     }
 
     /**

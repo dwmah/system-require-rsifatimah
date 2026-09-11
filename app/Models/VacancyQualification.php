@@ -11,6 +11,11 @@ class VacancyQualification extends Model
     use HasFactory;
 
     /**
+     * Label kanonikal untuk kualifikasi jenjang pendidikan.
+     */
+    public const LABEL_EDUCATION = 'Pendidikan Formal';
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
