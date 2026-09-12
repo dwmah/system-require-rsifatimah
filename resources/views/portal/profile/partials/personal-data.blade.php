@@ -87,6 +87,7 @@
                     name="birth_date"
                     id="birth_date"
                     value="{{ old('birth_date', $profile?->birth_date?->format('Y-m-d')) }}"
+                    max="{{ now()->subDay()->toDateString() }}"
                     required
                     class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $errors->has('birth_date') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100' }} focus:outline-hidden focus:ring-2"
                 >

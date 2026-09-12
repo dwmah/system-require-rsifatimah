@@ -34,6 +34,8 @@ class ApplicationStageHistory extends Model
         'started_at',
         'decided_at',
         'note',
+        'published_at',
+        'applicant_message',
     ];
 
     /**
@@ -47,6 +49,7 @@ class ApplicationStageHistory extends Model
             'status' => ApplicationStageStatus::class,
             'started_at' => 'datetime',
             'decided_at' => 'datetime',
+            'published_at' => 'datetime',
         ];
     }
 

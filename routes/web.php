@@ -62,7 +62,72 @@ Route::middleware('guest')->group(function () {
 // Shared Authenticated Routes
 Route::middleware('auth')->group(function () {
     Route::post('/keluar', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+
     Route::get('/dokumen/download/{document}', [ApplicantDocumentController::class, 'download'])->name('documents.download');
+
+    Route::get('/portal', [PortalHomeController::class, 'index'])->name('portal.home');
+
+    // Profil Pelamar
+    Route::get('/portal/profil', [\App\Http\Controllers\Portal\ProfileController::class, 'show'])->name('profile.show');
+    Route::patch('/portal/profil/data-pribadi', [\App\Http\Controllers\Portal\ProfileController::class, 'updatePersonal'])->name('profile.personal.update');
+    Route::patch('/portal/profil/alamat-kontak', [\App\Http\Controllers\Portal\ProfileController::class, 'updateContact'])->name('profile.contact.update');
+
+    // Riwayat Pendidikan
+    Route::post('/portal/profil/pendidikan', [\App\Http\Controllers\Portal\ApplicantEducationController::class, 'store'])->name('profile.educations.store');
+    Route::patch('/portal/profil/pendidikan/{education}', [\App\Http\Controllers\Portal\ApplicantEducationController::class, 'update'])->name('profile.educations.update');
+    Route::delete('/portal/profil/pendidikan/{education}', [\App\Http\Controllers\Portal\ApplicantEducationController::class, 'destroy'])->name('profile.educations.destroy');
+
+    // Lisensi / STR
+    Route::post('/portal/profil/lisensi', [\App\Http\Controllers\Portal\ApplicantLicenseController::class, 'store'])->name('profile.licenses.store');
+    Route::patch('/portal/profil/lisensi/{license}', [\App\Http\Controllers\Portal\ApplicantLicenseController::class, 'update'])->name('profile.licenses.update');
+    Route::delete('/portal/profil/lisensi/{license}', [\App\Http\Controllers\Portal\ApplicantLicenseController::class, 'destroy'])->name('profile.licenses.destroy');
+
+    // Sertifikasi
+    Route::post('/portal/profil/sertifikasi', [\App\Http\Controllers\Portal\ApplicantCertificationController::class, 'store'])->name('profile.certifications.store');
+    Route::patch('/portal/profil/sertifikasi/{certification}', [\App\Http\Controllers\Portal\ApplicantCertificationController::class, 'update'])->name('profile.certifications.update');
+    Route::delete('/portal/profil/sertifikasi/{certification}', [\App\Http\Controllers\Portal\ApplicantCertificationController::class, 'destroy'])->name('profile.certifications.destroy');
+
+    // Pengalaman Kerja
+    Route::post('/portal/profil/pengalaman', [\App\Http\Controllers\Portal\ApplicantWorkExperienceController::class, 'store'])->name('profile.work-experiences.store');
+    Route::patch('/portal/profil/pengalaman/{workExperience}', [\App\Http\Controllers\Portal\ApplicantWorkExperienceController::class, 'update'])->name('profile.work-experiences.update');
+    Route::delete('/portal/profil/pengalaman/{workExperience}', [\App\Http\Controllers\Portal\ApplicantWorkExperienceController::class, 'destroy'])->name('profile.work-experiences.destroy');
+
+    // Alur Lamaran Pekerjaan (Fase 8A & 8B)
+    Route::get('/portal/lamaran', [\App\Http\Controllers\Portal\ApplicationController::class, 'index'])->name('portal.applications.index');
+    Route::get('/portal/lamaran/mulai/{jobVacancy}', [\App\Http\Controllers\Portal\ApplicationController::class, 'start'])->name('portal.applications.start');
+    Route::post('/portal/lamaran/mulai/{jobVacancy}', [\App\Http\Controllers\Portal\ApplicationController::class, 'store'])->name('portal.applications.store');
+    Route::get('/portal/lamaran/{jobApplication}', [\App\Http\Controllers\Portal\ApplicationController::class, 'show'])
+        ->whereNumber('jobApplication')
+        ->name('portal.applications.show');
+
+    // Berkas Persyaratan & Final Submit (Fase 8B)
+    Route::get('/portal/lamaran/{jobApplication}/berkas', [\App\Http\Controllers\Portal\ApplicationDocumentController::class, 'index'])
+        ->whereNumber('jobApplication')
+        ->name('portal.applications.documents.index');
+    Route::post('/portal/lamaran/{jobApplication}/berkas/{requirement}', [\App\Http\Controllers\Portal\ApplicationDocumentController::class, 'store'])
+        ->whereNumber('jobApplication')
+        ->whereNumber('requirement')
+        ->name('portal.applications.documents.store');
+    Route::delete('/portal/lamaran/{jobApplication}/berkas/{document}', [\App\Http\Controllers\Portal\ApplicationDocumentController::class, 'destroy'])
+        ->whereNumber('jobApplication')
+        ->whereNumber('document')
+        ->name('portal.applications.documents.destroy');
+    Route::get('/portal/lamaran/{jobApplication}/berkas/{document}/download', [\App\Http\Controllers\Portal\ApplicationDocumentController::class, 'download'])
+        ->whereNumber('jobApplication')
+        ->whereNumber('document')
+        ->name('portal.applications.documents.download');
+
+    Route::get('/portal/lamaran/{jobApplication}/review', [\App\Http\Controllers\Portal\ApplicationSubmissionController::class, 'review'])
+        ->whereNumber('jobApplication')
+        ->name('portal.applications.review');
+    Route::post('/portal/lamaran/{jobApplication}/submit', [\App\Http\Controllers\Portal\ApplicationSubmissionController::class, 'submit'])
+        ->whereNumber('jobApplication')
+        ->name('portal.applications.submit');
+
+    // Tracking Proses Seleksi Pelamar (Fase 9)
+    Route::get('/portal/lamaran/{jobApplication}/tracking', [\App\Http\Controllers\Portal\ApplicationTrackingController::class, 'show'])
+        ->whereNumber('jobApplication')
+        ->name('portal.applications.tracking');
 });
 
 // =========================================================================

@@ -3,10 +3,17 @@
 ])
 
 @php
+<<<<<<< HEAD
     $isDashboardActive = $activeMenu === 'dashboard' || request()->routeIs('portal.home');
     $isProfileActive = $activeMenu === 'profile' || request()->routeIs('portal.profile.*') || request()->routeIs('profile.*');
     $isApplicationsActive = $activeMenu === 'applications' || request()->routeIs('portal.applications.*');
     $isNotificationsActive = $activeMenu === 'notifications' || request()->routeIs('portal.notifications.*');
+=======
+    $isDashboardActive = $activeMenu === 'dashboard' || request()->routeIs('portal.home') || request()->routeIs('applicant.dashboard');
+    $isProfileActive = $activeMenu === 'profile' || request()->routeIs('profile.*') || request()->routeIs('applicant.profile.*');
+    $isApplicationsActive = $activeMenu === 'applications' || request()->routeIs('portal.applications.*') || request()->routeIs('applicant.applications.*');
+    $isNotificationsActive = $activeMenu === 'notifications' || request()->routeIs('applicant.notifications.*');
+>>>>>>> 00c3161e062b5b07902ac4a8b7a5537efbf9b88d
 
     $isLowonganActive = $activeMenu === 'lowongan' || request()->routeIs('vacancies.*');
     $isPanduanActive = $activeMenu === 'panduan' || request()->routeIs('guides.*');
@@ -52,11 +59,38 @@
                     <span>Profil Saya</span>
                 </a>
 
+<<<<<<< HEAD
                 {{-- Notifikasi --}}
                 <a href="{{ route('portal.notifications.index') }}"
                    class="flex items-center justify-between px-3 py-2 text-xs font-medium rounded-lg transition-colors {{ $isNotificationsActive ? 'bg-[#E6F2F8] text-[#0179B5] font-semibold border-l-4 border-[#0179B5]' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
                     <div class="flex items-center gap-3">
                         <svg class="w-4 h-4 shrink-0 {{ $isNotificationsActive ? 'text-[#0179B5]' : 'text-slate-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+=======
+                {{-- Lamaran Saya --}}
+                <a
+                    href="{{ route('portal.applications.index') }}"
+                    @class([
+                        'flex items-center gap-3 px-3 py-2 text-xs font-medium rounded-lg transition-colors',
+                        'bg-rsi-50 text-rsi-800 font-semibold' => $isApplicationsActive,
+                        'text-slate-600 hover:bg-slate-50 hover:text-slate-900' => ! $isApplicationsActive,
+                    ])
+                >
+                    <svg class="w-4 h-4 shrink-0 {{ $isApplicationsActive ? 'text-rsi-700' : 'text-slate-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <span>Lamaran Saya</span>
+                </a>
+
+                {{-- Notifikasi (Tahap Mendatang) --}}
+                <a
+                    href="{{ Route::has('applicant.notifications.index') ? route('applicant.notifications.index') : 'javascript:void(0)' }}"
+                    title="Pusat notifikasi akan segera aktif"
+                    class="flex items-center justify-between px-3 py-2 text-xs font-medium rounded-lg text-slate-400 hover:text-slate-600 transition-colors"
+                    aria-disabled="true"
+                >
+                    <div class="flex items-center gap-3">
+                        <svg class="w-4 h-4 shrink-0 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+>>>>>>> 00c3161e062b5b07902ac4a8b7a5537efbf9b88d
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                         </svg>
                         <span>Notifikasi</span>

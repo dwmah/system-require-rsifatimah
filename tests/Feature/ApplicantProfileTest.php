@@ -123,6 +123,20 @@ class ApplicantProfileTest extends TestCase
         $this->assertEquals('Perempuan', $user->applicantProfile->gender);
     }
 
+    public function test_birth_date_today_is_rejected(): void
+    {
+        $user = $this->createApplicantUser();
+
+        $response = $this->actingAs($user)->patch(route('profile.personal.update'), [
+            'name' => 'Nama Pelamar',
+            'birth_place' => 'Banyuwangi',
+            'birth_date' => now()->toDateString(),
+            'gender' => 'Laki-laki',
+        ]);
+
+        $response->assertSessionHasErrors(['birth_date']);
+    }
+
     public function test_email_update_succeeds_and_ignores_current_user_id(): void
     {
         $user = $this->createApplicantUser(['email' => 'original@example.com']);
