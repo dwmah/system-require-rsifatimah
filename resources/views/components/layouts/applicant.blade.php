@@ -1,9 +1,14 @@
 @props([
     'title' => null,
     'activeMenu' => null,
-    'userName' => 'Nama Pelamar',
-    'userEmail' => 'pelamar@example.com',
+    'userName' => null,
+    'userEmail' => null,
 ])
+
+@php
+    $userName = $userName ?? Auth::user()?->name ?? 'Nama Pelamar';
+    $userEmail = $userEmail ?? Auth::user()?->email ?? 'pelamar@example.com';
+@endphp
 
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-slate-50">

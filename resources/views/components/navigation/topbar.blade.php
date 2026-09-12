@@ -29,7 +29,8 @@
                 @if ($variant === 'applicant')
                     {{-- Notifications Link / Icon --}}
                     <a
-                        href="{{ Route::has('applicant.notifications.index') ? route('applicant.notifications.index') : '/applicant/notifikasi' }}"
+                        href="{{ Route::has('applicant.notifications.index') ? route('applicant.notifications.index') : 'javascript:void(0)' }}"
+                        title="Notifikasi akan segera hadir"
                         class="p-2 text-slate-400 hover:text-rsi-700 hover:bg-slate-50 rounded-lg transition-colors relative focus:outline-hidden focus:ring-2 focus:ring-rsi-500"
                         aria-label="Notifikasi akun"
                     >
@@ -38,7 +39,7 @@
                         </svg>
                     </a>
 
-                    {{-- Applicant Profile Pill --}}
+                    {{-- Applicant Profile Pill & Quick Logout --}}
                     <div class="flex items-center gap-3 pl-2 border-l border-slate-200">
                         <div class="w-8 h-8 rounded-full bg-rsi-100 text-rsi-800 font-semibold text-xs flex items-center justify-center ring-1 ring-rsi-200">
                             {{ strtoupper(substr($userName, 0, 2)) }}
@@ -47,12 +48,27 @@
                             <p class="text-xs font-semibold text-slate-900 truncate max-w-[140px]">{{ $userName }}</p>
                             <p class="text-[11px] text-slate-500 truncate max-w-[140px]">{{ $userEmail }}</p>
                         </div>
+                        @if (Route::has('logout'))
+                            <form method="POST" action="{{ route('logout') }}" class="inline ml-1">
+                                @csrf
+                                <button
+                                    type="submit"
+                                    title="Keluar / Logout"
+                                    class="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors focus:outline-hidden focus:ring-2 focus:ring-red-500 cursor-pointer"
+                                    aria-label="Keluar dari akun"
+                                >
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                    </svg>
+                                </button>
+                            </form>
+                        @endif
                     </div>
                 @else
                     {{-- Public Mode: Masuk & Daftar Buttons --}}
                     <div class="flex items-center gap-2">
                         <x-ui.button
-                            :href="Route::has('login') ? route('login') : '/login'"
+                            :href="Route::has('login') ? route('login') : '/masuk'"
                             variant="ghost"
                             size="sm"
                         >
@@ -60,7 +76,7 @@
                         </x-ui.button>
 
                         <x-ui.button
-                            :href="Route::has('register') ? route('register') : '/register'"
+                            :href="Route::has('register') ? route('register') : '/daftar'"
                             variant="primary"
                             size="sm"
                         >

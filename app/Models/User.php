@@ -28,6 +28,8 @@ class User extends Authenticatable
         'phone',
         'is_active',
         'deactivated_at',
+        'terms_accepted_at',
+        'privacy_accepted_at',
     ];
 
     /**
@@ -52,6 +54,8 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_active' => 'boolean',
             'deactivated_at' => 'datetime',
+            'terms_accepted_at' => 'datetime',
+            'privacy_accepted_at' => 'datetime',
         ];
     }
 

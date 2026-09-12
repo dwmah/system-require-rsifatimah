@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'recruitment.open' => \App\Http\Middleware\EnsurePublicRecruitmentIsOpen::class,
+            'applicant.active' => \App\Http\Middleware\EnsureApplicantAccountIsActive::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
