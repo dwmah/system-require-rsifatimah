@@ -117,6 +117,8 @@ class ApplicationController extends Controller
             'jobVacancy.selectionStages',
             'recruitmentPeriod',
             'user.applicantProfile',
+            'documents.documentRequirement',
+            'snapshot',
         ]);
 
         return view('portal.applications.show', compact('jobApplication'));

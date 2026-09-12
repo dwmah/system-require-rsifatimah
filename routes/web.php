@@ -72,13 +72,37 @@ Route::middleware(['auth', 'applicant.active'])->group(function () {
     Route::patch('/portal/profil/pengalaman/{workExperience}', [\App\Http\Controllers\Portal\ApplicantWorkExperienceController::class, 'update'])->name('profile.work-experiences.update');
     Route::delete('/portal/profil/pengalaman/{workExperience}', [\App\Http\Controllers\Portal\ApplicantWorkExperienceController::class, 'destroy'])->name('profile.work-experiences.destroy');
 
-    // Alur Lamaran Pekerjaan (Fase 8A)
+    // Alur Lamaran Pekerjaan (Fase 8A & 8B)
     Route::get('/portal/lamaran', [\App\Http\Controllers\Portal\ApplicationController::class, 'index'])->name('portal.applications.index');
     Route::get('/portal/lamaran/mulai/{jobVacancy}', [\App\Http\Controllers\Portal\ApplicationController::class, 'start'])->name('portal.applications.start');
     Route::post('/portal/lamaran/mulai/{jobVacancy}', [\App\Http\Controllers\Portal\ApplicationController::class, 'store'])->name('portal.applications.store');
     Route::get('/portal/lamaran/{jobApplication}', [\App\Http\Controllers\Portal\ApplicationController::class, 'show'])
         ->whereNumber('jobApplication')
         ->name('portal.applications.show');
+
+    // Berkas Persyaratan & Final Submit (Fase 8B)
+    Route::get('/portal/lamaran/{jobApplication}/berkas', [\App\Http\Controllers\Portal\ApplicationDocumentController::class, 'index'])
+        ->whereNumber('jobApplication')
+        ->name('portal.applications.documents.index');
+    Route::post('/portal/lamaran/{jobApplication}/berkas/{requirement}', [\App\Http\Controllers\Portal\ApplicationDocumentController::class, 'store'])
+        ->whereNumber('jobApplication')
+        ->whereNumber('requirement')
+        ->name('portal.applications.documents.store');
+    Route::delete('/portal/lamaran/{jobApplication}/berkas/{document}', [\App\Http\Controllers\Portal\ApplicationDocumentController::class, 'destroy'])
+        ->whereNumber('jobApplication')
+        ->whereNumber('document')
+        ->name('portal.applications.documents.destroy');
+    Route::get('/portal/lamaran/{jobApplication}/berkas/{document}/download', [\App\Http\Controllers\Portal\ApplicationDocumentController::class, 'download'])
+        ->whereNumber('jobApplication')
+        ->whereNumber('document')
+        ->name('portal.applications.documents.download');
+
+    Route::get('/portal/lamaran/{jobApplication}/review', [\App\Http\Controllers\Portal\ApplicationSubmissionController::class, 'review'])
+        ->whereNumber('jobApplication')
+        ->name('portal.applications.review');
+    Route::post('/portal/lamaran/{jobApplication}/submit', [\App\Http\Controllers\Portal\ApplicationSubmissionController::class, 'submit'])
+        ->whereNumber('jobApplication')
+        ->name('portal.applications.submit');
 });
 
 // Development Only: Design System & Component Visual Preview

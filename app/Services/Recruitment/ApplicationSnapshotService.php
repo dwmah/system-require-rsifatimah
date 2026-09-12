@@ -5,6 +5,7 @@ namespace App\Services\Recruitment;
 use App\Exceptions\Recruitment\ApplicationAlreadySnapshottedException;
 use App\Models\ApplicationSnapshot;
 use App\Models\JobApplication;
+use Carbon\CarbonInterface;
 
 class ApplicationSnapshotService
 {
@@ -19,7 +20,7 @@ class ApplicationSnapshotService
      *
      * @throws ApplicationAlreadySnapshottedException
      */
-    public function capture(JobApplication $application): ApplicationSnapshot
+    public function capture(JobApplication $application, ?CarbonInterface $capturedAt = null): ApplicationSnapshot
     {
         if ($application->snapshot()->exists()) {
             throw new ApplicationAlreadySnapshottedException();
@@ -111,12 +112,13 @@ class ApplicationSnapshotService
             ->values()
             ->toArray() ?? [];
 
-        // 7. Master Lowongan dan Persyaratannya (Deterministik)
+        // 7. Master Lowongan dan Persyaratannya (Deterministik dengan Stable Master IDs)
         $qualifications = $vacancy->qualifications()
             ->orderBy('sort_order')
             ->orderBy('id')
             ->get()
             ->map(fn ($q) => [
+                'id' => $q->id,
                 'label' => $q->label,
                 'value' => $q->value,
                 'sort_order' => $q->sort_order,
@@ -129,6 +131,7 @@ class ApplicationSnapshotService
             ->orderBy('id')
             ->get()
             ->map(fn ($d) => [
+                'id' => $d->id,
                 'name' => $d->name,
                 'description' => $d->description,
                 'is_required' => (bool) $d->is_required,
@@ -144,6 +147,7 @@ class ApplicationSnapshotService
             ->orderBy('id')
             ->get()
             ->map(fn ($s) => [
+                'id' => $s->id,
                 'name' => $s->name,
                 'description' => $s->description,
                 'sort_order' => $s->sort_order,
@@ -179,7 +183,7 @@ class ApplicationSnapshotService
             'certifications' => $certificationsData,
             'work_experiences' => $workExperiencesData,
             'vacancy_data' => $vacancyData,
-            'captured_at' => now(),
+            'captured_at' => $capturedAt ?? now(),
         ]);
     }
 }
