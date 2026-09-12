@@ -5,7 +5,7 @@
 @php
     $isDashboardActive = $activeMenu === 'dashboard' || request()->routeIs('portal.home') || request()->routeIs('applicant.dashboard');
     $isProfileActive = $activeMenu === 'profile' || request()->routeIs('profile.*') || request()->routeIs('applicant.profile.*');
-    $isApplicationsActive = $activeMenu === 'applications' || request()->routeIs('applicant.applications.*');
+    $isApplicationsActive = $activeMenu === 'applications' || request()->routeIs('portal.applications.*') || request()->routeIs('applicant.applications.*');
     $isNotificationsActive = $activeMenu === 'notifications' || request()->routeIs('applicant.notifications.*');
 
     $isLowonganActive = $activeMenu === 'lowongan' || request()->routeIs('vacancies.*');
@@ -51,20 +51,19 @@
                     <span>Profil Saya</span>
                 </a>
 
-                {{-- Lamaran Saya (Tahap Mendatang) --}}
+                {{-- Lamaran Saya --}}
                 <a
-                    href="{{ Route::has('applicant.applications.index') ? route('applicant.applications.index') : 'javascript:void(0)' }}"
-                    title="Modul lamaran akan segera aktif"
-                    class="flex items-center justify-between px-3 py-2 text-xs font-medium rounded-lg text-slate-400 hover:text-slate-600 transition-colors"
-                    aria-disabled="true"
+                    href="{{ route('portal.applications.index') }}"
+                    @class([
+                        'flex items-center gap-3 px-3 py-2 text-xs font-medium rounded-lg transition-colors',
+                        'bg-rsi-50 text-rsi-800 font-semibold' => $isApplicationsActive,
+                        'text-slate-600 hover:bg-slate-50 hover:text-slate-900' => ! $isApplicationsActive,
+                    ])
                 >
-                    <div class="flex items-center gap-3">
-                        <svg class="w-4 h-4 shrink-0 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        <span>Lamaran Saya</span>
-                    </div>
-                    <span class="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-normal">Nanti</span>
+                    <svg class="w-4 h-4 shrink-0 {{ $isApplicationsActive ? 'text-rsi-700' : 'text-slate-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <span>Lamaran Saya</span>
                 </a>
 
                 {{-- Notifikasi (Tahap Mendatang) --}}

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class JobApplication extends Model
 {
@@ -91,5 +92,13 @@ class JobApplication extends Model
     public function stageHistories(): HasMany
     {
         return $this->hasMany(ApplicationStageHistory::class);
+    }
+
+    /**
+     * Snapshot data beku lamaran pekerjaan saat diajukan resmi.
+     */
+    public function snapshot(): HasOne
+    {
+        return $this->hasOne(ApplicationSnapshot::class);
     }
 }

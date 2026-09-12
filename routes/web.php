@@ -71,6 +71,14 @@ Route::middleware(['auth', 'applicant.active'])->group(function () {
     Route::post('/portal/profil/pengalaman', [\App\Http\Controllers\Portal\ApplicantWorkExperienceController::class, 'store'])->name('profile.work-experiences.store');
     Route::patch('/portal/profil/pengalaman/{workExperience}', [\App\Http\Controllers\Portal\ApplicantWorkExperienceController::class, 'update'])->name('profile.work-experiences.update');
     Route::delete('/portal/profil/pengalaman/{workExperience}', [\App\Http\Controllers\Portal\ApplicantWorkExperienceController::class, 'destroy'])->name('profile.work-experiences.destroy');
+
+    // Alur Lamaran Pekerjaan (Fase 8A)
+    Route::get('/portal/lamaran', [\App\Http\Controllers\Portal\ApplicationController::class, 'index'])->name('portal.applications.index');
+    Route::get('/portal/lamaran/mulai/{jobVacancy}', [\App\Http\Controllers\Portal\ApplicationController::class, 'start'])->name('portal.applications.start');
+    Route::post('/portal/lamaran/mulai/{jobVacancy}', [\App\Http\Controllers\Portal\ApplicationController::class, 'store'])->name('portal.applications.store');
+    Route::get('/portal/lamaran/{jobApplication}', [\App\Http\Controllers\Portal\ApplicationController::class, 'show'])
+        ->whereNumber('jobApplication')
+        ->name('portal.applications.show');
 });
 
 // Development Only: Design System & Component Visual Preview
