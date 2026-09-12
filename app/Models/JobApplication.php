@@ -35,6 +35,8 @@ class JobApplication extends Model
         'accepted_at',
         'rejected_at',
         'hired_at',
+        'final_result_published_at',
+        'final_result_message',
     ];
 
     /**
@@ -51,6 +53,7 @@ class JobApplication extends Model
             'accepted_at' => 'datetime',
             'rejected_at' => 'datetime',
             'hired_at' => 'datetime',
+            'final_result_published_at' => 'datetime',
         ];
     }
 

@@ -68,15 +68,9 @@
             <div class="flex flex-col md:items-end gap-2 shrink-0 pt-4 md:pt-0 border-t md:border-t-0 border-slate-100">
                 <div class="flex items-center gap-2">
                     <span class="text-xs text-slate-400 font-medium">Status:</span>
-                    @if ($isDraft)
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                            {{ $jobApplication->status->label() }}
-                        </span>
-                    @else
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                            {{ $jobApplication->status->label() }}
-                        </span>
-                    @endif
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border {{ $publicStatus['badge_class'] }}">
+                        {{ $publicStatus['label'] }}
+                    </span>
                 </div>
                 <div class="text-xs text-slate-600">
                     Nomor Lamaran:
@@ -175,7 +169,7 @@
                         </p>
                     </a>
                 @else
-                    <div class="p-4 rounded-xl border border-rsi-200 bg-rsi-50/50">
+                    <a href="{{ route('portal.applications.tracking', $jobApplication) }}" class="p-4 rounded-xl border border-rsi-200 bg-rsi-50/50 hover:bg-rsi-100/50 transition-colors block">
                         <div class="flex items-center justify-between mb-2">
                             <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-rsi-700 text-white text-xs font-bold">
                                 3
@@ -187,16 +181,16 @@
                                 Terkirim Resmi
                             </span>
                         </div>
-                        <h3 class="text-sm font-bold text-slate-900">Lamaran Terkirim</h3>
+                        <h3 class="text-sm font-bold text-slate-900">Tracking Seleksi &rarr;</h3>
                         <p class="text-[11px] text-slate-600 mt-1 leading-relaxed">
                             Snapshot data dan nomor lamaran telah resmi tercatat.
                         </p>
-                    </div>
+                    </a>
                 @endif
             </div>
         </div>
 
-        {{-- Next Actions Banner (Only for DRAFT) --}}
+        {{-- Next Actions Banner --}}
         @if ($isDraft)
             <div class="p-5 rounded-2xl bg-gradient-to-r from-rsi-50 via-white to-rsi-50/40 border border-rsi-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div class="flex items-start gap-3">
@@ -220,6 +214,34 @@
                     class="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold bg-rsi-700 text-white hover:bg-rsi-800 transition-colors shrink-0 shadow-2xs"
                 >
                     <span>Lanjutkan Unggah Berkas</span>
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                </a>
+            </div>
+        @else
+            <div class="p-5 rounded-2xl bg-gradient-to-r from-rsi-50 via-white to-rsi-50/40 border border-rsi-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="flex items-start gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-rsi-700 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                        </svg>
+                    </div>
+                    <div class="space-y-0.5">
+                        <h3 class="text-sm font-bold text-rsi-900">
+                            Pantau Progres Tahapan Seleksi
+                        </h3>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Lamaran resmi telah terkirim. Anda dapat melihat perkembangan status setiap tahapan seleksi secara berkala.
+                        </p>
+                    </div>
+                </div>
+
+                <a
+                    href="{{ route('portal.applications.tracking', $jobApplication) }}"
+                    class="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold bg-rsi-700 text-white hover:bg-rsi-800 transition-colors shrink-0 shadow-2xs"
+                >
+                    <span>Lihat Status Seleksi</span>
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                     </svg>

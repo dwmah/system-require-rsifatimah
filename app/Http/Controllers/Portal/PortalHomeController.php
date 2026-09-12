@@ -3,24 +3,19 @@
 namespace App\Http\Controllers\Portal;
 
 use App\Http\Controllers\Controller;
-use App\Services\Profile\ProfileCompletenessService;
-use Illuminate\Support\Facades\Auth;
+use App\Services\Portal\ApplicantDashboardService;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class PortalHomeController extends Controller
 {
     /**
-     * Display the temporary authenticated applicant portal home shell.
+     * Menampilkan dashboard utama pelamar yang terotentikasi.
      */
-    public function index(ProfileCompletenessService $completenessService): View
+    public function index(Request $request, ApplicantDashboardService $dashboardService): View
     {
-        $user = Auth::user();
+        $dashboardData = $dashboardService->getDashboardData($request->user());
 
-        return view('portal.home', [
-            'user' => $user,
-            'percentage' => $completenessService->percentage($user),
-            'isComplete' => $completenessService->isComplete($user),
-            'missingItems' => $completenessService->missingItems($user),
-        ]);
+        return view('portal.home', $dashboardData);
     }
 }

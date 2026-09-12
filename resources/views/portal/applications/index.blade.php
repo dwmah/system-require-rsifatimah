@@ -111,30 +111,39 @@
                         </div>
 
                         <div class="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-3 pt-3 sm:pt-0 border-t sm:border-t-0 border-slate-100">
-                            {{-- Status Badge --}}
+                            {{-- Safe Public Status Badge --}}
                             @php
-                                $statusClass = match ($app->status) {
-                                    \App\Enums\JobApplicationStatus::DRAFT => 'bg-amber-50 text-amber-700 border-amber-200',
-                                    \App\Enums\JobApplicationStatus::SUBMITTED => 'bg-blue-50 text-blue-700 border-blue-200',
-                                    \App\Enums\JobApplicationStatus::IN_PROCESS => 'bg-indigo-50 text-indigo-700 border-indigo-200',
-                                    \App\Enums\JobApplicationStatus::ACCEPTED => 'bg-emerald-50 text-emerald-700 border-emerald-200',
-                                    \App\Enums\JobApplicationStatus::REJECTED => 'bg-red-50 text-red-700 border-red-200',
-                                };
+                                $safeStatus = $app->safe_status ?? [
+                                    'label' => $app->status->label(),
+                                    'badge_class' => 'bg-slate-100 text-slate-700 border-slate-200',
+                                ];
                             @endphp
 
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold border {{ $statusClass }}">
-                                {{ $app->status->label() }}
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold border {{ $safeStatus['badge_class'] }}">
+                                {{ $safeStatus['label'] }}
                             </span>
 
-                            <a
-                                href="{{ route('portal.applications.show', $app) }}"
-                                class="inline-flex items-center gap-1 text-xs font-semibold text-rsi-700 hover:text-rsi-800 hover:underline"
-                            >
-                                <span>Detail Lamaran</span>
-                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                </svg>
-                            </a>
+                            <div class="flex items-center gap-3 pt-1">
+                                @if ($app->status->value !== 'draft')
+                                    <a
+                                        href="{{ route('portal.applications.tracking', $app) }}"
+                                        class="inline-flex items-center gap-1 text-xs font-bold text-rsi-700 hover:text-rsi-800 hover:underline"
+                                    >
+                                        <span>Status Seleksi</span>
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </a>
+                                    <span class="text-slate-300">&bull;</span>
+                                @endif
+
+                                <a
+                                    href="{{ route('portal.applications.show', $app) }}"
+                                    class="inline-flex items-center gap-1 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:underline"
+                                >
+                                    <span>{{ $app->status->value === 'draft' ? 'Lanjutkan Lamaran' : 'Detail Lamaran' }}</span>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 @endforeach

@@ -103,6 +103,11 @@ Route::middleware(['auth', 'applicant.active'])->group(function () {
     Route::post('/portal/lamaran/{jobApplication}/submit', [\App\Http\Controllers\Portal\ApplicationSubmissionController::class, 'submit'])
         ->whereNumber('jobApplication')
         ->name('portal.applications.submit');
+
+    // Tracking Proses Seleksi Pelamar (Fase 9)
+    Route::get('/portal/lamaran/{jobApplication}/tracking', [\App\Http\Controllers\Portal\ApplicationTrackingController::class, 'show'])
+        ->whereNumber('jobApplication')
+        ->name('portal.applications.tracking');
 });
 
 // Development Only: Design System & Component Visual Preview

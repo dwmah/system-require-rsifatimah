@@ -10,6 +10,7 @@ use App\Models\JobApplication;
 use App\Models\JobVacancy;
 use App\Services\Profile\ProfileCompletenessService;
 use App\Services\Recruitment\JobApplicationService;
+use App\Services\Recruitment\SelectionTrackingService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -20,13 +21,17 @@ class ApplicationController extends Controller
     /**
      * Menampilkan daftar seluruh lamaran pekerjaan milik pelamar yang sedang aktif.
      */
-    public function index(Request $request): View
+    public function index(Request $request, SelectionTrackingService $trackingService): View
     {
         $applications = $request->user()
             ->jobApplications()
-            ->with(['jobVacancy', 'recruitmentPeriod'])
+            ->with(['jobVacancy', 'recruitmentPeriod', 'snapshot'])
             ->latest()
             ->get();
+
+        foreach ($applications as $app) {
+            $app->safe_status = $trackingService->publicApplicationStatus($app);
+        }
 
         return view('portal.applications.index', compact('applications'));
     }
@@ -107,7 +112,7 @@ class ApplicationController extends Controller
     /**
      * Menampilkan detail lamaran pekerjaan pelamar (Step 1 Data & Formasi terkunci).
      */
-    public function show(JobApplication $jobApplication): View
+    public function show(JobApplication $jobApplication, SelectionTrackingService $trackingService): View
     {
         Gate::authorize('view', $jobApplication);
 
@@ -121,6 +126,11 @@ class ApplicationController extends Controller
             'snapshot',
         ]);
 
-        return view('portal.applications.show', compact('jobApplication'));
+        $publicStatus = $trackingService->publicApplicationStatus($jobApplication);
+
+        return view('portal.applications.show', [
+            'jobApplication' => $jobApplication,
+            'publicStatus' => $publicStatus,
+        ]);
     }
 }
