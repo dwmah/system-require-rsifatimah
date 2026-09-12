@@ -59,42 +59,40 @@ class ApplicationDocumentController extends Controller
     public function store(
         Request $request,
         JobApplication $jobApplication,
-        VacancyDocumentRequirement $requirement,
-        ApplicationDocumentService $documentService
+        ApplicationDocumentService $documentService,
+        ?VacancyDocumentRequirement $requirement = null
     ): RedirectResponse {
         Gate::authorize('update', $jobApplication);
 
+        $targetRequirement = ($requirement && $requirement->exists)
+            ? $requirement
+            : VacancyDocumentRequirement::findOrFail($request->input('vacancy_document_requirement_id'));
+
         // Verifikasi kepemilikan requirement terhadap lowongan lamaran
-        if ($requirement->job_vacancy_id !== $jobApplication->job_vacancy_id) {
+        if ($targetRequirement->job_vacancy_id !== $jobApplication->job_vacancy_id) {
             abort(404, 'Persyaratan berkas tidak sesuai dengan formasi lamaran.');
         }
 
-        $request->validate([
-            'file' => ['required', 'file'],
-        ], [
-            'file.required' => 'Pilih file yang ingin diunggah.',
-            'file.file' => 'File yang diunggah tidak valid.',
-        ]);
+        $file = $request->file('file') ?? $request->file('document_file');
+        if (! $file) {
+            return back()->withErrors(['file' => 'Pilih file yang ingin diunggah.']);
+        }
 
         try {
             $documentService->uploadOrReplace(
                 $jobApplication,
-                $requirement,
-                $request->file('file')
+                $targetRequirement,
+                $file
             );
 
             return redirect()->route('portal.applications.documents.index', $jobApplication)
-                ->with('success', "Berkas '{$requirement->name}' berhasil diunggah.");
+                ->with('success', 'Berkas "' . $targetRequirement->name . '" berhasil disimpan.');
         } catch (ValidationException $e) {
-            return redirect()->back()
-                ->withErrors($e->errors())
-                ->withInput();
+            return back()->withErrors($e->errors())->withInput();
         } catch (DomainException $e) {
-            return redirect()->back()
-                ->with('error', $e->getMessage());
+            return back()->with('error', $e->getMessage());
         } catch (\Throwable $e) {
-            return redirect()->back()
-                ->with('error', 'Terjadi kesalahan saat mengunggah berkas. Silakan coba lagi.');
+            return back()->with('error', 'Terjadi kesalahan saat mengunggah berkas. Silakan coba lagi.');
         }
     }
 

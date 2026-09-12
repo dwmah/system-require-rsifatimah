@@ -3,7 +3,7 @@
         <!-- Candidate Greeting Header -->
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div class="flex items-center gap-4">
-                <div class="w-14 h-14 rounded-2xl bg-[#0179B5] text-white font-bold text-xl flex items-center justify-center shadow-md flex-shrink-0">
+                <div class="w-14 h-14 rounded-2xl bg-[#0179B5] text-white font-bold text-xl flex items-center justify-center shadow-md shrink-0">
                     {{ strtoupper(substr($user->name, 0, 2)) }}
                 </div>
                 <div>
@@ -70,7 +70,7 @@
                 <div class="bg-gradient-to-r from-emerald-600 to-teal-700 rounded-2xl p-6 text-white shadow-md space-y-4">
                     <div class="flex items-start justify-between gap-4">
                         <div class="flex items-start gap-3.5">
-                            <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0 text-white">
+                            <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0 text-white">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                             </div>
                             <div>
@@ -100,7 +100,7 @@
                 <!-- BANNER MERAH: TIDAK LOLOS DENGAN ALASAN PENOLAKAN -->
                 <div class="bg-gradient-to-r from-rose-700 to-red-800 rounded-2xl p-6 text-white shadow-md space-y-4">
                     <div class="flex items-start gap-3.5">
-                        <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0 text-white">
+                        <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0 text-white">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         </div>
                         <div class="flex-1">
@@ -135,7 +135,7 @@
             @elseif($application->isSubmitted())
                 <!-- BANNER AMBER: MENUNGGU VERIFIKASI -->
                 <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6 shadow-sm flex items-start gap-4">
-                    <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center flex-shrink-0">
+                    <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     </div>
                     <div class="flex-1">
@@ -150,7 +150,7 @@
                 <!-- BANNER DRAFT: PERLU DIKIRIM -->
                 <div class="bg-sky-50 border border-sky-200 rounded-2xl p-6 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div class="flex items-start gap-3.5">
-                        <div class="w-10 h-10 rounded-xl bg-sky-100 text-[#0179B5] flex items-center justify-center flex-shrink-0">
+                        <div class="w-10 h-10 rounded-xl bg-sky-100 text-[#0179B5] flex items-center justify-center shrink-0">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                         </div>
                         <div>
@@ -162,11 +162,78 @@
                         </div>
                     </div>
 
-                    <a href="{{ route('portal.applications.index') }}" class="px-5 py-2.5 bg-[#0179B5] hover:bg-[#016293] text-white text-xs font-bold rounded-lg shadow-sm transition-colors text-center whitespace-nowrap">
-                        Buka Workspace Dokumen &rarr;
+                    <a href="{{ route('portal.applications.documents.index', $application) }}" class="px-5 py-2.5 bg-[#0179B5] hover:bg-[#016293] text-white text-xs font-bold rounded-lg shadow-sm transition-colors text-center whitespace-nowrap">
+                        Unggah Berkas Persyaratan &rarr;
                     </a>
                 </div>
             @endif
+
+            <!-- PRIMARY APPLICATION SUMMARY CARD -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
+                    <h2 class="text-base font-bold text-slate-900">
+                        Status Lamaran Aktif
+                    </h2>
+                    <a href="{{ route('portal.applications.index') }}" class="text-xs font-semibold text-[#0179B5] hover:underline">
+                        Semua Lamaran Saya &rarr;
+                    </a>
+                </div>
+
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+                    <div class="space-y-2">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="font-mono text-xs font-bold text-[#0179B5] bg-sky-50 px-2.5 py-0.5 rounded border border-sky-100">
+                                {{ $application->jobVacancy->code ?? 'VAC' }}
+                            </span>
+                            <span class="text-xs text-slate-400">&bull;</span>
+                            <span class="text-xs font-medium text-slate-500">
+                                {{ $application->recruitmentPeriod->name ?? '-' }}
+                            </span>
+                        </div>
+
+                        <h3 class="text-lg font-bold text-slate-900">
+                            {{ $application->jobVacancy->title ?? '-' }}
+                        </h3>
+
+                        <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500">
+                            <div>
+                                <span>Nomor Lamaran: </span>
+                                <strong class="text-slate-800 font-mono">
+                                    {{ $application->application_number ?? 'Draft (Belum Diterbitkan)' }}
+                                </strong>
+                            </div>
+                            @if ($application->submitted_at)
+                                <div>
+                                    <span>Dikirim: </span>
+                                    <strong class="text-slate-700">
+                                        {{ $application->submitted_at->translatedFormat('d M Y, H:i') }} WIB
+                                    </strong>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+
+                    @if(!empty($quickAction))
+                        <div class="flex flex-col sm:flex-row lg:flex-col items-start lg:items-end gap-3 shrink-0">
+                            @if (!empty($publicStatus))
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border {{ $publicStatus['badge_class'] ?? '' }}">
+                                    {{ $publicStatus['label'] ?? '' }}
+                                </span>
+                            @endif
+
+                            <a
+                                href="{{ $quickAction['url'] }}"
+                                class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-[#0179B5] hover:bg-[#016293] text-white transition-colors shadow-sm"
+                            >
+                                <span>{{ $quickAction['label'] }}</span>
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                </svg>
+                            </a>
+                        </div>
+                    @endif
+                </div>
+            </div>
         @else
             <!-- BANNER BELUM MEMILIH FORMASI -->
             <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
@@ -249,14 +316,17 @@
                 </div>
 
                 <!-- Step 4: Pengumuman Akhir & MCU -->
-                <div class="p-4 rounded-xl border {{ $application && $application->isAccepted() ? 'bg-teal-50 border-teal-300' : 'bg-slate-50 border-slate-200' }}">
+                @php
+                    $isFinalAccepted = !empty($finalResult) && ($finalResult['status'] ?? null) === 'accepted';
+                @endphp
+                <div class="p-4 rounded-xl border {{ $isFinalAccepted ? 'bg-teal-50 border-teal-300' : 'bg-slate-50 border-slate-200' }}">
                     <div class="flex items-center gap-2.5 mb-2">
-                        <span class="w-6 h-6 rounded-full {{ $application && $application->isAccepted() ? 'bg-teal-700 text-white' : 'bg-slate-300 text-slate-700' }} font-bold text-xs flex items-center justify-center">4</span>
+                        <span class="w-6 h-6 rounded-full {{ $isFinalAccepted ? 'bg-teal-700 text-white' : 'bg-slate-300 text-slate-700' }} font-bold text-xs flex items-center justify-center">4</span>
                         <span class="font-bold text-xs text-slate-900">Pengumuman Akhir / MCU</span>
                     </div>
                     <p class="text-[11px] text-slate-500">Pemeriksaan kesehatan kerja dan penetapan karyawan baru.</p>
-                    <div class="mt-2 text-[10px] font-semibold {{ $application && $application->isAccepted() ? 'text-teal-800' : 'text-slate-400' }}">
-                        {{ $application && $application->isAccepted() ? '✓ Diterima Menjadi Karyawan' : 'Jadwal Akhir' }}
+                    <div class="mt-2 text-[10px] font-semibold {{ $isFinalAccepted ? 'text-teal-800' : 'text-slate-400' }}">
+                        {{ $isFinalAccepted ? '✓ Diterima Menjadi Karyawan' : 'Jadwal Akhir' }}
                     </div>
                 </div>
             </div>

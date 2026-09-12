@@ -47,6 +47,7 @@ class RecruitmentFullWorkflowTest extends TestCase
         $this->applicant = User::factory()->create([
             'name' => 'Ahmad Fauzi, S.Kep.',
             'email' => 'fauzi@example.com',
+            'phone' => '08123456789',
             'role' => User::ROLE_APPLICANT,
             'is_active' => true,
         ]);
@@ -55,7 +56,20 @@ class RecruitmentFullWorkflowTest extends TestCase
             'user_id' => $this->applicant->id,
             'nik' => '3510123456780001',
             'gender' => 'male',
+            'birth_place' => 'Banyuwangi',
+            'birth_date' => '1995-05-12',
+            'religion' => 'Islam',
+            'address_ktp' => 'Jl. Basuki Rahmat No. 10',
+            'address_domicile' => 'Jl. Basuki Rahmat No. 10',
             'phone' => '08123456789',
+        ]);
+
+        $this->applicant->applicantProfile->educations()->create([
+            'institution_name' => 'Universitas Airlangga',
+            'education_level' => 'S1',
+            'study_program' => 'Keperawatan',
+            'graduation_year' => 2018,
+            'gpa' => 3.75,
         ]);
 
         // 3. Active Recruitment Period
@@ -179,8 +193,10 @@ class RecruitmentFullWorkflowTest extends TestCase
         $this->assertEquals(3, $application->documents()->count());
 
         // 3. Final Submit
-        $responseSubmit = $this->actingAs($this->applicant)->post(route('portal.applications.submit', $application));
-        $responseSubmit->assertRedirect(route('portal.applications.index'));
+        $responseSubmit = $this->actingAs($this->applicant)->post(route('portal.applications.submit', $application), [
+            'declaration' => true,
+        ]);
+        $responseSubmit->assertRedirect(route('portal.applications.show', $application));
 
         $application->refresh();
         $this->assertEquals(JobApplicationStatus::SUBMITTED, $application->status);

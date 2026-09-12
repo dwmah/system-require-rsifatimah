@@ -209,7 +209,7 @@
                         <button type="button" @click="uploadModalOpen = false" class="text-slate-400 hover:text-slate-600 text-lg">&times;</button>
                     </div>
 
-                    <form method="POST" action="{{ route('portal.applications.documents.store', $application) }}" enctype="multipart/form-data" class="space-y-4">
+                    <form method="POST" :action="'{{ url('/portal/lamaran') }}/' + '{{ $application->id ?? '' }}' + '/berkas/' + selectedReqId" enctype="multipart/form-data" class="space-y-4">
                         @csrf
                         <input type="hidden" name="vacancy_document_requirement_id" :value="selectedReqId">
 

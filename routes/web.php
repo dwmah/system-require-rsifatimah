@@ -95,7 +95,7 @@ Route::middleware('auth')->group(function () {
     // Alur Lamaran Pekerjaan (Fase 8A & 8B)
     Route::get('/portal/lamaran', [\App\Http\Controllers\Portal\ApplicationController::class, 'index'])->name('portal.applications.index');
     Route::get('/portal/lamaran/mulai/{jobVacancy}', [\App\Http\Controllers\Portal\ApplicationController::class, 'start'])->name('portal.applications.start');
-    Route::post('/portal/lamaran/mulai/{jobVacancy}', [\App\Http\Controllers\Portal\ApplicationController::class, 'store'])->name('portal.applications.store');
+    Route::post('/portal/lamaran/mulai/{jobVacancy?}', [\App\Http\Controllers\Portal\ApplicationController::class, 'store'])->name('portal.applications.store');
     Route::get('/portal/lamaran/{jobApplication}', [\App\Http\Controllers\Portal\ApplicationController::class, 'show'])
         ->whereNumber('jobApplication')
         ->name('portal.applications.show');
@@ -104,9 +104,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/portal/lamaran/{jobApplication}/berkas', [\App\Http\Controllers\Portal\ApplicationDocumentController::class, 'index'])
         ->whereNumber('jobApplication')
         ->name('portal.applications.documents.index');
-    Route::post('/portal/lamaran/{jobApplication}/berkas/{requirement}', [\App\Http\Controllers\Portal\ApplicationDocumentController::class, 'store'])
+    Route::post('/portal/lamaran/{jobApplication}/berkas/{requirement?}', [\App\Http\Controllers\Portal\ApplicationDocumentController::class, 'store'])
         ->whereNumber('jobApplication')
-        ->whereNumber('requirement')
         ->name('portal.applications.documents.store');
     Route::delete('/portal/lamaran/{jobApplication}/berkas/{document}', [\App\Http\Controllers\Portal\ApplicationDocumentController::class, 'destroy'])
         ->whereNumber('jobApplication')
@@ -136,13 +135,7 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'applicant'])->prefix('portal')->name('portal.')->group(function () {
     Route::get('/', [PortalHomeController::class, 'index'])->name('home');
 
-    // Lamaran Saya & Workspace Pengunggahan Dokumen
-    Route::get('/lamaran', [ApplicantApplicationController::class, 'index'])->name('applications.index');
-    Route::get('/lamaran/pilih-formasi', [ApplicantApplicationController::class, 'create'])->name('applications.create');
-    Route::post('/lamaran/pilih-formasi', [ApplicantApplicationController::class, 'store'])->name('applications.store');
-    Route::post('/lamaran/{application}/submit', [ApplicantApplicationController::class, 'submit'])->name('applications.submit');
-    Route::post('/lamaran/{application}/dokumen', [ApplicantDocumentController::class, 'store'])->name('applications.documents.store');
-    Route::delete('/lamaran/{application}/dokumen/{document}', [ApplicantDocumentController::class, 'destroy'])->name('applications.documents.destroy');
+    // Acknowledge Announcement
     Route::post('/lamaran/{application}/konfirmasi-pengumuman', [ApplicantApplicationController::class, 'acknowledgeAnnouncement'])->name('applications.acknowledge');
 
     // Profil Pelamar
