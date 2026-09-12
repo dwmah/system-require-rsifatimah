@@ -68,12 +68,40 @@ class RecruitmentPeriod extends Model
             && $this->registration_end_at->gte($time);
     }
 
+    public function isOpenForSubmission(): bool
+    {
+        return $this->isCurrentlyOpen();
+    }
+
+    /**
+     * Alias for submission deadline
+     */
+    public function getSubmissionDeadlineAttribute()
+    {
+        return $this->registration_end_at;
+    }
+
+    public function getStartDateAttribute()
+    {
+        return $this->registration_start_at;
+    }
+
+    public function getIsActiveAttribute(): bool
+    {
+        return $this->status === RecruitmentPeriodStatus::OPEN;
+    }
+
     /**
      * Daftar lowongan pekerjaan yang dibuka pada periode ini.
      */
     public function jobVacancies(): HasMany
     {
         return $this->hasMany(JobVacancy::class);
+    }
+
+    public function vacancies(): HasMany
+    {
+        return $this->jobVacancies();
     }
 
     /**

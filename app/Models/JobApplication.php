@@ -18,8 +18,6 @@ class JobApplication extends Model
      * Invariants:
      * 1. recruitment_period_id HARUS sama dengan job_vacancy.recruitment_period_id.
      * 2. Satu user hanya memiliki satu aplikasi aktif dalam satu periode rekrutmen.
-     * 3. accepted_at mencatat waktu kelulusan seleksi akhir, sedangkan hired_at mencatat
-     *    waktu resmi mulai bekerja (orientasi dan kontrak selesai) sebelum akun dinonaktifkan.
      *
      * @var list<string>
      */
@@ -29,11 +27,16 @@ class JobApplication extends Model
         'job_vacancy_id',
         'application_number',
         'status',
+        'current_stage_id',
         'submitted_at',
         'locked_at',
         'accepted_at',
         'rejected_at',
         'hired_at',
+        'rejection_reason',
+        'announcement_seen_at',
+        'verified_at',
+        'verified_by',
     ];
 
     /**
@@ -50,6 +53,8 @@ class JobApplication extends Model
             'accepted_at' => 'datetime',
             'rejected_at' => 'datetime',
             'hired_at' => 'datetime',
+            'announcement_seen_at' => 'datetime',
+            'verified_at' => 'datetime',
         ];
     }
 
@@ -78,6 +83,22 @@ class JobApplication extends Model
     }
 
     /**
+     * Tahapan seleksi aktif saat ini.
+     */
+    public function currentStage(): BelongsTo
+    {
+        return $this->belongsTo(VacancySelectionStage::class, 'current_stage_id');
+    }
+
+    /**
+     * Admin/Verifikator yang melakukan verifikasi berkas.
+     */
+    public function verifier(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'verified_by');
+    }
+
+    /**
      * Seluruh dokumen/berkas yang diunggah untuk lamaran ini.
      */
     public function documents(): HasMany
@@ -90,6 +111,43 @@ class JobApplication extends Model
      */
     public function stageHistories(): HasMany
     {
-        return $this->hasMany(ApplicationStageHistory::class);
+        return $this->hasMany(ApplicationStageHistory::class)->orderBy('id', 'asc');
+    }
+
+    /**
+     * Helper status checks
+     */
+    public function isDraft(): bool
+    {
+        return $this->status === JobApplicationStatus::DRAFT;
+    }
+
+    public function isSubmitted(): bool
+    {
+        return $this->status === JobApplicationStatus::SUBMITTED;
+    }
+
+    public function isPassedAdministration(): bool
+    {
+        return in_array($this->status, [
+            JobApplicationStatus::PASSED_ADMINISTRATION,
+            JobApplicationStatus::IN_SELECTION,
+            JobApplicationStatus::ACCEPTED,
+        ]);
+    }
+
+    public function isRejected(): bool
+    {
+        return $this->status === JobApplicationStatus::REJECTED;
+    }
+
+    public function isAccepted(): bool
+    {
+        return $this->status === JobApplicationStatus::ACCEPTED;
+    }
+
+    public function isLocked(): bool
+    {
+        return !is_null($this->locked_at) || !$this->isDraft();
     }
 }

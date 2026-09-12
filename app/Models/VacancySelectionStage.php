@@ -39,6 +39,26 @@ class VacancySelectionStage extends Model
         ];
     }
 
+    public function getStageNameAttribute(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setStageNameAttribute(?string $value): void
+    {
+        $this->attributes['name'] = $value;
+    }
+
+    public function getSequenceOrderAttribute(): int
+    {
+        return $this->sort_order ?? 1;
+    }
+
+    public function setSequenceOrderAttribute($value): void
+    {
+        $this->attributes['sort_order'] = (int) $value;
+    }
+
     /**
      * Lowongan pekerjaan pemilik tahapan seleksi.
      */

@@ -50,6 +50,48 @@ class JobVacancy extends Model
     }
 
     /**
+     * Aliases for seamless schema compatibility
+     */
+    public function getDepartmentAttribute(): ?string
+    {
+        return $this->unit;
+    }
+
+    public function setDepartmentAttribute(?string $value): void
+    {
+        $this->attributes['unit'] = $value ?? 'Pelayanan Medis';
+    }
+
+    public function getFormationTypeAttribute(): ?string
+    {
+        return $this->employment_type ?? 'Tenaga Keperawatan';
+    }
+
+    public function setFormationTypeAttribute(?string $value): void
+    {
+        $this->attributes['employment_type'] = $value ?? 'Tenaga Keperawatan';
+    }
+
+    public function getIsPublishedAttribute(): bool
+    {
+        return $this->status === JobVacancyStatus::OPEN;
+    }
+
+    public function setIsPublishedAttribute($value): void
+    {
+        $this->attributes['status'] = $value ? JobVacancyStatus::OPEN->value : JobVacancyStatus::DRAFT->value;
+        if ($value && is_null($this->open_at)) {
+            $this->attributes['open_at'] = now();
+            $this->attributes['close_at'] = now()->addMonth();
+        }
+    }
+
+    public function getSummaryAttribute(): ?string
+    {
+        return $this->description ? \Illuminate\Support\Str::limit(strip_tags($this->description), 150) : null;
+    }
+
+    /**
      * Scope query untuk lowongan yang benar-benar aktif dibuka:
      * 1. Status lowongan OPEN
      * 2. Berada dalam rentang tanggal open_at s/d close_at
@@ -60,8 +102,12 @@ class JobVacancy extends Model
         $time = $at ?? now();
 
         return $query->where('status', JobVacancyStatus::OPEN)
-            ->where('open_at', '<=', $time)
-            ->where('close_at', '>=', $time)
+            ->where(function ($q) use ($time) {
+                $q->whereNull('open_at')->orWhere('open_at', '<=', $time);
+            })
+            ->where(function ($q) use ($time) {
+                $q->whereNull('close_at')->orWhere('close_at', '>=', $time);
+            })
             ->whereHas('recruitmentPeriod', function (Builder $periodQuery) use ($time) {
                 $periodQuery->currentlyOpen($time);
             });
@@ -75,10 +121,8 @@ class JobVacancy extends Model
         $time = $at ?? now();
 
         $isVacancyActive = $this->status === JobVacancyStatus::OPEN
-            && $this->open_at !== null
-            && $this->close_at !== null
-            && $this->open_at->lte($time)
-            && $this->close_at->gte($time);
+            && ($this->open_at === null || $this->open_at->lte($time))
+            && ($this->close_at === null || $this->close_at->gte($time));
 
         if (! $isVacancyActive) {
             return false;
@@ -105,6 +149,14 @@ class JobVacancy extends Model
     public function getRouteKeyName(): string
     {
         return 'code';
+    }
+
+    /**
+     * Retrieve the model for a bound value.
+     */
+    public function resolveRouteBinding($value, $field = null)
+    {
+        return $this->where('code', $value)->orWhere('id', $value)->firstOrFail();
     }
 
     /**

@@ -19,6 +19,14 @@ class RecruitmentService
     }
 
     /**
+     * Mendapatkan periode rekrutmen aktif saat ini.
+     */
+    public function getActivePeriod(?CarbonInterface $at = null): ?RecruitmentPeriod
+    {
+        return RecruitmentPeriod::currentlyOpen($at)->first() ?? RecruitmentPeriod::latest()->first();
+    }
+
+    /**
      * Mendapatkan seluruh lowongan pekerjaan yang saat ini terbuka untuk publik.
      */
     public function getCurrentlyOpenVacancies(?CarbonInterface $at = null): Collection

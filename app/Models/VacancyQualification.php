@@ -39,6 +39,19 @@ class VacancyQualification extends Model
         ];
     }
 
+    public function getDescriptionAttribute(): ?string
+    {
+        return $this->value ?? $this->label;
+    }
+
+    public function setDescriptionAttribute(?string $val): void
+    {
+        $this->attributes['value'] = $val;
+        if (empty($this->attributes['label'])) {
+            $this->attributes['label'] = 'Kualifikasi Umum';
+        }
+    }
+
     /**
      * Lowongan yang memiliki kualifikasi ini.
      */

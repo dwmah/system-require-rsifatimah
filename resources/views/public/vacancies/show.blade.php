@@ -214,20 +214,35 @@
                         </div>
                     </div>
 
-                    {{-- CTA Section: Non-operational per instructions (Authentication module to follow) --}}
-                    <div class="mt-6 pt-4 border-t border-slate-100 space-y-2">
-                        <button
-                            type="button"
-                            disabled
-                            aria-disabled="true"
-                            title="Pendaftaran online akan dibuka setelah modul akun pelamar diaktifkan pada fase autentikasi."
-                            class="w-full inline-flex items-center justify-center font-medium rounded-lg text-sm px-4 py-2.5 bg-rsi-700 text-white opacity-60 cursor-not-allowed shadow-xs"
-                        >
-                            <span>Lamar Sekarang</span>
-                        </button>
-                        <p class="text-[11px] text-center text-slate-400">
-                            Pendaftaran online akan segera diaktifkan melalui akun pelamar terdaftar.
-                        </p>
+                    {{-- CTA Section --}}
+                    <div class="mt-6 pt-4 border-t border-slate-100 space-y-2.5">
+                        @auth
+                            @if(auth()->user()->isAdmin())
+                                <a
+                                    href="{{ route('admin.vacancies.edit', $jobVacancy) }}"
+                                    class="w-full inline-flex items-center justify-center font-semibold rounded-lg text-sm px-4 py-2.5 bg-slate-800 hover:bg-slate-900 text-white shadow-xs transition-colors"
+                                >
+                                    <span>Kelola Lowongan (Admin)</span>
+                                </a>
+                            @else
+                                <a
+                                    href="{{ route('portal.applications.create', ['vacancy_id' => $jobVacancy->id]) }}"
+                                    class="w-full inline-flex items-center justify-center font-semibold rounded-lg text-sm px-4 py-2.5 bg-[#0179B5] hover:bg-[#016293] text-white shadow-xs transition-colors text-center"
+                                >
+                                    <span>Lamar Posisi Ini</span>
+                                </a>
+                            @endif
+                        @else
+                            <a
+                                href="{{ route('login') }}"
+                                class="w-full inline-flex items-center justify-center font-semibold rounded-lg text-sm px-4 py-2.5 bg-[#0179B5] hover:bg-[#016293] text-white shadow-xs transition-colors text-center"
+                            >
+                                <span>Lamar Sekarang</span>
+                            </a>
+                            <p class="text-[11px] text-center text-slate-500">
+                                Belum punya akun? <a href="{{ route('register') }}" class="text-[#0179B5] font-semibold hover:underline">Daftar Akun Baru</a>
+                            </p>
+                        @endauth
                     </div>
                 </x-ui.card>
 

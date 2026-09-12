@@ -12,9 +12,19 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->redirectGuestsTo('/masuk');
+        $middleware->redirectUsersTo(function (Request $request) {
+            if ($request->user()?->isAdmin()) {
+                return route('admin.dashboard');
+            }
+            return route('portal.home');
+        });
+
         $middleware->alias([
             'recruitment.open' => \App\Http\Middleware\EnsurePublicRecruitmentIsOpen::class,
             'applicant.active' => \App\Http\Middleware\EnsureApplicantAccountIsActive::class,
+            'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
+            'applicant' => \App\Http\Middleware\EnsureUserIsApplicant::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
