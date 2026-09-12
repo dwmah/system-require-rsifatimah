@@ -33,16 +33,12 @@ class JobApplication extends Model
         'locked_at',
         'accepted_at',
         'rejected_at',
-        'hired_at',
-<<<<<<< HEAD
         'rejection_reason',
         'announcement_seen_at',
         'verified_at',
         'verified_by',
-=======
         'final_result_published_at',
         'final_result_message',
->>>>>>> 00c3161e062b5b07902ac4a8b7a5537efbf9b88d
     ];
 
     /**
@@ -59,12 +55,9 @@ class JobApplication extends Model
             'accepted_at' => 'datetime',
             'rejected_at' => 'datetime',
             'hired_at' => 'datetime',
-<<<<<<< HEAD
             'announcement_seen_at' => 'datetime',
             'verified_at' => 'datetime',
-=======
             'final_result_published_at' => 'datetime',
->>>>>>> 00c3161e062b5b07902ac4a8b7a5537efbf9b88d
         ];
     }
 
