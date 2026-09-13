@@ -1,0 +1,428 @@
+<!DOCTYPE html><html lang="id" style="width: 1280px; height: 1239px; overflow: hidden; position: relative;"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Profil Saya - Sistem Rekrutmen SDM RSI Fatimah Banyuwangi</title>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "on-primary-fixed-variant": "#004b72",
+            "on-primary-fixed": "#001e31",
+            "error-container": "#ffdad6",
+            "surface-container": "#e6eff8",
+            "on-tertiary-fixed": "#121d21",
+            "on-secondary-fixed-variant": "#004b72",
+            "inverse-primary": "#91cdff",
+            "primary": "#005f90",
+            "on-tertiary-container": "#f4fbff",
+            "on-tertiary": "#ffffff",
+            "primary-fixed-dim": "#91cdff",
+            "inverse-on-surface": "#e9f2fb",
+            "inverse-surface": "#293138",
+            "surface-container-low": "#ecf5fe",
+            "surface-variant": "#dbe4ed",
+            "tertiary-fixed-dim": "#bcc8ce",
+            "primary-fixed": "#cce5ff",
+            "background": "#f6faff",
+            "on-surface": "#141d23",
+            "secondary": "#066495",
+            "outline": "#707881",
+            "secondary-fixed-dim": "#90cdff",
+            "surface": "#f6faff",
+            "surface-bright": "#f6faff",
+            "on-primary-container": "#f7faff",
+            "on-surface-variant": "#404850",
+            "on-secondary-fixed": "#001e31",
+            "tertiary": "#515c61",
+            "surface-container-highest": "#dbe4ed",
+            "surface-tint": "#006496",
+            "outline-variant": "#bfc7d1",
+            "on-background": "#141d23",
+            "secondary-fixed": "#cbe6ff",
+            "tertiary-fixed": "#d8e4ea",
+            "on-primary": "#ffffff",
+            "on-secondary-container": "#00537e",
+            "on-error": "#ffffff",
+            "surface-container-high": "#e0e9f2",
+            "tertiary-container": "#69757a",
+            "surface-container-lowest": "#ffffff",
+            "on-tertiary-fixed-variant": "#3d484d",
+            "on-secondary": "#ffffff",
+            "surface-dim": "#d2dbe4",
+            "secondary-container": "#84c8fe",
+            "error": "#ba1a1a",
+            "primary-container": "#0179b5",
+            "on-error-container": "#93000a"
+          },
+          borderRadius: {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          fontFamily: {
+            sans: ["Inter", "sans-serif"]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    @layer base {
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body class="bg-[#f8fafc] font-sans text-slate-800 antialiased min-h-screen flex flex-col">
+<!-- 1. APPLICATION SHELL & TOP NAVBAR -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-[#0179B5] text-white shadow-[0_2px_8px_rgba(0,0,0,0.12)] h-16">
+<div class="h-full w-full px-4 lg:px-6 flex items-center justify-between">
+<!-- Left side: Brand -->
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 flex items-center justify-center shrink-0"><img alt="Logo RSI Fatimah Banyuwangi" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBE24lq-SG5M-autn-KYUlYmfj5XqMQ81DUD5JvtBKqD3KiftYhkDSkD_5DhqoqVertp7hH1J7Ce5_9XUJGMGUuW0xe0tMgBW76Bzis0OF2z836Fq4RGh6pFMJf5DGKLMXYaEiqVXla5v5fQUxbI6tA59q_vGoan5FY8mNRBNMkoSLxEmFpplXEzhS2Y1LLFptVboFXKonTFosNIeRmTbdbj4PPTGOxRLE_wTpivP6_PLmRZqDXMNKZj977IWZ0RKlUElY"></div>
+<div class="flex flex-col leading-tight">
+<span class="font-bold text-base tracking-tight text-white">RSI Fatimah Banyuwangi</span>
+<span class="text-xs text-white/80 font-normal">Sistem Rekrutmen SDM</span>
+</div>
+</div>
+<!-- Right side: User & Status items -->
+<div class="flex items-center gap-3 sm:gap-4">
+<!-- Account Status Badge -->
+
+<!-- Notification Icon -->
+<button class="relative p-2 rounded-lg text-white/90 hover:text-white hover:bg-white/10 transition-colors" title="Notifikasi" type="button">
+
+
+</button>
+<div class="h-6 w-px bg-white/20 mx-0.5 hidden sm:block"></div>
+<!-- Profile Dropdown trigger -->
+<div class="flex items-center gap-2.5 pl-1 cursor-pointer select-none group">
+<div class="relative">
+<div class="w-9 h-9 rounded-full aspect-square shrink-0 flex items-center justify-center bg-white/20 text-white font-semibold text-xs border border-white/30" style="border-radius: 9999px; width: 36px; height: 36px; min-width: 36px; min-height: 36px; aspect-ratio: 1 / 1;">AF</div>
+
+</div>
+<div class="hidden md:flex flex-col text-left leading-tight">
+<span class="text-xs font-semibold text-white group-hover:text-white/90 transition-colors">Ahmad Fauzi, S.Kep</span>
+<span class="text-[11px] text-white/80">Pelamar</span>
+</div>
+<span class="material-symbols-outlined text-white/80 text-[18px] group-hover:text-white transition-colors">expand_more</span>
+</div>
+</div>
+</div>
+</header>
+<!-- APP BODY: SIDEBAR + MAIN CONTENT AREA -->
+<div class="pt-16 flex-1 flex">
+<!-- 2. LEFT SIDEBAR (Width 240px) -->
+<aside class="w-60 shrink-0 bg-white border-r border-[#e5e7eb] flex flex-col justify-between min-h-[calc(100vh-4rem)] fixed top-16 bottom-0 left-0 overflow-y-auto z-40 hidden md:flex">
+<div class="py-5 px-3 space-y-6"><!-- Section 1: MENU UTAMA -->
+<div>
+<span class="px-3 text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-2">Menu Utama</span>
+<nav class="space-y-1">
+<a class="flex items-center justify-between px-3 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors text-sm font-medium" href="#">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[20px] text-slate-400">work</span>
+<span class="">Lowongan</span>
+</div>
+
+</a>
+<div>
+<button class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors text-sm font-medium" type="button">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[20px] text-slate-400">menu_book</span>
+<span class="">Panduan</span>
+</div>
+<svg class="w-4 h-4 text-slate-400 shrink-0 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<div class="mt-1 space-y-1 pl-9 pr-2">
+
+
+</div>
+</div>
+</nav>
+</div>
+<!-- Section 2: PORTAL PELAMAR -->
+<div>
+<span class="px-3 text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-2">Portal Pelamar</span>
+<nav class="space-y-1">
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors text-sm font-medium" href="#">
+<span class="material-symbols-outlined text-[20px] text-slate-400">dashboard</span>
+<span class="">Dashboard</span>
+</a>
+<!-- Profil Saya STRICTLY ACTIVE -->
+<a class="flex items-center gap-2.5 px-3 py-2 text-sm font-semibold transition-colors" href="#" style="background-color: rgb(230, 242, 248); color: rgb(1, 121, 181); border-left: 3px solid rgb(1, 121, 181); border-radius: 0px 6px 6px 0px;">
+<span class="material-symbols-outlined text-[20px]" style="color: rgb(1, 121, 181);">account_circle</span>
+<span class="">Profil Saya</span>
+</a>
+<a class="flex items-center justify-between px-3 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors text-sm font-medium" href="#">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[20px] text-slate-400">description</span>
+<span class="">Lamaran Saya</span>
+</div>
+
+</a>
+<a class="flex items-center justify-between px-3 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors text-sm font-medium" href="#">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[20px] text-slate-400">notifications</span>
+<span class="">Notifikasi</span>
+</div>
+
+</a>
+</nav>
+</div></div>
+<!-- Bottom Section: Helpdesk SDM Card -->
+
+<div class="p-4 border-t border-slate-200 bg-white"><div class="text-[11px] text-slate-400 font-medium leading-tight">Pusat Layanan SDM</div><div class="text-xs font-bold text-slate-800 tracking-tight mt-0.5">(0333) 421118</div></div></aside>
+<!-- MAIN VIEW CONTAINER -->
+<main class="flex-1 md:ml-60 min-w-0 bg-[#f8fafc] flex flex-col justify-between">
+<div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6"><!-- PAGE HEADER & BREADCRUMB -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+<div>
+<div class="flex items-center gap-1.5 text-xs text-slate-500 mb-1.5">
+<span class="">Portal Pelamar</span>
+<span class="material-symbols-outlined text-[14px] text-slate-400">chevron_right</span>
+<span class="text-[#0179b5] font-semibold">Profil Saya</span>
+</div>
+<h1 class="text-2xl font-bold text-slate-900 tracking-tight">Profil Saya</h1>
+<p class="text-sm text-slate-500 mt-0.5">Kelola dan pastikan data pribadi serta informasi pendidikan Anda telah benar sebelum mengikuti proses rekrutmen.</p>
+</div>
+<div class="shrink-0">
+<button class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0179B5] text-white hover:bg-[#005f90] transition-colors font-medium text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0179b5] focus:ring-offset-2" id="editProfileBtn" onclick="toggleEditMode()" type="button">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+<span class="">Edit Profil</span>
+</button>
+</div>
+</div>
+<!-- Success Alert Notification (hidden by default) -->
+<div class="hidden p-3.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center justify-between shadow-sm animate-fade-in" id="successAlert">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-emerald-600 text-[20px]">check_circle</span>
+<span class="text-sm font-medium">Perubahan data profil berhasil disimpan.</span>
+</div>
+<button class="text-emerald-700 hover:text-emerald-900" onclick="document.getElementById('successAlert').classList.add('hidden')" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<!-- TOP SUMMARY & COMPLETENESS ROW -->
+<div class="grid grid-cols-1 gap-6">
+<!-- Compact Applicant Summary Card -->
+
+<!-- Compact Profile Completeness Card (90% Lengkap) -->
+
+</div>
+<!-- SECTION 4: INFORMASI PENGGUNAAN DATA PADA FORM LAMARAN (Notice Banner) -->
+
+<!-- MAIN DETAILS GRID (2 COLUMNS: Profile Data & Qualifications) -->
+<div class="grid grid-cols-1 gap-6">
+<!-- Left Column: Data Pribadi (lg:col-span-7) -->
+<div class="space-y-6 w-full">
+<!-- SECTION 1: DATA PRIBADI -->
+<div class="bg-white rounded-xl border border-[#e5e7eb] shadow-sm overflow-hidden">
+<div class="px-5 py-3.5 bg-slate-50/80 border-b border-[#e5e7eb] flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[#0179b5] text-[20px]">badge</span>
+<h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide">Data Pribadi</h3>
+</div>
+
+</div>
+<div class="p-5">
+<!-- VIEW MODE CONTAINER -->
+<div class="space-y-4 text-sm" id="viewModeContent">
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div>
+<span class="text-xs font-medium text-slate-400 block mb-0.5">Nama Lengkap</span>
+<span class="font-semibold text-slate-800">Ahmad Fauzi, S.Kep., Ners</span>
+</div>
+<div>
+<span class="text-xs font-medium text-slate-400 block mb-0.5">NIK (Nomor Induk Kependudukan)</span>
+<div class="flex items-center gap-1.5">
+<span class="font-semibold text-slate-800">3510134509070005</span>
+
+</div>
+</div>
+<div>
+<span class="text-xs font-medium text-slate-400 block mb-0.5">Tempat, Tanggal Lahir</span>
+<span class="font-medium text-slate-800">Banyuwangi, 14 Mei 1998</span>
+</div>
+<div>
+<span class="text-xs font-medium text-slate-400 block mb-0.5">Jenis Kelamin</span>
+<span class="font-medium text-slate-800">Laki-laki</span>
+</div>
+<div>
+<span class="text-xs font-medium text-slate-400 block mb-0.5">Email Utama</span>
+<div class="flex items-center gap-1.5">
+<span class="font-medium text-slate-800">ahmad.fauzi@email.com</span>
+
+</div>
+</div>
+<div>
+<span class="text-xs font-medium text-slate-400 block mb-0.5">Nomor HP / WhatsApp</span>
+<span class="font-medium text-slate-800">+62 812-3456-7890</span>
+</div>
+</div>
+<div class="pt-2 border-t border-slate-100">
+<span class="text-xs font-medium text-slate-400 block mb-0.5">Alamat KTP</span>
+<span class="font-medium text-slate-800 leading-relaxed block">Jl. Letjen Suprapto No. 45, RT 02 / RW 05, Kel. Kebalenan,<br>Kec. Banyuwangi, Kab. Banyuwangi, Jawa Timur 68416</span>
+</div>
+<div>
+<span class="text-xs font-medium text-slate-400 block mb-0.5">Alamat Domisili</span>
+<span class="font-medium text-slate-800 flex items-center gap-2">
+<span class="">Sama dengan KTP</span>
+<span class="material-symbols-outlined text-emerald-600 text-[16px]">check_circle</span>
+</span>
+</div>
+<div class="p-3 rounded-lg bg-slate-50 border border-slate-200/80 flex items-start gap-2.5">
+<span class="material-symbols-outlined text-[#0179b5] text-[18px] shrink-0 mt-0.5">info</span>
+<p class="text-[11px] text-slate-500 leading-relaxed">
+              Pastikan email dan nomor WhatsApp aktif karena pengumuman dan undangan seleksi resmi dikirim melalui kanal tersebut.
+            </p>
+</div>
+</div>
+<!-- EDIT MODE CONTAINER (Hidden by default) -->
+<form class="hidden space-y-4" id="profileForm" onsubmit="handleProfileSubmit(event)">
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div>
+<label class="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap <span class="text-red-500">*</span></label>
+<input class="w-full text-sm rounded-lg border-slate-300 focus:border-[#0179b5] focus:ring-[#0179b5]/20" required="" type="text" value="Ahmad Fauzi, S.Kep., Ners">
+</div>
+<div>
+<label class="block text-xs font-semibold text-slate-700 mb-1">NIK (Terkunci)</label>
+<input class="w-full text-sm rounded-lg border-slate-200 bg-slate-100 text-slate-500 cursor-not-allowed" disabled="" type="text" value="3510123456789001">
+</div>
+<div>
+<label class="block text-xs font-semibold text-slate-700 mb-1">Tempat, Tanggal Lahir <span class="text-red-500">*</span></label>
+<input class="w-full text-sm rounded-lg border-slate-300 focus:border-[#0179b5] focus:ring-[#0179b5]/20" required="" type="text" value="Banyuwangi, 14 Mei 1998">
+</div>
+<div>
+<label class="block text-xs font-semibold text-slate-700 mb-1">Jenis Kelamin <span class="text-red-500">*</span></label>
+<select class="w-full text-sm rounded-lg border-slate-300 focus:border-[#0179b5] focus:ring-[#0179b5]/20">
+<option selected="">Laki-laki</option>
+<option>Perempuan</option>
+</select>
+</div>
+<div>
+<label class="block text-xs font-semibold text-slate-700 mb-1">Email Utama <span class="text-red-500">*</span></label>
+<input class="w-full text-sm rounded-lg border-slate-300 focus:border-[#0179b5] focus:ring-[#0179b5]/20" required="" type="email" value="ahmad.fauzi@email.com">
+</div>
+<div>
+<label class="block text-xs font-semibold text-slate-700 mb-1">Nomor WhatsApp <span class="text-red-500">*</span></label>
+<input class="w-full text-sm rounded-lg border-slate-300 focus:border-[#0179b5] focus:ring-[#0179b5]/20" required="" type="text" value="+62 812-3456-7890">
+</div>
+<div class="sm:col-span-2">
+<label class="block text-xs font-semibold text-slate-700 mb-1">Alamat Domisili KTP <span class="text-red-500">*</span></label>
+<textarea class="w-full text-sm rounded-lg border-slate-300 focus:border-[#0179b5] focus:ring-[#0179b5]/20" rows="2">Jl. Letjen Suprapto No. 45, RT 02 / RW 05, Kel. Kebalenan, Kec. Banyuwangi, Kab. Banyuwangi, Jawa Timur 68416</textarea>
+</div>
+</div>
+<div class="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100">
+<button class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors" onclick="toggleEditMode()" type="button">
+              Batal
+            </button>
+<button class="px-4 py-2 text-xs font-semibold text-white bg-[#0179B5] hover:bg-[#005f90] rounded-lg transition-colors shadow-sm" type="submit">
+              Simpan Perubahan
+            </button>
+</div>
+</form>
+</div>
+</div>
+</div>
+<!-- Right Column: Pendidikan, Kualifikasi Profesional & Keamanan (lg:col-span-5) -->
+
+</div></div>
+<!-- 6. SLEEK SINGLE-LINE AUTHENTICATED FOOTER (IDENTICAL TO SCREEN_4) -->
+<footer class="w-full bg-white border-t border-slate-200 py-3 px-8 mt-auto flex items-center justify-between text-xs text-slate-500"><span class="text-xs text-slate-500">© 2026 RSI Fatimah Banyuwangi. Hak Cipta Dilindungi.</span><div class="flex items-center gap-4 text-xs text-slate-500"><a class="hover:text-primary transition-colors" href="#">Kebijakan Privasi</a><span class="">•</span><a class="hover:text-primary transition-colors" href="#">Syarat &amp; Ketentuan</a></div></footer>
+</main>
+</div>
+<script>
+    function toggleEditMode() {
+      const viewMode = document.getElementById('viewModeContent');
+      const editMode = document.getElementById('profileForm');
+      const editBtn = document.getElementById('editProfileBtn');
+      const indicator = document.getElementById('modeIndicator');
+
+      if (viewMode.classList.contains('hidden')) {
+        // Return to view mode
+        viewMode.classList.remove('hidden');
+        editMode.classList.add('hidden');
+        editBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">edit</span><span>Edit Profil</span>';
+        indicator.textContent = 'Mode Lihat';
+        indicator.className = 'text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-200 text-slate-700';
+      } else {
+        // Switch to edit mode
+        viewMode.classList.add('hidden');
+        editMode.classList.remove('hidden');
+        editBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">visibility</span><span>Mode Lihat</span>';
+        indicator.textContent = 'Mode Edit';
+        indicator.className = 'text-xs font-semibold px-2.5 py-0.5 rounded-full bg-sky-100 text-[#0179b5]';
+      }
+    }
+
+    function handleProfileSubmit(event) {
+      event.preventDefault();
+      toggleEditMode();
+      const alertBox = document.getElementById('successAlert');
+      alertBox.classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body></html>

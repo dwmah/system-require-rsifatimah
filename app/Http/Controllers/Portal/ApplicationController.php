@@ -80,17 +80,26 @@ class ApplicationController extends Controller
      */
     public function store(
         Request $request,
-        JobVacancy $jobVacancy,
-        JobApplicationService $service
+        JobApplicationService $service,
+        ?JobVacancy $jobVacancy = null
     ): RedirectResponse {
-        try {
-            $application = $service->startDraft($request->user(), $jobVacancy);
+        $targetVacancy = ($jobVacancy && $jobVacancy->exists)
+            ? $jobVacancy
+            : JobVacancy::findOrFail($request->input('job_vacancy_id'));
 
-            return redirect()->route('portal.applications.show', $application)
-                ->with('success', 'Draft lamaran berhasil dibuat. Formasi yang dipilih telah terkunci untuk periode ini.');
+        try {
+            $application = $service->startDraft($request->user(), $targetVacancy);
+
+            if ($request->route('jobVacancy')) {
+                return redirect()->route('portal.applications.show', $application)
+                    ->with('success', 'Draft lamaran berhasil dibuat. Formasi yang dipilih telah terkunci untuk periode ini.');
+            }
+
+            return redirect()->route('portal.applications.index')
+                ->with('success', 'Draft lamaran berhasil dibuat.');
         } catch (DuplicateApplicationException $e) {
             $existing = JobApplication::where('user_id', $request->user()->id)
-                ->where('recruitment_period_id', $jobVacancy->recruitment_period_id)
+                ->where('recruitment_period_id', $targetVacancy->recruitment_period_id)
                 ->first();
 
             if ($existing) {

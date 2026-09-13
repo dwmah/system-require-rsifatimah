@@ -15,6 +15,9 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
+    public const ROLE_APPLICANT = 'applicant';
+    public const ROLE_ADMIN = 'admin';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -23,6 +26,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'role',
         'password',
         'registration_number',
         'phone',
@@ -60,6 +64,22 @@ class User extends Authenticatable
     }
 
     /**
+     * Cek apakah user memiliki hak akses Super User / Admin HRD.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === self::ROLE_ADMIN;
+    }
+
+    /**
+     * Cek apakah user adalah pelamar.
+     */
+    public function isApplicant(): bool
+    {
+        return $this->role === self::ROLE_APPLICANT;
+    }
+
+    /**
      * Profil lengkap pelamar (1-to-1).
      */
     public function applicantProfile(): HasOne
@@ -73,5 +93,13 @@ class User extends Authenticatable
     public function jobApplications(): HasMany
     {
         return $this->hasMany(JobApplication::class);
+    }
+
+    /**
+     * Notifikasi in-app untuk user.
+     */
+    public function recruitmentNotifications(): HasMany
+    {
+        return $this->hasMany(RecruitmentNotification::class)->latest();
     }
 }

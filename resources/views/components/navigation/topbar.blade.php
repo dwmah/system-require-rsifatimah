@@ -1,10 +1,17 @@
 @props([
     'variant' => 'public', // 'public' or 'applicant'
-    'userName' => 'Nama Pelamar',
-    'userEmail' => 'pelamar@example.com',
+    'userName' => null,
+    'userEmail' => null,
 ])
 
-<header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-2xs">
+@php
+    $currentUser = auth()->user();
+    $name = $userName ?? $currentUser?->name ?? 'Pengguna';
+    $email = $userEmail ?? $currentUser?->email ?? '';
+    $unreadCount = $currentUser ? $currentUser->recruitmentNotifications()->whereNull('read_at')->count() : 0;
+@endphp
+
+<header class="bg-[#0179B5] border-b border-[#016699] sticky top-0 z-40 shadow-xs">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
             {{-- Left: Brand and Mobile Hamburger Toggle --}}
@@ -13,7 +20,7 @@
                 <button
                     type="button"
                     @click="mobileMenuOpen = !mobileMenuOpen"
-                    class="lg:hidden p-2 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors focus:outline-hidden focus:ring-2 focus:ring-rsi-500"
+                    class="lg:hidden p-1.5 rounded-lg text-white hover:bg-[#016699] transition-colors focus:outline-hidden focus:ring-2 focus:ring-white"
                     aria-label="Buka menu navigasi"
                 >
                     <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -21,40 +28,47 @@
                     </svg>
                 </button>
 
-                <x-ui.brand />
+                <x-ui.brand inverted />
             </div>
 
-            {{-- Right: Public Actions or Applicant Profile --}}
+            {{-- Right: Public Actions or Authenticated Profile --}}
             <div class="flex items-center gap-3">
-                @if ($variant === 'applicant')
+                @if ($currentUser)
                     {{-- Notifications Link / Icon --}}
-                    <a
-                        href="{{ Route::has('applicant.notifications.index') ? route('applicant.notifications.index') : 'javascript:void(0)' }}"
-                        title="Notifikasi akan segera hadir"
-                        class="p-2 text-slate-400 hover:text-rsi-700 hover:bg-slate-50 rounded-lg transition-colors relative focus:outline-hidden focus:ring-2 focus:ring-rsi-500"
-                        aria-label="Notifikasi akun"
-                    >
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                        </svg>
-                    </a>
+                    @if(!$currentUser->isAdmin())
+                        <a
+                            href="{{ route('portal.notifications.index') }}"
+                            title="Pusat Notifikasi"
+                            class="p-2 text-white hover:text-sky-100 hover:bg-[#016699] rounded-lg transition-colors relative focus:outline-hidden focus:ring-2 focus:ring-white"
+                            aria-label="Notifikasi akun"
+                        >
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                            </svg>
+                            @if($unreadCount > 0)
+                                <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-rose-400 ring-2 ring-[#0179B5]"></span>
+                            @endif
+                        </a>
+                    @endif
 
-                    {{-- Applicant Profile Pill & Quick Logout --}}
-                    <div class="flex items-center gap-3 pl-2 border-l border-slate-200">
-                        <div class="w-8 h-8 rounded-full bg-rsi-100 text-rsi-800 font-semibold text-xs flex items-center justify-center ring-1 ring-rsi-200">
-                            {{ strtoupper(substr($userName, 0, 2)) }}
-                        </div>
-                        <div class="hidden sm:block text-left leading-tight">
-                            <p class="text-xs font-semibold text-slate-900 truncate max-w-[140px]">{{ $userName }}</p>
-                            <p class="text-[11px] text-slate-500 truncate max-w-[140px]">{{ $userEmail }}</p>
-                        </div>
+                    {{-- Profile Pill & Quick Dashboard/Logout --}}
+                    <div class="flex items-center gap-3 pl-2 border-l border-white/20">
+                        <a href="{{ $currentUser->isAdmin() ? route('admin.dashboard') : route('portal.home') }}" class="flex items-center gap-2 text-white hover:opacity-90 transition-opacity" title="Buka Dashboard">
+                            <div class="w-8 h-8 rounded-full bg-white text-[#0179B5] font-bold text-xs flex items-center justify-center shadow-xs">
+                                {{ strtoupper(substr($name, 0, 2)) }}
+                            </div>
+                            <div class="hidden sm:block text-left leading-tight">
+                                <p class="text-xs font-bold text-white truncate max-w-[140px]">{{ $name }}</p>
+                                <p class="text-[11px] text-sky-100 truncate max-w-[140px]">{{ $currentUser->isAdmin() ? 'Admin SDI' : $email }}</p>
+                            </div>
+                        </a>
                         @if (Route::has('logout'))
                             <form method="POST" action="{{ route('logout') }}" class="inline ml-1">
                                 @csrf
                                 <button
                                     type="submit"
-                                    title="Keluar / Logout"
-                                    class="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors focus:outline-hidden focus:ring-2 focus:ring-red-500 cursor-pointer"
+                                    title="Keluar Akun"
+                                    class="p-1.5 text-sky-100 hover:text-white hover:bg-[#016699] rounded-lg transition-colors focus:outline-hidden focus:ring-2 focus:ring-white cursor-pointer"
                                     aria-label="Keluar dari akun"
                                 >
                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -66,22 +80,20 @@
                     </div>
                 @else
                     {{-- Public Mode: Masuk & Daftar Buttons --}}
-                    <div class="flex items-center gap-2">
-                        <x-ui.button
-                            :href="Route::has('login') ? route('login') : '/masuk'"
-                            variant="ghost"
-                            size="sm"
+                    <div class="flex items-center gap-2.5">
+                        <a
+                            href="{{ Route::has('login') ? route('login') : '/masuk' }}"
+                            class="px-3.5 py-1.5 text-xs font-semibold text-white hover:text-sky-100 transition-colors"
                         >
                             Masuk
-                        </x-ui.button>
+                        </a>
 
-                        <x-ui.button
-                            :href="Route::has('register') ? route('register') : '/daftar'"
-                            variant="primary"
-                            size="sm"
+                        <a
+                            href="{{ Route::has('register') ? route('register') : '/daftar'"
+                            class="px-4 py-1.5 rounded-lg bg-white hover:bg-slate-50 text-[#0179B5] text-xs font-bold shadow-sm transition-all"
                         >
-                            Daftar Akun
-                        </x-ui.button>
+                            Daftar
+                        </a>
                     </div>
                 @endif
             </div>

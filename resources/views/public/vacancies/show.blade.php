@@ -214,33 +214,68 @@
                         </div>
                     </div>
 
-                    {{-- CTA Section: Mengarah ke portal start application --}}
-                    <div class="mt-6 pt-4 border-t border-slate-100 space-y-2">
-                        @if ($jobVacancy->isCurrentlyOpen())
-                            <a
-                                href="{{ route('portal.applications.start', $jobVacancy) }}"
-                                class="w-full inline-flex items-center justify-center gap-2 font-semibold rounded-lg text-sm px-4 py-2.5 bg-rsi-700 hover:bg-rsi-800 text-white shadow-xs transition-colors cursor-pointer"
-                            >
-                                <span>Lamar Sekarang</span>
-                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                </svg>
-                            </a>
-                            <p class="text-[11px] text-center text-slate-400">
-                                Pastikan profil dasar Anda telah lengkap 100% sebelum mendaftar.
-                            </p>
+                    {{-- CTA Section --}}
+                    <div class="mt-6 pt-4 border-t border-slate-100 space-y-2.5">
+                        @auth
+                            @if(auth()->user()->isAdmin())
+                                <a
+                                    href="{{ route('admin.vacancies.edit', $jobVacancy) }}"
+                                    class="w-full inline-flex items-center justify-center font-semibold rounded-lg text-sm px-4 py-2.5 bg-slate-800 hover:bg-slate-900 text-white shadow-xs transition-colors"
+                                >
+                                    <span>Kelola Lowongan (Admin)</span>
+                                </a>
+                            @elseif ($jobVacancy->isCurrentlyOpen())
+                                <a
+                                    href="{{ route('portal.applications.start', $jobVacancy) }}"
+                                    class="w-full inline-flex items-center justify-center gap-2 font-semibold rounded-lg text-sm px-4 py-2.5 bg-rsi-700 hover:bg-rsi-800 text-white shadow-xs transition-colors cursor-pointer"
+                                >
+                                    <span>Lamar Posisi Ini</span>
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                    </svg>
+                                </a>
+                                <p class="text-[11px] text-center text-slate-400">
+                                    Pastikan profil dasar Anda telah lengkap sebelum mendaftar.
+                                </p>
+                            @else
+                                <button
+                                    type="button"
+                                    disabled
+                                    class="w-full inline-flex items-center justify-center font-medium rounded-lg text-sm px-4 py-2.5 bg-slate-200 text-slate-500 cursor-not-allowed shadow-xs"
+                                >
+                                    <span>Pendaftaran Ditutup</span>
+                                </button>
+                                <p class="text-[11px] text-center text-slate-400">
+                                    Masa pendaftaran untuk lowongan ini telah berakhir.
+                                </p>
+                            @endif
                         @else
-                            <button
-                                type="button"
-                                disabled
-                                class="w-full inline-flex items-center justify-center font-medium rounded-lg text-sm px-4 py-2.5 bg-slate-200 text-slate-500 cursor-not-allowed shadow-xs"
-                            >
-                                <span>Pendaftaran Ditutup</span>
-                            </button>
-                            <p class="text-[11px] text-center text-slate-400">
-                                Masa pendaftaran untuk lowongan ini telah berakhir.
-                            </p>
-                        @endif
+                            @if ($jobVacancy->isCurrentlyOpen())
+                                <a
+                                    href="{{ route('portal.applications.start', $jobVacancy) }}"
+                                    class="w-full inline-flex items-center justify-center gap-2 font-semibold rounded-lg text-sm px-4 py-2.5 bg-rsi-700 hover:bg-rsi-800 text-white shadow-xs transition-colors cursor-pointer"
+                                >
+                                    <span>Lamar Sekarang</span>
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                    </svg>
+                                </a>
+                                <p class="text-[11px] text-center text-slate-500">
+                                    Belum punya akun? <a href="{{ route('register') }}" class="text-rsi-700 font-semibold hover:underline">Daftar Akun Baru</a>
+                                </p>
+                            @else
+                                <button
+                                    type="button"
+                                    disabled
+                                    class="w-full inline-flex items-center justify-center font-medium rounded-lg text-sm px-4 py-2.5 bg-slate-200 text-slate-500 cursor-not-allowed shadow-xs"
+                                >
+                                    <span>Pendaftaran Ditutup</span>
+                                </button>
+                                <p class="text-[11px] text-center text-slate-400">
+                                    Masa pendaftaran untuk lowongan ini telah berakhir.
+                                </p>
+                            @endif
+                        @endauth
                     </div>
                 </x-ui.card>
 

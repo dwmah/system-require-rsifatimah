@@ -130,21 +130,22 @@
         role="dialog"
         aria-modal="true"
     >
-        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-            <div
-                x-show="showModal"
-                x-transition:enter="ease-out duration-200"
-                x-transition:enter-start="opacity-0"
-                x-transition:enter-end="opacity-100"
-                x-transition:leave="ease-in duration-150"
-                x-transition:leave-start="opacity-100"
-                x-transition:leave-end="opacity-0"
-                class="fixed inset-0 bg-slate-900/40 backdrop-blur-2xs transition-opacity"
-                @click="showModal = false"
-            ></div>
+        {{-- Backdrop --}}
+        <div
+            x-show="showModal"
+            x-transition:enter="ease-out duration-200"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="ease-in duration-150"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            class="fixed inset-0 bg-slate-900/50 backdrop-blur-2xs transition-opacity"
+            @click="showModal = false"
+            aria-hidden="true"
+        ></div>
 
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
-
+        {{-- Dialog Wrapper --}}
+        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0 relative z-10 pointer-events-none">
             <div
                 x-show="showModal"
                 x-transition:enter="ease-out duration-200"
@@ -153,11 +154,11 @@
                 x-transition:leave="ease-in duration-150"
                 x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
                 x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                class="inline-block w-full max-w-lg p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl border border-slate-200"
+                class="relative w-full max-w-lg p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-2xl rounded-2xl border border-slate-200 pointer-events-auto"
             >
                 <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
                     <h3 class="text-base font-bold text-slate-900" x-text="modalTitle"></h3>
-                    <button type="button" @click="showModal = false" class="text-slate-400 hover:text-slate-600 focus:outline-hidden">
+                    <button type="button" @click="showModal = false" class="text-slate-400 hover:text-slate-600 focus:outline-hidden cursor-pointer">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
@@ -174,27 +175,40 @@
                         <label class="block text-xs font-semibold text-slate-700 mb-1.5">
                             Jenis Lisensi / STR <span class="text-red-500 font-bold">*</span>
                         </label>
-                        <input
-                            type="text"
+                        <select
                             name="license_type"
                             x-model="formData.license_type"
-                            placeholder="Contoh: STR Perawat / STRA Apoteker"
                             required
-                            class="w-full rounded-lg text-sm py-2 px-3.5 border border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100 focus:outline-hidden focus:ring-2"
+                            class="w-full rounded-lg text-sm py-2 px-3.5 border border-slate-300 bg-white text-slate-900 focus:border-rsi-600 focus:ring-rsi-100 focus:outline-hidden focus:ring-2"
                         >
+                            <option value="">Pilih Jenis Lisensi / STR</option>
+                            <option value="STR Perawat">STR Perawat</option>
+                            <option value="STR Bidan">STR Bidan</option>
+                            <option value="STR Dokter Umum">STR Dokter Umum</option>
+                            <option value="STR Dokter Spesialis">STR Dokter Spesialis</option>
+                            <option value="STRA (Apoteker)">STRA (Apoteker)</option>
+                            <option value="STR Tenaga Teknis Kefarmasian">STR Tenaga Teknis Kefarmasian (TTK)</option>
+                            <option value="STR Radiografer">STR Radiografer</option>
+                            <option value="STR Ahli Teknologi Laboratorium Medik">STR ATLM / Analis Kesehatan</option>
+                            <option value="STR Fisioterapis">STR Fisioterapis</option>
+                            <option value="STR Perekam Medis">STR Perekam Medis (RMIK)</option>
+                            <option value="STR Ahli Gizi / Nutrisionis">STR Ahli Gizi / Nutrisionis</option>
+                            <option value="SIP (Surat Izin Praktik)">SIP (Surat Izin Praktik)</option>
+                            <option value="Lainnya">Lisensi Medis Lainnya</option>
+                        </select>
                     </div>
 
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1.5">
-                            Nomor Lisensi / STR <span class="text-red-500 font-bold">*</span>
+                            Nomor Registrasi / STR <span class="text-red-500 font-bold">*</span>
                         </label>
                         <input
                             type="text"
                             name="license_number"
                             x-model="formData.license_number"
-                            placeholder="Nomor registrasi resmi yang tercantum di STR"
+                            placeholder="Contoh: 1234567890123456"
                             required
-                            class="w-full rounded-lg text-sm py-2 px-3.5 border border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100 focus:outline-hidden focus:ring-2"
+                            class="w-full rounded-lg text-sm py-2 px-3.5 border border-slate-300 font-mono text-slate-900 focus:border-rsi-600 focus:ring-rsi-100 focus:outline-hidden focus:ring-2"
                         >
                     </div>
 
@@ -213,16 +227,31 @@
 
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1.5">
-                                Tanggal Kedaluwarsa
+                                Berlaku Sampai
                             </label>
                             <input
                                 type="date"
                                 name="expires_at"
                                 x-model="formData.expires_at"
-                                class="w-full rounded-lg text-sm py-2 px-3.5 border border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100 focus:outline-hidden focus:ring-2"
+                                :disabled="formData.is_lifetime"
+                                class="w-full rounded-lg text-sm py-2 px-3.5 border border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100 focus:outline-hidden focus:ring-2 disabled:bg-slate-100 disabled:text-slate-400"
                             >
-                            <p class="text-[10px] text-slate-400 mt-1">Kosongkan jika berlaku seumur hidup.</p>
                         </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 pt-1">
+                        <input
+                            type="checkbox"
+                            name="is_lifetime"
+                            id="is_lifetime"
+                            x-model="formData.is_lifetime"
+                            value="1"
+                            @change="if(formData.is_lifetime) formData.expires_at = ''"
+                            class="rounded border-slate-300 text-rsi-700 focus:ring-rsi-600 h-4 w-4"
+                        >
+                        <label for="is_lifetime" class="text-xs font-medium text-slate-700">
+                            Berlaku Seumur Hidup (STR Peraturan Terbaru)
+                        </label>
                     </div>
 
                     <div class="pt-3 flex justify-end gap-2 border-t border-slate-100">
@@ -234,7 +263,7 @@
                             Batal
                         </button>
                         <x-ui.button type="submit" variant="primary" size="sm">
-                            Simpan Lisensi
+                            Simpan STR / Lisensi
                         </x-ui.button>
                     </div>
                 </form>

@@ -40,6 +40,36 @@ class VacancyDocumentRequirement extends Model
         ];
     }
 
+    public function getDocumentNameAttribute(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setDocumentNameAttribute(?string $value): void
+    {
+        $this->attributes['name'] = $value;
+    }
+
+    public function getIsMandatoryAttribute(): bool
+    {
+        return (bool) $this->is_required;
+    }
+
+    public function setIsMandatoryAttribute($value): void
+    {
+        $this->attributes['is_required'] = (bool) $value;
+    }
+
+    public function getSequenceOrderAttribute(): int
+    {
+        return $this->sort_order ?? 1;
+    }
+
+    public function setSequenceOrderAttribute($value): void
+    {
+        $this->attributes['sort_order'] = (int) $value;
+    }
+
     /**
      * Lowongan pekerjaan pemilik syarat dokumen.
      */

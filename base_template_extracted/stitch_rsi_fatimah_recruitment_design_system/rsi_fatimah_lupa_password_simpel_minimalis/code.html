@@ -1,0 +1,409 @@
+<!DOCTYPE html><html lang="id"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>RSI Fatimah Banyuwangi - Lupa Password</title>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<!-- Bootstrap 5 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Bootstrap Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+    :root {
+      --rsi-primary: #0179b5;
+      --rsi-primary-hover: #016699;
+      --rsi-primary-soft: #e6f2f8;
+      --rsi-bg: #f6f8fa;
+      --rsi-surface: #ffffff;
+      --rsi-border: #e5e7eb;
+      --rsi-text-main: #212529;
+      --rsi-text-muted: #6c757d;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--rsi-bg);
+      color: var(--rsi-text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Minimal Authentication Header */
+    .auth-header {
+      background-color: var(--rsi-surface);
+      border-bottom: 1px solid var(--rsi-border);
+      padding: 14px 0;
+    }
+
+    .brand-logo-box {
+      width: 36px;
+      height: 36px;
+      background-color: var(--rsi-primary);
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 20px;
+    }
+
+    .brand-title {
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.2;
+      color: var(--rsi-text-main);
+      margin: 0;
+    }
+
+    .brand-subtitle {
+      font-size: 12px;
+      color: var(--rsi-text-muted);
+      margin: 0;
+    }
+
+    .back-nav-link {
+      font-size: 14px;
+      color: var(--rsi-text-muted);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .back-nav-link:hover {
+      color: var(--rsi-primary);
+    }
+
+    /* Main Auth Container */
+    .auth-card-container {
+      background-color: var(--rsi-surface);
+      border: 1px solid var(--rsi-border);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    }
+
+    /* Left Branding Banner */
+    .auth-visual-col {
+      background: linear-gradient(145deg, #0179b5 0%, #015885 100%);
+      color: #ffffff;
+      padding: 44px 36px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .badge-portal-tag {
+      background-color: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(4px);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .quote-box {
+      background-color: rgba(255, 255, 255, 0.1);
+      border-left: 3px solid #ffffff;
+      border-radius: 0 8px 8px 0;
+      padding: 14px 16px;
+      margin: 20px 0;
+      font-size: 13.5px;
+      line-height: 1.5;
+      font-style: italic;
+    }
+
+    .benefit-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.9);
+      margin-bottom: 10px;
+    }
+
+    .benefit-item i {
+      color: #a5d8ff;
+      font-size: 15px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    /* Right Form Area */
+    .auth-form-col {
+      padding: 48px 42px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .form-heading {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--rsi-text-main);
+      margin-bottom: 6px;
+    }
+
+    .form-desc {
+      font-size: 14px;
+      color: var(--rsi-text-muted);
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    .form-label {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--rsi-text-main);
+      margin-bottom: 6px;
+    }
+
+    .form-control {
+      height: 44px;
+      font-size: 14px;
+      border-radius: 8px;
+      border: 1px solid #ced4da;
+      padding: 10px 14px;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .form-control:focus {
+      border-color: var(--rsi-primary);
+      box-shadow: 0 0 0 3px rgba(1, 121, 181, 0.15);
+    }
+
+    .btn-primary-rsi {
+      background-color: var(--rsi-primary);
+      border: 1px solid var(--rsi-primary);
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 8px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .btn-primary-rsi:hover {
+      background-color: var(--rsi-primary-hover);
+      border-color: var(--rsi-primary-hover);
+      color: #ffffff;
+    }
+
+    .btn-outline-rsi {
+      background-color: transparent;
+      border: 1px solid var(--rsi-border);
+      color: var(--rsi-text-main);
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 8px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+
+    .btn-outline-rsi:hover {
+      background-color: #f1f3f5;
+      color: var(--rsi-text-main);
+      border-color: #d1d5db;
+    }
+
+    .back-login-link {
+      color: var(--rsi-primary);
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .back-login-link:hover {
+      text-decoration: underline;
+      color: var(--rsi-primary-hover);
+    }
+
+    .info-callout {
+      background-color: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 12.5px;
+      color: #475569;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .info-callout i {
+      color: var(--rsi-primary);
+      font-size: 16px;
+      margin-top: 1px;
+    }
+
+    /* State Switcher & Simulation Badges for Quality Review */
+    .state-demo-bar {
+      background-color: #ffffff;
+      border: 1px dashed #cbd5e1;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .state-pill {
+      cursor: pointer;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-weight: 500;
+      border: 1px solid transparent;
+      background: none;
+      color: #64748b;
+    }
+
+    .state-pill.active {
+      background-color: var(--rsi-primary-soft);
+      color: var(--rsi-primary);
+      font-weight: 600;
+      border-color: #b9ddf1;
+    }
+
+    /* Success Card Box */
+    .success-icon-wrap {
+      width: 56px;
+      height: 56px;
+      background-color: #ecfdf5;
+      color: #059669;
+      border: 1px solid #a7f3d0;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      margin-bottom: 16px;
+    }
+
+    /* Footer */
+    .auth-footer {
+      margin-top: auto;
+      padding: 24px 0;
+      font-size: 12px;
+      color: var(--rsi-text-muted);
+      text-align: center;
+      border-top: 1px solid var(--rsi-border);
+      background-color: var(--rsi-surface);
+    }
+
+    .auth-footer a {
+      color: var(--rsi-text-muted);
+      text-decoration: none;
+      margin: 0 10px;
+    }
+
+    .auth-footer a:hover {
+      color: var(--rsi-primary);
+    }
+  </style>
+</head>
+<body>
+<!-- 1. Minimal Authentication Header -->
+<header class="auth-header">
+<div class="container">
+<div class="d-flex align-items-center justify-content-between">
+<div class="d-flex align-items-center gap-3">
+<img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCqJPKWq2Y8Wtmi7MPQQPgRE8FJLdPaZAK5oPJgy--G3m9RwXb2_eIfoC-mChZMJEV2Xknt6rK9ppMQjd7FvTyDsGZ866DdjDgHZtamJcmBqOL-SO5iNNFb2up9-8v7NoHQCECMcsZZ3G8qvj5r2BVmoPorfX6jgE7ChN6B_84zF7PZVMP5fvD95BVD3GcMuYuwzCIO8pHvxTTelktzDlVRfZdZxyIvyKGjGulbT4tNoutUlhY19N4dHDEcgCt5V7_nVTM" alt="Logo RSI Fatimah Banyuwangi" class="h-9 w-auto object-contain" style="height: 36px; width: auto; object-fit: contain;">
+<div>
+<h1 class="brand-title">RSI Fatimah Banyuwangi</h1>
+<p class="brand-subtitle">Sistem Rekrutmen SDM Rumah Sakit</p>
+</div>
+</div>
+<div>
+<a class="back-nav-link" href="#"><i class="bi bi-arrow-left"></i> Kembali ke Login</a>
+</div>
+</div>
+</div>
+</header>
+<!-- 2. Main Authentication Content -->
+<main class="flex-grow-1 py-5 d-flex align-items-center justify-content-center">
+<div class="container" style="max-width: 480px;">
+<!-- Interactive Preview State Switcher -->
+<div class="auth-card-container"><div class="p-4 p-md-5"><div class="text-center mb-4"><h2 class="form-heading h4 fw-bold mb-2">Lupa Password?</h2><p class="text-muted small mb-0" style="line-height: 1.5;">Masukkan email atau nomor yang terdaftar. Kami akan mengirimkan tautan untuk mengatur ulang kata sandi Anda.</p></div><form><div class="mb-3"><label class="form-label small fw-semibold text-dark" for="emailInput">Email/Nomor telepon Terdaftar <span class="text-danger">*</span></label><input class="form-control" id="emailInput" placeholder="nama@email.com" required="" type="email"></div><div class="d-grid mb-4"><button class="btn btn-primary-rsi" style="background-color: #0179b5; border-color: #0179b5;" type="submit"><i class="bi bi-send me-1"></i> Kirim Instruksi Reset</button></div></form><div class="text-center mb-4 pt-1"><a class="back-login-link small" href="#"><i class="bi bi-arrow-left"></i> Ingat password Anda? Masuk Sekarang</a></div><div class="info-callout py-2 px-3 rounded-3" style="background-color: #f8fafc; border: 1px solid #e2e8f0;"><span class="text-muted small">Pastikan untuk memeriksa folder Spam / Junk jika email belum masuk dalam beberapa menit.</span></div></div></div>
+</div>
+</main>
+<!-- 3. Minimal Authentication Footer -->
+<footer class="auth-footer"><div class="container"><div class="d-flex flex-column flex-sm-row justify-content-between align-items-center small text-muted gap-2"><span class="mb-0">© 2025 RSI Fatimah Banyuwangi. Hak Cipta Dilindungi.</span><div class="d-flex align-items-center gap-3"><a class="text-muted text-decoration-none" href="#">Kebijakan Privasi</a><span class="">•</span><a class="text-muted text-decoration-none" href="#">Syarat &amp; Ketentuan</a></div></div></div></footer>
+<!-- Bootstrap 5 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Interactive State Handler -->
+<script>
+    function showState(stateName) {
+      const defaultForm = document.getElementById('state-form-default');
+      const successForm = document.getElementById('state-form-success');
+      const alertError = document.getElementById('alert-error-box');
+      const emailInput = document.getElementById('emailInput');
+      const pills = document.querySelectorAll('.state-pill');
+
+      pills.forEach(p => p.classList.remove('active'));
+
+      if (stateName === 'default') {
+        defaultForm.classList.remove('d-none');
+        successForm.classList.add('d-none');
+        alertError.classList.add('d-none');
+        emailInput.classList.remove('is-invalid');
+        pills[0].classList.add('active');
+      } else if (stateName === 'error') {
+        defaultForm.classList.remove('d-none');
+        successForm.classList.add('d-none');
+        alertError.classList.remove('d-none');
+        emailInput.classList.add('is-invalid');
+        pills[1].classList.add('active');
+      } else if (stateName === 'success') {
+        defaultForm.classList.add('d-none');
+        successForm.classList.remove('d-none');
+        alertError.classList.add('d-none');
+        emailInput.classList.remove('is-invalid');
+        pills[2].classList.add('active');
+      }
+    }
+
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      const emailVal = document.getElementById('emailInput').value.trim();
+      if (emailVal) {
+        document.getElementById('targetEmailSuccess').textContent = emailVal;
+      }
+      showState('success');
+    }
+  </script>
+
+
+
+
+
+
+
+
+</body></html>
