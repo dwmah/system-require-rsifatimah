@@ -79,6 +79,8 @@ class AdminVacancyController extends Controller
             'department' => 'nullable|string|max:255',
             'formation_type' => 'required|string|max:100',
             'quota' => 'required|integer|min:1',
+            'open_at' => 'nullable|date',
+            'close_at' => 'nullable|date|after_or_equal:open_at',
             'summary' => 'nullable|string',
             'description' => 'required|string',
             'is_published' => 'boolean',
@@ -94,6 +96,14 @@ class AdminVacancyController extends Controller
         DB::transaction(function () use ($request, $validated) {
             $code = 'VAC-' . strtoupper(Str::slug($request->title, '')) . '-' . rand(100, 999);
 
+            $openAt = $request->filled('open_at')
+                ? (strlen($request->open_at) === 10 ? \Carbon\Carbon::parse($request->open_at)->startOfDay() : \Carbon\Carbon::parse($request->open_at))
+                : now();
+
+            $closeAt = $request->filled('close_at')
+                ? (strlen($request->close_at) === 10 ? \Carbon\Carbon::parse($request->close_at)->endOfDay() : \Carbon\Carbon::parse($request->close_at))
+                : now()->addMonth()->endOfDay();
+
             $vacancy = JobVacancy::create([
                 'recruitment_period_id' => $validated['recruitment_period_id'],
                 'code' => $code,
@@ -103,8 +113,8 @@ class AdminVacancyController extends Controller
                 'location' => 'RSI Fatimah Banyuwangi',
                 'quota' => $validated['quota'],
                 'description' => $validated['description'],
-                'open_at' => now(),
-                'close_at' => now()->addMonth(),
+                'open_at' => $openAt,
+                'close_at' => $closeAt,
                 'status' => $request->has('is_published') ? JobVacancyStatus::OPEN : JobVacancyStatus::DRAFT,
             ]);
 
@@ -236,11 +246,13 @@ class AdminVacancyController extends Controller
             'department' => 'nullable|string|max:255',
             'formation_type' => 'required|string|max:100',
             'quota' => 'required|integer|min:1',
+            'open_at' => 'nullable|date',
+            'close_at' => 'nullable|date|after_or_equal:open_at',
             'description' => 'required|string',
             'is_published' => 'boolean',
         ]);
 
-        $vacancy->update([
+        $updateData = [
             'recruitment_period_id' => $validated['recruitment_period_id'],
             'title' => $validated['title'],
             'unit' => $validated['department'] ?? 'Pelayanan Medis',
@@ -248,7 +260,21 @@ class AdminVacancyController extends Controller
             'quota' => $validated['quota'],
             'description' => $validated['description'],
             'status' => $request->has('is_published') ? JobVacancyStatus::OPEN : JobVacancyStatus::DRAFT,
-        ]);
+        ];
+
+        if ($request->filled('open_at')) {
+            $updateData['open_at'] = strlen($request->open_at) === 10
+                ? \Carbon\Carbon::parse($request->open_at)->startOfDay()
+                : \Carbon\Carbon::parse($request->open_at);
+        }
+
+        if ($request->filled('close_at')) {
+            $updateData['close_at'] = strlen($request->close_at) === 10
+                ? \Carbon\Carbon::parse($request->close_at)->endOfDay()
+                : \Carbon\Carbon::parse($request->close_at);
+        }
+
+        $vacancy->update($updateData);
 
         return redirect()->route('admin.vacancies.show', $vacancy)->with('success', 'Data lowongan berhasil diperbarui.');
     }

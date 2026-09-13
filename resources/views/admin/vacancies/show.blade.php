@@ -28,12 +28,14 @@
                 <div>
                     <span class="text-xs font-bold text-slate-400 font-mono">{{ $vacancy->code }}</span>
                     <h1 class="text-2xl font-extrabold text-slate-900 mt-1">{{ $vacancy->title }}</h1>
-                    <div class="flex items-center gap-3 mt-1.5 text-xs text-slate-600">
+                    <div class="flex flex-wrap items-center gap-3 mt-1.5 text-xs text-slate-600">
                         <span>Unit: <strong>{{ $vacancy->department }}</strong></span>
                         <span>&bull;</span>
                         <span>Formasi: <strong>{{ $vacancy->formation_type }}</strong></span>
                         <span>&bull;</span>
                         <span>Periode: <strong>{{ $vacancy->recruitmentPeriod->name ?? '-' }}</strong></span>
+                        <span>&bull;</span>
+                        <span>Pendaftaran: <strong>{{ $vacancy->open_at?->translatedFormat('d M Y') ?? '-' }} &mdash; {{ $vacancy->close_at?->translatedFormat('d M Y') ?? '-' }}</strong></span>
                     </div>
                 </div>
 

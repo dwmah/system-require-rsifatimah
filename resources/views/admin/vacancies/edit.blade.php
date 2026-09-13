@@ -63,6 +63,24 @@
                                    class="w-full h-10 px-3 text-xs bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:border-[#0179B5] focus:bg-white">
                         </div>
                     </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Tanggal Mulai Pendaftaran <span class="text-rose-500">*</span></label>
+                        <input type="date" name="open_at" value="{{ old('open_at', $vacancy->open_at ? $vacancy->open_at->format('Y-m-d') : now()->format('Y-m-d')) }}" required
+                               class="w-full h-10 px-3 text-xs bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:border-[#0179B5] focus:bg-white">
+                        @error('open_at')
+                            <p class="text-[11px] text-rose-500 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Batas Akhir Pendaftaran (Deadline) <span class="text-rose-500">*</span></label>
+                        <input type="date" name="close_at" value="{{ old('close_at', $vacancy->close_at ? $vacancy->close_at->format('Y-m-d') : now()->addMonth()->format('Y-m-d')) }}" required
+                               class="w-full h-10 px-3 text-xs bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:border-[#0179B5] focus:bg-white">
+                        @error('close_at')
+                            <p class="text-[11px] text-rose-500 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
 
                 <div>

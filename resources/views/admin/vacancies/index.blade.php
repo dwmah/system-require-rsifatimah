@@ -72,8 +72,9 @@
                                 <td class="py-3.5 px-4 font-medium text-slate-700">
                                     {{ $vac->department }}
                                 </td>
-                                <td class="py-3.5 px-4 text-slate-500">
-                                    {{ $vac->recruitmentPeriod->name ?? '-' }}
+                                <td class="py-3.5 px-4 text-slate-600">
+                                    <div class="font-medium text-slate-700">{{ $vac->recruitmentPeriod->name ?? '-' }}</div>
+                                    <div class="text-[11px] text-slate-400 mt-0.5">Batas: <span class="font-medium text-slate-600">{{ $vac->close_at?->translatedFormat('d M Y') ?? '-' }}</span></div>
                                 </td>
                                 <td class="py-3.5 px-4 text-center font-bold text-slate-800">
                                     {{ $vac->quota }}
