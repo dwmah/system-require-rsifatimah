@@ -15,7 +15,6 @@ use App\Services\Recruitment\ApplicationDocumentService;
 use App\Services\Recruitment\ApplicationSubmissionService;
 use DomainException;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 

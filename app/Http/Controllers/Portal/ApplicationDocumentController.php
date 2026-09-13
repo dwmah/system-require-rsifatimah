@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Portal;
 
-use App\Enums\JobApplicationStatus;
 use App\Http\Controllers\Controller;
 use App\Models\ApplicationDocument;
 use App\Models\JobApplication;
@@ -154,7 +153,7 @@ class ApplicationDocumentController extends Controller
             $safeFilename,
             [
                 'Content-Type' => $document->mime_type ?: 'application/octet-stream',
-                'Content-Disposition' => 'attachment; filename="' . $safeFilename . '"',
+                'Content-Disposition' => 'attachment; filename="'.$safeFilename.'"',
             ]
         );
     }

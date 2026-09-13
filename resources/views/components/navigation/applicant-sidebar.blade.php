@@ -3,10 +3,10 @@
 ])
 
 @php
-    $isDashboardActive = $activeMenu === 'dashboard' || request()->routeIs('portal.home') || request()->routeIs('applicant.dashboard');
-    $isProfileActive = $activeMenu === 'profile' || request()->routeIs('profile.*') || request()->routeIs('applicant.profile.*');
-    $isApplicationsActive = $activeMenu === 'applications' || request()->routeIs('portal.applications.*') || request()->routeIs('applicant.applications.*');
-    $isNotificationsActive = $activeMenu === 'notifications' || request()->routeIs('applicant.notifications.*');
+    $isDashboardActive = $activeMenu === 'dashboard' || request()->routeIs('portal.home');
+    $isProfileActive = $activeMenu === 'profile' || request()->routeIs('profile.*');
+    $isApplicationsActive = $activeMenu === 'applications' || request()->routeIs('portal.applications.*');
+    $isNotificationsActive = $activeMenu === 'notifications';
 
     $isLowonganActive = $activeMenu === 'lowongan' || request()->routeIs('vacancies.*');
     $isPanduanActive = $activeMenu === 'panduan' || request()->routeIs('guides.*');
@@ -23,7 +23,7 @@
             <nav class="space-y-1">
                 {{-- Dashboard / Portal Home --}}
                 <a
-                    href="{{ Route::has('portal.home') ? route('portal.home') : (Route::has('applicant.dashboard') ? route('applicant.dashboard') : '#') }}"
+                    href="{{ route('portal.home') }}"
                     @class([
                         'flex items-center gap-3 px-3 py-2 text-xs font-medium rounded-lg transition-colors',
                         'bg-rsi-50 text-rsi-800 font-semibold' => $isDashboardActive,
@@ -92,7 +92,7 @@
 
             <nav class="space-y-1">
                 <a
-                    href="{{ Route::has('vacancies.index') ? route('vacancies.index') : '/lowongan' }}"
+                    href="{{ route('vacancies.index') }}"
                     @class([
                         'flex items-center gap-3 px-3 py-2 text-xs font-medium rounded-lg transition-colors',
                         'bg-rsi-50 text-rsi-800 font-semibold' => $isLowonganActive,
@@ -106,7 +106,7 @@
                 </a>
 
                 <a
-                    href="{{ Route::has('guides.flow') ? route('guides.flow') : '/panduan/alur-pendaftaran' }}"
+                    href="{{ route('guides.flow') }}"
                     @class([
                         'flex items-center gap-3 px-3 py-2 text-xs font-medium rounded-lg transition-colors',
                         'bg-rsi-50 text-rsi-800 font-semibold' => $isPanduanActive,
