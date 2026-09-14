@@ -89,7 +89,7 @@
                         </a>
 
                         <a
-                            href="{{ Route::has('register') ? route('register') : '/daftar'"
+                            href="{{ Route::has('register') ? route('register') : '/daftar' }}"
                             class="px-4 py-1.5 rounded-lg bg-white hover:bg-slate-50 text-[#0179B5] text-xs font-bold shadow-sm transition-all"
                         >
                             Daftar
