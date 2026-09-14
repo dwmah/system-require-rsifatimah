@@ -96,6 +96,34 @@
             </div>
         @endif
 
+        {{-- Active Stage Deadline Reminder Banner --}}
+        @php
+            $currentActiveStage = collect($trackingData['stages'] ?? [])->firstWhere('is_current', true);
+        @endphp
+
+        @if ($currentActiveStage && $currentActiveStage['end_at'])
+            <div class="p-5 rounded-2xl border {{ $currentActiveStage['is_deadline_approaching'] ? 'bg-amber-50 border-amber-300 text-amber-900' : 'bg-sky-50 border-sky-200 text-sky-900' }} shadow-2xs space-y-2">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div class="flex items-center gap-2 font-bold text-sm">
+                        <svg class="w-5 h-5 {{ $currentActiveStage['is_deadline_approaching'] ? 'text-amber-600' : 'text-[#0179B5]' }} shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span>Pengingat Batas Waktu: {{ $currentActiveStage['name'] }}</span>
+                    </div>
+                    @if ($currentActiveStage['days_remaining'] !== null && $currentActiveStage['days_remaining'] >= 0)
+                        <span class="px-3 py-1 text-xs font-extrabold rounded-full {{ $currentActiveStage['is_deadline_approaching'] ? 'bg-amber-200 text-amber-900' : 'bg-sky-200 text-sky-900' }} self-start sm:self-auto">
+                            {{ $currentActiveStage['days_remaining'] === 0 ? 'Hari Terakhir!' : 'Sisa ' . $currentActiveStage['days_remaining'] . ' Hari Lagi' }}
+                        </span>
+                    @elseif ($currentActiveStage['is_past_deadline'])
+                        <span class="px-3 py-1 text-xs font-bold rounded-full bg-slate-200 text-slate-700 self-start sm:self-auto">
+                            Batas Waktu Berakhir
+                        </span>
+                    @endif
+                </div>
+                <p class="text-xs {{ $currentActiveStage['is_deadline_approaching'] ? 'text-amber-800' : 'text-sky-800' }} leading-relaxed">
+                    Batas waktu terakhir untuk tahapan ini adalah <strong>{{ $currentActiveStage['end_at']->translatedFormat('d F Y') }}</strong>. Pastikan Anda menyelesaikan seluruh kewajiban atau memantau instruksi panitia tepat waktu.
+                </p>
+            </div>
+        @endif
+
         {{-- Selection Process Timeline --}}
         <div class="bg-white rounded-2xl border border-slate-200 shadow-2xs p-6 sm:p-7 space-y-6">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-slate-100">
@@ -165,7 +193,7 @@
                             </span>
 
                             {{-- Step Content Card --}}
-                            <div class="bg-slate-50/70 hover:bg-slate-50 rounded-xl border border-slate-200 p-4 sm:p-5 transition-colors space-y-2">
+                            <div class="bg-slate-50/70 hover:bg-slate-50 rounded-xl border border-slate-200 p-4 sm:p-5 transition-colors space-y-2.5">
                                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                                     <div class="flex items-center gap-2 flex-wrap">
                                         <h3 class="text-sm font-bold text-slate-900">
@@ -187,6 +215,30 @@
                                     <p class="text-xs text-slate-600 leading-relaxed">
                                         {{ $stage['description'] }}
                                     </p>
+                                @endif
+
+                                {{-- Schedule & Deadline Display --}}
+                                @if ($stage['start_at'] || $stage['end_at'])
+                                    <div class="flex flex-wrap items-center gap-2 pt-1">
+                                        <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium bg-white border border-slate-200 text-slate-700 shadow-2xs">
+                                            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                            <span>
+                                                @if ($stage['start_at'] && $stage['end_at'])
+                                                    {{ $stage['start_at']->translatedFormat('d M Y') }} &ndash; {{ $stage['end_at']->translatedFormat('d M Y') }}
+                                                @elseif ($stage['end_at'])
+                                                    Batas Akhir: {{ $stage['end_at']->translatedFormat('d M Y') }}
+                                                @elseif ($stage['start_at'])
+                                                    Mulai: {{ $stage['start_at']->translatedFormat('d M Y') }}
+                                                @endif
+                                            </span>
+                                        </div>
+
+                                        @if ($stage['is_current'] && $stage['end_at'] && ! $stage['is_past_deadline'] && $stage['days_remaining'] !== null)
+                                            <span class="px-2 py-0.5 text-[10px] font-bold rounded {{ $stage['is_deadline_approaching'] ? 'bg-amber-100 text-amber-800 border border-amber-200' : 'bg-blue-100 text-blue-800 border border-blue-200' }}">
+                                                {{ $stage['days_remaining'] === 0 ? 'Hari Terakhir!' : 'Sisa ' . $stage['days_remaining'] . ' Hari' }}
+                                            </span>
+                                        @endif
+                                    </div>
                                 @endif
 
                                 {{-- Safe Applicant Message (Only if published) --}}
