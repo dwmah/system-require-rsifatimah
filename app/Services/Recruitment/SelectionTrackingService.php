@@ -220,6 +220,12 @@ class SelectionTrackingService
                 $isCurrent = false;
             }
 
+            $startAt = !empty($stage['start_at']) ? \Carbon\Carbon::parse($stage['start_at']) : null;
+            $endAt = !empty($stage['end_at']) ? \Carbon\Carbon::parse($stage['end_at']) : null;
+            $daysRemaining = $endAt ? (int) ceil(now()->diffInDays($endAt->endOfDay(), false)) : null;
+            $isDeadlineApproaching = $endAt && $daysRemaining !== null && $daysRemaining >= 0 && $daysRemaining <= 3;
+            $isPastDeadline = $endAt ? $endAt->endOfDay()->isPast() : false;
+
             $stagesOutput[] = [
                 'id' => $stageId,
                 'name' => (string) ($stage['name'] ?? 'Tahapan Seleksi'),
@@ -230,6 +236,11 @@ class SelectionTrackingService
                 'badge_class' => $badgeClass,
                 'applicant_message' => $applicantMessage,
                 'published_at' => $publishedAt,
+                'start_at' => $startAt,
+                'end_at' => $endAt,
+                'days_remaining' => $daysRemaining,
+                'is_deadline_approaching' => $isDeadlineApproaching,
+                'is_past_deadline' => $isPastDeadline,
                 'is_current' => false,
             ];
         }

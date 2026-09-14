@@ -79,16 +79,24 @@
 
             <!-- Persyaratan Dokumen -->
             <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
-                <h2 class="text-xs font-bold uppercase tracking-wider text-[#0179B5]">Persyaratan Berkas</h2>
-                <ul class="space-y-2 text-xs text-slate-700">
+                <h2 class="text-xs font-bold uppercase tracking-wider text-[#0179B5]">Persyaratan Berkas ({{ $vacancy->documentRequirements->count() }})</h2>
+                <ul class="space-y-2.5 text-xs text-slate-700">
                     @forelse ($vacancy->documentRequirements as $docReq)
-                        <li class="flex items-center justify-between py-1 border-b border-slate-100">
-                            <span>{{ $docReq->document_name }}</span>
-                            @if($docReq->is_mandatory)
-                                <span class="px-1.5 py-0.5 text-[10px] font-bold bg-rose-100 text-rose-800 rounded">Wajib</span>
-                            @else
-                                <span class="px-1.5 py-0.5 text-[10px] text-slate-500 bg-slate-100 rounded">Opsional</span>
+                        <li class="p-2.5 bg-slate-50 rounded-lg border border-slate-100 space-y-1">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="font-semibold text-slate-900">{{ $docReq->name }}</span>
+                                @if($docReq->is_required)
+                                    <span class="px-1.5 py-0.5 text-[10px] font-bold bg-rose-100 text-rose-800 rounded">Wajib</span>
+                                @else
+                                    <span class="px-1.5 py-0.5 text-[10px] text-slate-500 bg-slate-200 rounded">Opsional</span>
+                                @endif
+                            </div>
+                            @if ($docReq->description)
+                                <p class="text-[11px] text-slate-500">{{ $docReq->description }}</p>
                             @endif
+                            <div class="text-[10px] text-slate-400 font-mono">
+                                Maks {{ round(($docReq->max_size_kb ?: 5120) / 1024, 1) }} MB
+                            </div>
                         </li>
                     @empty
                         <li class="text-slate-400">Belum ada persyaratan berkas diatur.</li>
@@ -98,14 +106,33 @@
 
             <!-- Tahapan Seleksi -->
             <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
-                <h2 class="text-xs font-bold uppercase tracking-wider text-[#0179B5]">Tahapan Seleksi</h2>
-                <div class="space-y-2 text-xs">
+                <h2 class="text-xs font-bold uppercase tracking-wider text-[#0179B5]">Tahapan Seleksi ({{ $vacancy->selectionStages->count() }})</h2>
+                <div class="space-y-2.5 text-xs">
                     @forelse ($vacancy->selectionStages as $stg)
-                        <div class="flex items-center gap-2.5 p-2 bg-slate-50 rounded-lg border border-slate-100">
-                            <span class="w-5 h-5 rounded-full bg-[#0179B5] text-white text-[10px] font-bold flex items-center justify-center">
-                                {{ $stg->sequence_order }}
-                            </span>
-                            <span class="font-medium text-slate-800">{{ $stg->stage_name }}</span>
+                        <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100 space-y-1">
+                            <div class="flex items-center gap-2">
+                                <span class="w-5 h-5 rounded-full bg-[#0179B5] text-white text-[10px] font-bold flex items-center justify-center shrink-0">
+                                    {{ $loop->iteration }}
+                                </span>
+                                <span class="font-bold text-slate-900">{{ $stg->name }}</span>
+                            </div>
+                            @if ($stg->description)
+                                <p class="text-[11px] text-slate-500 pl-7">{{ $stg->description }}</p>
+                            @endif
+                            @if ($stg->start_at || $stg->end_at)
+                                <div class="pl-7 text-[11px] text-[#0179B5] font-medium flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                    <span>
+                                        @if ($stg->start_at && $stg->end_at)
+                                            {{ $stg->start_at->translatedFormat('d M Y') }} &mdash; {{ $stg->end_at->translatedFormat('d M Y') }}
+                                        @elseif ($stg->end_at)
+                                            Batas Akhir: {{ $stg->end_at->translatedFormat('d M Y') }}
+                                        @elseif ($stg->start_at)
+                                            Mulai: {{ $stg->start_at->translatedFormat('d M Y') }}
+                                        @endif
+                                    </span>
+                                </div>
+                            @endif
                         </div>
                     @empty
                         <p class="text-slate-400">Belum ada tahapan seleksi.</p>

@@ -83,6 +83,32 @@
             </div>
         </div>
 
+        {{-- Deadline Reminder Alert --}}
+        @php
+            $deadline = $jobApplication->jobVacancy->close_at ?? $jobApplication->recruitmentPeriod->registration_end_at;
+            $daysLeft = $deadline ? (int) ceil(now()->diffInDays($deadline->endOfDay(), false)) : null;
+        @endphp
+
+        @if ($deadline && $jobApplication->status->value === 'draft')
+            <div class="p-4 rounded-2xl border {{ $daysLeft !== null && $daysLeft <= 3 ? 'bg-amber-50 border-amber-300 text-amber-900' : 'bg-sky-50 border-sky-200 text-sky-900' }} shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl {{ $daysLeft !== null && $daysLeft <= 3 ? 'bg-amber-100 text-amber-700' : 'bg-[#0179B5]/10 text-[#0179B5]' }} flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <div class="text-xs">
+                        <span class="font-bold block">Batas Waktu Pengisian & Unggah Berkas: {{ $deadline->translatedFormat('d F Y') }} (23:59 WIB)</span>
+                        <span class="{{ $daysLeft !== null && $daysLeft <= 3 ? 'text-amber-800' : 'text-sky-800' }}">Pastikan seluruh berkas wajib diunggah dan lamaran difinalisasi sebelum batas waktu berakhir.</span>
+                    </div>
+                </div>
+
+                @if ($daysLeft !== null && $daysLeft >= 0)
+                    <span class="px-3 py-1 text-xs font-extrabold rounded-full {{ $daysLeft <= 3 ? 'bg-amber-200 text-amber-900' : 'bg-sky-200 text-sky-900' }} shrink-0 self-start sm:self-auto">
+                        {{ $daysLeft === 0 ? 'Hari Terakhir!' : 'Sisa ' . $daysLeft . ' Hari Lagi' }}
+                    </span>
+                @endif
+            </div>
+        @endif
+
         {{-- Application Workflow Stepper --}}
         <div class="bg-white rounded-2xl border border-slate-200 shadow-2xs p-5">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-3">

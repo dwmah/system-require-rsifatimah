@@ -91,10 +91,55 @@
                             </div>
 
                             <button type="submit" class="px-5 py-2 bg-[#0179B5] hover:bg-[#016293] text-white text-xs font-semibold rounded-lg shadow-sm transition-colors">
-                                Simpan Jadwal
+                                Simpan Jadwal Periode
                             </button>
                         </div>
                     </form>
+
+                    <!-- Vacancy Stage Timelines Overview -->
+                    @if ($period->jobVacancies->isNotEmpty())
+                        <div class="pt-4 border-t border-slate-100 space-y-3">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">
+                                    Tahapan & Batas Waktu Seleksi Per Formasi Lowongan ({{ $period->jobVacancies->count() }})
+                                </h3>
+                                <span class="text-[11px] text-slate-400">Klik "Edit Batas Waktu" untuk menyesuaikan tanggal per tahapan</span>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                @foreach ($period->jobVacancies as $vac)
+                                    <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                                        <div class="flex items-start justify-between gap-2">
+                                            <div>
+                                                <div class="font-bold text-xs text-slate-900">{{ $vac->title }}</div>
+                                                <div class="text-[11px] text-slate-500">{{ $vac->unit }} &bull; {{ $vac->employment_type }}</div>
+                                            </div>
+                                            <a href="{{ route('admin.vacancies.edit', $vac) }}" class="px-2.5 py-1 text-[11px] font-semibold bg-white border border-slate-300 rounded-lg hover:bg-slate-100 text-[#0179B5] shadow-2xs shrink-0">
+                                                Edit Batas Waktu
+                                            </a>
+                                        </div>
+
+                                        <div class="space-y-1 pt-1.5 border-t border-slate-200/60 text-[11px]">
+                                            @forelse ($vac->selectionStages as $stg)
+                                                <div class="flex items-center justify-between text-slate-600 py-0.5">
+                                                    <span class="truncate pr-2">{{ $loop->iteration }}. {{ $stg->name }}</span>
+                                                    <span class="font-mono text-[10px] shrink-0 {{ $stg->end_at && $stg->end_at->isPast() ? 'text-slate-400' : 'text-[#0179B5] font-semibold' }}">
+                                                        @if ($stg->end_at)
+                                                            Batas: {{ $stg->end_at->format('d M Y') }}
+                                                        @else
+                                                            <span class="text-slate-400 italic">Belum diatur</span>
+                                                        @endif
+                                                    </span>
+                                                </div>
+                                            @empty
+                                                <div class="text-slate-400 italic text-[11px]">Belum ada tahapan diatur.</div>
+                                            @endforelse
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
                 </div>
             @empty
                 <div class="bg-white p-12 text-center text-slate-400 rounded-xl border border-slate-200">
