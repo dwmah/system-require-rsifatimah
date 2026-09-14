@@ -6,18 +6,14 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ?? 'Panel Administrasi SDI' }} - RSI Fatimah Banyuwangi</title>
 
-    <!-- Google Fonts: Inter -->
-    <link href="https://fonts.googleapis.com" rel="preconnect">
-    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Tahoma', sans-serif;
             background-color: #F6FAFF;
             color: #1E293B;
+            font-size: 15px;
         }
     </style>
 </head>
@@ -51,8 +47,8 @@
                             {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
                         </div>
                         <div class="hidden md:flex flex-col text-left leading-tight">
-                            <span class="text-xs font-semibold text-white">{{ auth()->user()->name }}</span>
-                            <span class="text-[10px] text-sky-100">Super User / SDI</span>
+                            <span class="text-sm font-semibold text-white">{{ auth()->user()->name }}</span>
+                            <span class="text-xs text-sky-100">Super User / SDI</span>
                         </div>
                         <svg class="w-3.5 h-3.5 text-sky-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
@@ -69,16 +65,16 @@
                          x-transition:leave-end="transform opacity-0 scale-95"
                          class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-50 text-slate-700 divide-y divide-slate-100">
                         <div class="px-4 py-2.5">
-                            <p class="text-xs font-semibold text-slate-900 truncate">{{ auth()->user()->name }}</p>
-                            <p class="text-[11px] text-slate-500 truncate mt-0.5">{{ auth()->user()->email }}</p>
-                            <span class="inline-block mt-1.5 px-2 py-0.5 text-[10px] font-medium bg-sky-50 text-[#0179B5] rounded border border-sky-100">Super User SDI</span>
+                            <p class="text-sm font-semibold text-slate-900 truncate">{{ auth()->user()->name }}</p>
+                            <p class="text-xs text-slate-500 truncate mt-0.5">{{ auth()->user()->email }}</p>
+                            <span class="inline-block mt-1.5 px-2 py-0.5 text-xs font-medium bg-sky-50 text-[#0179B5] rounded border border-sky-100">Super User SDI</span>
                         </div>
                         <div class="py-1">
-                            <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2.5 px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 transition-colors">
+                            <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2.5 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
                                 <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                                 <span>Dashboard SDI</span>
                             </a>
-                            <a href="{{ route('vacancies.index') }}" target="_blank" class="flex items-center gap-2.5 px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 transition-colors">
+                            <a href="{{ route('vacancies.index') }}" target="_blank" class="flex items-center gap-2.5 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
                                 <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
                                 <span>Portal Publik</span>
                             </a>

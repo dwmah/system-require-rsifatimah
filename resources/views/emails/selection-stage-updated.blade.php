@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <title>Pembaruan Tahapan Seleksi - RSI Fatimah Banyuwangi</title>
     <style>
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #F6FAFF; color: #1E293B; margin: 0; padding: 0; }
+        body { font-family: 'Tahoma', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #F6FAFF; color: #1E293B; margin: 0; padding: 0; font-size: 15px; }
         .container { max-width: 600px; margin: 30px auto; background-color: #ffffff; border-radius: 12px; border: 1px solid #E2E8F0; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
         .header { background-color: #0179B5; color: #ffffff; padding: 24px 30px; text-align: center; }
         .header h1 { margin: 0; font-size: 20px; font-weight: 700; }

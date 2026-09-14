@@ -4,7 +4,7 @@
     <div class="space-y-6">
         <!-- Section Menu Utama -->
         <div>
-            <div class="px-5 text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">
+            <div class="px-5 text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5">
                 Menu Administrasi SDI
             </div>
             <nav class="space-y-1">
@@ -75,12 +75,12 @@
 
         <!-- Section Tautan Publik -->
         <div>
-            <div class="px-5 text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">
+            <div class="px-5 text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5">
                 Tampilan Publik
             </div>
             <nav class="space-y-1">
                 <a href="{{ route('vacancies.index') }}" target="_blank"
-                   class="flex items-center justify-between px-5 py-2 text-sm font-medium text-slate-600 hover:text-[#0179B5] hover:bg-slate-50 transition-colors">
+                   class="flex items-center justify-between px-5 py-2.5 text-sm font-medium text-slate-600 hover:text-[#0179B5] hover:bg-slate-50 transition-colors">
                     <div class="flex items-center gap-3">
                         <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
@@ -97,9 +97,9 @@
         <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl">
             <div class="flex items-center gap-2">
                 <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                <span class="text-xs font-semibold text-slate-800">Sistem Rekrutmen SDI</span>
+                <span class="text-sm font-semibold text-slate-800">Sistem Rekrutmen SDI</span>
             </div>
-            <p class="text-[11px] text-slate-500 mt-1">RSI Fatimah Banyuwangi</p>
+            <p class="text-xs text-slate-500 mt-1">RSI Fatimah Banyuwangi</p>
         </div>
     </div>
 </aside>

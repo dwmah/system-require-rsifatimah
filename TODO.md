@@ -8,7 +8,7 @@ Status Dokumen	Draft Rancangan Awal (Untuk Penyusunan Flowchart & Validasi)
 1. Latar Belakang & Tujuan
 Sistem ini dirancang untuk memodernisasi dan mendigitalisasi proses penerimaan tenaga kerja di RSI Fatimah Banyuwangi. Sistem rekrutmen ini akan diintegrasikan dengan portal web resmi rumah sakit, memungkinkan pelamar mengirimkan dokumen secara mandiri, serta memfasilitasi tim SDI (Sumber Daya Insani / HRD) dalam menyeleksi, memvalidasi berkas, dan mempublikasikan status kelulusan peserta secara terstruktur sesuai standar regulasi dan akreditasi rumah sakit (KARS/Kemenkes).
 2. Konsep Desain & Antarmuka (UI/UX)
-• Identitas Visual / Warna Tema: Didominasi warna Biru Khas RSI Fatimah sebagai warna identitas korporat rumah sakit pada komponen navbar, header, tombol utama, dan indikator status.
+• Identitas Visual / Warna Tema: Didominasi warna Biru Khas RSI Fatimah sebagai warna identitas korporat rumah sakit pada komponen navbar, header, tombol utama, dan indikator status (Dengan font khas dari fatimah sendiri yaitu Tahoma dengan ukuran yang agak besar untuk memudahkan pengeliahtan pada para ADMIN dan USER).
 • Integrasi Menu Website: Menambahkan menu baru yaitu 'Rekrutmen' pada website utama (berdampingan dengan menu Diklat/Profil). Menu Rekrutmen memiliki dua submenu utama:
 a. Informasi Pendaftaran: Halaman terbuka untuk publik berisi jadwal rekrutmen, formasi lowongan yang dibuka, kualifikasi/syarat umum, serta dashboard timeline seleksi dan statistik (jumlah kebutuhan vs pelamar).
 b. Pendaftaran Pelamar: Pintu gerbang (login page & registrasi akun) khusus pelamar untuk mengakses dashboard mandiri, mengunggah berkas, dan memantau status seleksi.
@@ -109,6 +109,7 @@ Manajemen Akun Pasca-Seleksi:
 Diagram alir berikut menggunakan model Swimlane (tiga jalur peran: Pelamar, Sistem Otomatis, dan Tim SDI) untuk menggambarkan pembagian tanggung jawab dan perpindahan data secara transparan:
  
 Gambar 1: Alur Kerja Sistem Informasi Rekrutmen Karyawan RSI Fatimah Banyuwangi (Eraser.io Flowchart)
+
 9. Panduan Penjelasan Flowchart kepada Pimpinan (Executive Briefing)
 Saat mempresentasikan rancangan alur kerja ini kepada atasan / pimpinan manajemen, gunakan 5 poin kunci penjelasan terstruktur berikut:
 1. Kendali Otomatis Berbasis Waktu (Date-Driven Lock)
