@@ -4,56 +4,48 @@
     'missingItems' => [],
 ])
 
-<div class="rounded-2xl border p-6 sm:p-7 {{ $isComplete ? 'bg-emerald-50/50 border-emerald-200' : 'bg-amber-50/50 border-amber-200' }}">
-    <div class="flex items-start gap-4">
-        <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-2xs {{ $isComplete ? 'bg-emerald-600 text-white' : 'bg-amber-500 text-white' }}">
-            @if ($isComplete)
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-                </svg>
-            @else
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-            @endif
-        </div>
-
-        <div class="space-y-2 flex-1">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <h3 class="text-base font-bold {{ $isComplete ? 'text-emerald-900' : 'text-amber-900' }}">
-                    Ringkasan Kesiapan Profil
-                </h3>
-                <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full {{ $isComplete ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800' }}">
-                    {{ $percentage }}% Terpenuhi
-                </span>
+<div class="rounded-2xl border p-4 sm:p-5 {{ $isComplete ? 'bg-emerald-50/60 border-emerald-200' : 'bg-amber-50/60 border-amber-200' }}">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="flex items-start sm:items-center gap-3.5">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-2xs {{ $isComplete ? 'bg-emerald-600 text-white' : 'bg-amber-500 text-white' }}">
+                @if ($isComplete)
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                    </svg>
+                @else
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                @endif
             </div>
 
-            @if ($isComplete)
-                <p class="text-xs sm:text-sm text-emerald-800 leading-relaxed">
-                    <strong>Profil dasar Anda telah lengkap.</strong> Seluruh data identitas, kontak, dan riwayat pendidikan formal telah siap digunakan untuk proses pendaftaran lowongan.
+            <div class="space-y-0.5">
+                <div class="flex items-center gap-2">
+                    <h3 class="text-sm sm:text-base font-bold {{ $isComplete ? 'text-emerald-950' : 'text-amber-950' }}">
+                        {{ $isComplete ? 'Profil Dasar Lengkap' : 'Profil Belum Lengkap' }}
+                    </h3>
+                    <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full {{ $isComplete ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800' }}">
+                        {{ $percentage }}% Terpenuhi
+                    </span>
+                </div>
+                <p class="text-xs {{ $isComplete ? 'text-emerald-800' : 'text-amber-800' }}">
+                    @if ($isComplete)
+                        Data identitas, pas foto, dan riwayat Anda telah siap digunakan untuk pendaftaran lowongan.
+                    @else
+                        Masih perlu dilengkapi:
+                        <span class="font-semibold">{{ implode(', ', $missingItems) }}</span>
+                    @endif
                 </p>
-                <div class="p-3 bg-white/80 rounded-xl border border-emerald-200/60 text-xs text-slate-600 mt-2">
-                    <p class="font-medium text-slate-700 mb-0.5">Catatan Persyaratan Lanjutan:</p>
-                    <p>Persyaratan khusus seperti STR/lisensi, sertifikasi keahlian, pengalaman kerja, dan kelengkapan dokumen pendukung akan mengikuti formasi lowongan yang Anda pilih pada tahapan pendaftaran.</p>
-                </div>
-                <div class="pt-2">
-                    <x-ui.button href="{{ route('vacancies.index') }}" variant="primary" size="sm">
-                        Jelajahi Lowongan Terbuka
-                    </x-ui.button>
-                </div>
-            @else
-                <p class="text-xs sm:text-sm text-amber-800 leading-relaxed">
-                    Profil Anda belum mencapai 100%. Mohon lengkapi bagian berikut agar akun siap digunakan untuk melamar:
-                </p>
-                <div class="p-3 bg-white/80 rounded-xl border border-amber-200/60 text-xs text-amber-900 space-y-1 mt-2">
-                    <p class="font-semibold text-amber-950 mb-1">Masih perlu dilengkapi:</p>
-                    <ul class="list-disc list-inside space-y-0.5 text-amber-900">
-                        @foreach ($missingItems as $item)
-                            <li>{{ $item }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
+            </div>
         </div>
+
+        @if ($isComplete)
+            <div class="shrink-0 self-end sm:self-center">
+                <a href="{{ route('vacancies.index') }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-[#0179B5] hover:bg-[#016293] text-white text-xs font-bold rounded-xl shadow-xs transition-colors whitespace-nowrap">
+                    <span>Jelajahi Lowongan Terbuka</span>
+                    <span>&rarr;</span>
+                </a>
+            </div>
+        @endif
     </div>
 </div>

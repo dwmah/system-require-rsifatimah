@@ -11,7 +11,7 @@
     $unreadCount = $currentUser ? $currentUser->recruitmentNotifications()->whereNull('read_at')->count() : 0;
 @endphp
 
-<header class="bg-[#0179B5] border-b border-[#016699] sticky top-0 z-40 shadow-xs">
+<header class="bg-[#0179B5] border-b border-[#016699] fixed top-0 inset-x-0 z-40 shadow-xs">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
             {{-- Left: Brand and Mobile Hamburger Toggle --}}
@@ -54,9 +54,13 @@
                     {{-- Profile Pill & Quick Dashboard/Logout --}}
                     <div class="flex items-center gap-3 pl-2 border-l border-white/20">
                         <a href="{{ $currentUser->isAdmin() ? route('admin.dashboard') : route('portal.home') }}" class="flex items-center gap-2 text-white hover:opacity-90 transition-opacity" title="Buka Dashboard">
-                            <div class="w-8 h-8 rounded-full bg-white text-[#0179B5] font-bold text-xs flex items-center justify-center shadow-xs">
-                                {{ strtoupper(substr($name, 0, 2)) }}
-                            </div>
+                            @if(!$currentUser->isAdmin() && $currentUser->profile_photo_url)
+                                <img src="{{ $currentUser->profile_photo_url }}" alt="{{ $name }}" class="w-8 h-8 rounded-full object-cover shadow-xs border border-white/40" style="width: 32px; height: 32px; min-width: 32px; min-height: 32px; max-width: 32px; max-height: 32px; object-fit: cover; border-radius: 9999px;">
+                            @else
+                                <div class="w-8 h-8 rounded-full bg-white text-[#0179B5] font-bold text-xs flex items-center justify-center shadow-xs">
+                                    {{ strtoupper(substr($name, 0, 2)) }}
+                                </div>
+                            @endif
                             <div class="hidden sm:block text-left leading-tight">
                                 <p class="text-xs font-bold text-white truncate max-w-[140px]">{{ $name }}</p>
                                 <p class="text-[11px] text-sky-100 truncate max-w-[140px]">{{ $currentUser->isAdmin() ? 'Admin SDI' : $email }}</p>
@@ -79,20 +83,13 @@
                         @endif
                     </div>
                 @else
-                    {{-- Public Mode: Masuk & Daftar Buttons --}}
+                    {{-- Public Mode: Masuk Button --}}
                     <div class="flex items-center gap-2.5">
                         <a
                             href="{{ Route::has('login') ? route('login') : '/masuk' }}"
-                            class="px-3.5 py-1.5 text-xs font-semibold text-white hover:text-sky-100 transition-colors"
+                            class="px-4 py-1.5 rounded-lg bg-white/15 hover:bg-white/25 text-white border border-white/30 text-xs font-bold shadow-2xs transition-all"
                         >
                             Masuk
-                        </a>
-
-                        <a
-                            href="{{ Route::has('register') ? route('register') : '/daftar' }}"
-                            class="px-4 py-1.5 rounded-lg bg-white hover:bg-slate-50 text-[#0179B5] text-xs font-bold shadow-sm transition-all"
-                        >
-                            Daftar
                         </a>
                     </div>
                 @endif

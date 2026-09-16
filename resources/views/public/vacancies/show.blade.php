@@ -224,20 +224,7 @@
                                 >
                                     <span>Kelola Lowongan (Admin)</span>
                                 </a>
-                            @elseif ($jobVacancy->isCurrentlyOpen())
-                                <a
-                                    href="{{ route('portal.applications.start', $jobVacancy) }}"
-                                    class="w-full inline-flex items-center justify-center gap-2 font-semibold rounded-lg text-sm px-4 py-2.5 bg-rsi-700 hover:bg-rsi-800 text-white shadow-xs transition-colors cursor-pointer"
-                                >
-                                    <span>Lamar Posisi Ini</span>
-                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                    </svg>
-                                </a>
-                                <p class="text-[11px] text-center text-slate-400">
-                                    Pastikan profil dasar Anda telah lengkap sebelum mendaftar.
-                                </p>
-                            @else
+                            @elseif (! $jobVacancy->isCurrentlyOpen())
                                 <button
                                     type="button"
                                     disabled
@@ -248,20 +235,196 @@
                                 <p class="text-[11px] text-center text-slate-400">
                                     Masa pendaftaran untuk lowongan ini telah berakhir.
                                 </p>
-                            @endif
-                        @else
-                            @if ($jobVacancy->isCurrentlyOpen())
+                            @elseif ($existingApplication && ! $existingApplication->isDraft())
+                                {{-- Lamaran sudah FINAL / TERKIRIM --}}
+                                <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-600 space-y-1.5">
+                                    <span class="font-bold text-slate-800 flex items-center gap-1.5">
+                                        <svg class="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                        </svg>
+                                        Lamaran Terkunci Resmi
+                                    </span>
+                                    <p class="text-[11px] leading-relaxed">
+                                        Anda telah mengirimkan lamaran untuk formasi <strong>{{ $existingApplication->jobVacancy->title }}</strong> pada periode rekrutmen ini. Pilihan formasi telah terkunci permanen.
+                                    </p>
+                                </div>
+                                <a
+                                    href="{{ route('portal.applications.show', $existingApplication) }}"
+                                    class="w-full inline-flex items-center justify-center gap-2 font-semibold rounded-lg text-xs px-4 py-2.5 bg-slate-800 hover:bg-slate-900 text-white shadow-xs transition-colors"
+                                >
+                                    <span>Lihat Detail Lamaran Anda</span>
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                    </svg>
+                                </a>
+                            @elseif ($existingApplication && $existingApplication->job_vacancy_id === $jobVacancy->id)
+                                {{-- Lamaran sedang draft pada formasi yang sama --}}
+                                <a
+                                    href="{{ route('portal.applications.show', $existingApplication) }}"
+                                    class="w-full inline-flex items-center justify-center gap-2 font-semibold rounded-lg text-sm px-4 py-2.5 bg-rsi-700 hover:bg-rsi-800 text-white shadow-xs transition-colors cursor-pointer"
+                                >
+                                    <span>Lanjutkan Draft Lamaran Ini</span>
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                    </svg>
+                                </a>
+                                <p class="text-[11px] text-center text-slate-400">
+                                    Anda sedang mengerjakan berkas draft untuk formasi ini.
+                                </p>
+                            @elseif ($existingApplication && $existingApplication->isDraft() && $existingApplication->job_vacancy_id !== $jobVacancy->id)
+                                {{-- KASUS UTAMA: Pelamar memiliki draft di formasi lain, ingin melamar formasi ini --}}
+                                <div x-data="{ showSwitchModal: false }">
+                                    <button
+                                        type="button"
+                                        @click="showSwitchModal = true"
+                                        class="w-full inline-flex items-center justify-center gap-2 font-semibold rounded-lg text-sm px-4 py-2.5 bg-rsi-700 hover:bg-rsi-800 text-white shadow-xs transition-colors cursor-pointer"
+                                    >
+                                        <span>Lamar Posisi Ini Sekarang</span>
+                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                        </svg>
+                                    </button>
+                                    <p class="text-[11px] text-center text-amber-600 mt-2 font-medium">
+                                        Draft sebelumnya ({{ $existingApplication->jobVacancy->title }}) akan otomatis diganti.
+                                    </p>
+
+                                    {{-- Modal Pop-up: Konfirmasi Ganti Formasi & Hapus Draft Lama --}}
+                                    <template x-teleport="body">
+                                        <div
+                                            x-show="showSwitchModal"
+                                            x-cloak
+                                            class="fixed inset-0 z-50 overflow-y-auto"
+                                            role="dialog"
+                                            aria-modal="true"
+                                        >
+                                            {{-- Backdrop --}}
+                                            <div
+                                                x-show="showSwitchModal"
+                                                x-transition:enter="ease-out duration-200"
+                                                x-transition:enter-start="opacity-0"
+                                                x-transition:enter-end="opacity-100"
+                                                x-transition:leave="ease-in duration-150"
+                                                x-transition:leave-start="opacity-100"
+                                                x-transition:leave-end="opacity-0"
+                                                class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs transition-opacity"
+                                                @click="showSwitchModal = false"
+                                                aria-hidden="true"
+                                            ></div>
+
+                                            {{-- Dialog Wrapper --}}
+                                            <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0 relative z-10 pointer-events-none">
+                                                <div
+                                                    x-show="showSwitchModal"
+                                                    x-transition:enter="ease-out duration-200"
+                                                    x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                                                    x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                                                    x-transition:leave="ease-in duration-150"
+                                                    x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                                                    x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                                                    class="relative w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-2xl rounded-2xl border border-slate-200 pointer-events-auto space-y-4"
+                                                >
+                                                    <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                                                        <div class="flex items-center gap-3">
+                                                            <div class="w-10 h-10 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                                                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                                                                </svg>
+                                                            </div>
+                                                            <div>
+                                                                <h3 class="text-base font-bold text-slate-900">Ganti Formasi Lamaran?</h3>
+                                                                <p class="text-xs text-slate-500">Konfirmasi pergantian draft lamaran</p>
+                                                            </div>
+                                                        </div>
+                                                        <button
+                                                            type="button"
+                                                            @click="showSwitchModal = false"
+                                                            class="text-slate-400 hover:text-slate-600 focus:outline-hidden cursor-pointer"
+                                                        >
+                                                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                            </svg>
+                                                        </button>
+                                                    </div>
+
+                                                    <div class="space-y-2.5 text-xs">
+                                                        <div class="p-3.5 bg-amber-50 rounded-xl border border-amber-200 text-amber-900 leading-relaxed">
+                                                            <strong class="block font-bold text-amber-950 flex items-center gap-1.5 mb-1 text-xs">
+                                                                <svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                                                </svg>
+                                                                Lamaran Sebelumnya Akan Dihapus:
+                                                            </strong>
+                                                            Anda saat ini memiliki draft lamaran untuk formasi <strong>{{ $existingApplication->jobVacancy->title }}</strong>. Draft tersebut beserta berkas dokumen lamaran draft sebelumnya akan <strong>dihapus</strong> dan otomatis diganti dengan formasi baru: <strong>{{ $jobVacancy->title }}</strong>.
+                                                        </div>
+
+                                                        <div class="p-3.5 bg-emerald-50 rounded-xl border border-emerald-200 text-emerald-900 leading-relaxed">
+                                                            <strong class="block font-bold text-emerald-950 flex items-center gap-1.5 mb-1 text-xs">
+                                                                <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                                                </svg>
+                                                                Profil Anda Tetap Aman Tersimpan:
+                                                            </strong>
+                                                            Data pribadi, kontak, riwayat pendidikan, STR/lisensi, sertifikasi, dan pengalaman kerja Anda <strong>TIDAK AKAN DIHAPUS</strong>.
+                                                        </div>
+
+                                                        <p class="text-slate-500 text-[11px] leading-relaxed">
+                                                            Pilihan formasi baru akan terkunci permanen hanya setelah Anda melakukan Final Submit di tahap akhir.
+                                                        </p>
+                                                    </div>
+
+                                                    <form method="POST" action="{{ route('portal.applications.store', $jobVacancy) }}">
+                                                        @csrf
+                                                        <input type="hidden" name="job_vacancy_id" value="{{ $jobVacancy->id }}">
+                                                        <input type="hidden" name="confirm_switch" value="1">
+
+                                                        <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+                                                            <button
+                                                                type="button"
+                                                                @click="showSwitchModal = false"
+                                                                class="px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                                                            >
+                                                                Batal
+                                                            </button>
+                                                            <button
+                                                                type="submit"
+                                                                class="px-4 py-2 text-xs font-bold text-white bg-rsi-700 hover:bg-rsi-800 rounded-lg shadow-xs transition-colors cursor-pointer"
+                                                            >
+                                                                Ya, Ganti ke Formasi Ini
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            @else
                                 <a
                                     href="{{ route('portal.applications.start', $jobVacancy) }}"
                                     class="w-full inline-flex items-center justify-center gap-2 font-semibold rounded-lg text-sm px-4 py-2.5 bg-rsi-700 hover:bg-rsi-800 text-white shadow-xs transition-colors cursor-pointer"
                                 >
-                                    <span>Lamar Sekarang</span>
+                                    <span>Lamar Posisi Ini Sekarang</span>
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                    </svg>
+                                </a>
+                                <p class="text-[11px] text-center text-slate-400">
+                                    Pastikan profil dasar Anda telah lengkap sebelum mendaftar.
+                                </p>
+                            @endif
+                        @else
+                            @if ($jobVacancy->isCurrentlyOpen())
+                                <a
+                                    href="{{ route('register', ['lowongan' => $jobVacancy->id]) }}"
+                                    class="w-full inline-flex items-center justify-center gap-2 font-semibold rounded-lg text-sm px-4 py-2.5 bg-rsi-700 hover:bg-rsi-800 text-white shadow-xs transition-colors cursor-pointer"
+                                >
+                                    <span>Lamar Posisi Ini Sekarang</span>
                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                                     </svg>
                                 </a>
                                 <p class="text-[11px] text-center text-slate-500">
-                                    Belum punya akun? <a href="{{ route('register') }}" class="text-rsi-700 font-semibold hover:underline">Daftar Akun Baru</a>
+                                    Sudah punya akun? <a href="{{ route('login', ['intended' => route('portal.applications.start', $jobVacancy)]) }}" class="text-rsi-700 font-semibold hover:underline">Masuk untuk Melamar</a>
                                 </p>
                             @else
                                 <button

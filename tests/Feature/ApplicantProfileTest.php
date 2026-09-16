@@ -437,40 +437,47 @@ class ApplicantProfileTest extends TestCase
         $service = new ProfileCompletenessService();
 
         // 1. Fresh user right after registration:
-        // Has name, email, phone, NIK (4 criteria = 40%)
+        // Has name, email, phone, NIK (4 criteria of 11 = 36%)
         $user = $this->createApplicantUser();
-        $this->assertEquals(40, $service->percentage($user));
+        $this->assertEquals(36, $service->percentage($user));
         $this->assertFalse($service->isComplete($user));
-        $this->assertCount(6, $service->missingItems($user));
+        $this->assertCount(7, $service->missingItems($user));
 
-        // 2. Fill personal data (+3 criteria: birth_place, birth_date, gender -> 70%)
+        // 2. Fill personal data (+3 criteria: birth_place, birth_date, gender -> 7/11 = 64%)
         $user->applicantProfile->update([
             'birth_place' => 'Banyuwangi',
             'birth_date' => '1996-04-12',
             'gender' => 'Laki-laki',
         ]);
-        $this->assertEquals(70, $service->percentage($user->fresh()));
+        $this->assertEquals(64, $service->percentage($user->fresh()));
 
-        // 3. Fill address (+2 criteria: address_ktp, address_domicile -> 90%)
+        // 3. Fill address (+2 criteria: address_ktp, address_domicile -> 9/11 = 82%)
         $user->applicantProfile->update([
             'address_ktp' => 'Jl. Ahmad Yani No. 5',
             'address_domicile' => 'Jl. Ahmad Yani No. 5',
             'same_as_ktp' => true,
         ]);
-        $this->assertEquals(90, $service->percentage($user->fresh()));
+        $this->assertEquals(82, $service->percentage($user->fresh()));
 
-        // 4. Add education (+1 criterion: min 1 education -> 100%)
+        // 4. Add education (+1 criterion: min 1 education -> 10/11 = 91%)
         $edu = ApplicantEducation::create([
             'applicant_profile_id' => $user->applicantProfile->id,
             'education_level' => 'S1',
             'institution_name' => 'Universitas Jember',
             'study_program' => 'Keperawatan',
         ]);
+        $this->assertEquals(91, $service->percentage($user->fresh()));
+        $this->assertFalse($service->isComplete($user->fresh()));
+
+        // 5. Add photo (+1 criterion: pas foto formal 3x4 -> 11/11 = 100%)
+        $user->applicantProfile->update([
+            'photo_path' => 'profile-photos/sample.jpg',
+        ]);
         $this->assertEquals(100, $service->percentage($user->fresh()));
         $this->assertTrue($service->isComplete($user->fresh()));
         $this->assertEmpty($service->missingItems($user->fresh()));
 
-        // 5. Adding License, Certification, Work Experience does NOT change completeness percentage (still 100%)
+        // 6. Adding License, Certification, Work Experience does NOT change completeness percentage (still 100%)
         ApplicantLicense::create([
             'applicant_profile_id' => $user->applicantProfile->id,
             'license_type' => 'STR Perawat',
@@ -487,9 +494,9 @@ class ApplicantProfileTest extends TestCase
         ]);
         $this->assertEquals(100, $service->percentage($user->fresh()));
 
-        // 6. Deleting the only education drops completeness back to 90%
-        $edu->delete();
-        $this->assertEquals(90, $service->percentage($user->fresh()));
+        // 7. Deleting the photo drops completeness back to 91%
+        $user->applicantProfile->update(['photo_path' => null]);
+        $this->assertEquals(91, $service->percentage($user->fresh()));
         $this->assertFalse($service->isComplete($user->fresh()));
     }
 
@@ -511,7 +518,8 @@ class ApplicantProfileTest extends TestCase
         $this->assertTrue($details['phone']);
         $this->assertFalse($details['nik']);
         $this->assertFalse($details['birth_place']);
-        $this->assertEquals(30, $service->percentage($user));
+        $this->assertFalse($details['photo']);
+        $this->assertEquals(27, $service->percentage($user));
         $this->assertFalse($service->isComplete($user));
     }
 
@@ -523,7 +531,7 @@ class ApplicantProfileTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('Kelengkapan Profil Dasar');
-        $response->assertSee('40% Selesai');
+        $response->assertSee('36% Selesai');
         $response->assertSee('Lengkapi Profil Sekarang');
     }
 }

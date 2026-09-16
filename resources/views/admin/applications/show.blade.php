@@ -19,9 +19,13 @@
         <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 pb-6 border-b border-slate-200">
                 <div class="flex items-start gap-4">
-                    <div class="w-14 h-14 rounded-2xl bg-[#0179B5] text-white font-bold text-xl flex items-center justify-center shadow-md flex-shrink-0">
-                        {{ strtoupper(substr($user->name, 0, 2)) }}
-                    </div>
+                    @if($user->profile_photo_url)
+                        <img src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}" class="w-14 h-14 rounded-2xl object-cover shadow-md flex-shrink-0 border border-slate-200" style="width: 56px; height: 56px; min-width: 56px; min-height: 56px; max-width: 56px; max-height: 56px; object-fit: cover; border-radius: 16px;">
+                    @else
+                        <div class="w-14 h-14 rounded-2xl bg-[#0179B5] text-white font-bold text-xl flex items-center justify-center shadow-md flex-shrink-0">
+                            {{ strtoupper(substr($user->name, 0, 2)) }}
+                        </div>
+                    @endif
                     <div>
                         <div class="flex items-center gap-3">
                             <h1 class="text-xl font-bold text-slate-900">{{ $user->name }}</h1>

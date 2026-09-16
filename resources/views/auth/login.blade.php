@@ -117,8 +117,8 @@
     {{-- Footer Tautan Daftar --}}
     <div class="mt-6 pt-5 border-t border-slate-100 text-center text-xs text-slate-500">
         Belum memiliki akun?
-        <a href="{{ route('register') }}" class="font-semibold text-rsi-700 hover:text-rsi-800 hover:underline transition-colors ml-1">
-            Daftar Sekarang
+        <a href="{{ route('vacancies.index') }}" class="font-semibold text-rsi-700 hover:text-rsi-800 hover:underline transition-colors ml-1">
+            Pilih Lowongan untuk Melamar &rarr;
         </a>
     </div>
 </x-layouts.auth>

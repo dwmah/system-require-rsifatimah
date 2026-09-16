@@ -3,6 +3,10 @@
     'activeMenu' => null,
 ])
 
+@php
+    $isApplicant = auth()->check() && !auth()->user()->isAdmin();
+@endphp
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-slate-50">
 <head>
@@ -23,16 +27,20 @@
 <body class="h-full flex flex-col font-sans antialiased text-slate-900 bg-slate-50" x-data="{ mobileMenuOpen: false }">
 
     {{-- Topbar Navigation --}}
-    <x-navigation.topbar variant="public" />
+    <x-navigation.topbar :variant="$isApplicant ? 'applicant' : 'public'" />
 
     {{-- Mobile Menu Drawer --}}
-    <x-navigation.mobile-menu variant="public" />
+    <x-navigation.mobile-menu :variant="$isApplicant ? 'applicant' : 'public'" :active-menu="$activeMenu" />
 
     {{-- Body Shell: Sidebar + Main Content --}}
-    <div class="flex-1 flex w-full max-w-7xl mx-auto">
+    <div class="pt-16 flex-1 flex w-full max-w-7xl mx-auto">
         {{-- Desktop Left Sidebar --}}
-        <div class="hidden lg:block shrink-0">
-            <x-navigation.public-sidebar :active-menu="$activeMenu" class="h-full sticky top-16" />
+        <div class="hidden lg:block shrink-0 sticky top-16 h-[calc(100vh-4rem)]">
+            @if ($isApplicant)
+                <x-navigation.applicant-sidebar :active-menu="$activeMenu" class="h-full" />
+            @else
+                <x-navigation.public-sidebar :active-menu="$activeMenu" class="h-full" />
+            @endif
         </div>
 
         {{-- Main Page Content --}}

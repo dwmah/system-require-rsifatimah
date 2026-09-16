@@ -88,6 +88,14 @@ class User extends Authenticatable
     }
 
     /**
+     * URL foto profil pelamar jika tersedia.
+     */
+    public function getProfilePhotoUrlAttribute(): ?string
+    {
+        return $this->applicantProfile?->photo_url;
+    }
+
+    /**
      * Riwayat lamaran pekerjaan yang diajukan oleh user.
      */
     public function jobApplications(): HasMany

@@ -9,6 +9,7 @@ use App\Services\Profile\ProfileCompletenessService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class ProfileController extends Controller
@@ -22,9 +23,6 @@ class ProfileController extends Controller
 
         $user->loadMissing([
             'applicantProfile.educations',
-            'applicantProfile.licenses',
-            'applicantProfile.certifications',
-            'applicantProfile.workExperiences',
         ]);
 
         $percentage = $completenessService->percentage($user);
@@ -96,5 +94,74 @@ class ProfileController extends Controller
         });
 
         return redirect()->route('profile.show')->with('success', 'Informasi alamat dan kontak berhasil diperbarui.');
+    }
+
+    /**
+     * Upload / perbarui foto profil pelamar.
+     */
+    public function updatePhoto(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'photo' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:5120'],
+        ], [
+            'photo.required' => 'Silakan pilih berkas foto yang ingin diunggah.',
+            'photo.image' => 'Berkas harus berupa file gambar valid.',
+            'photo.mimes' => 'Format foto yang diperbolehkan hanya JPG, JPEG, PNG, atau WEBP.',
+            'photo.max' => 'Ukuran foto maksimal adalah 5 MB.',
+        ]);
+
+        try {
+            $user = $request->user();
+            $file = $request->file('photo');
+
+            if (! $file || ! $file->isValid()) {
+                return redirect()->route('profile.show')->withErrors(['photo' => 'Berkas foto tidak valid atau gagal diunggah.']);
+            }
+
+            $storedPath = $file->store('profile-photos', 'public');
+
+            $profile = $user->applicantProfile()->firstOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'nik' => $user->registration_number ?? (string) rand(1000000000000000, 9999999999999999),
+                    'same_as_ktp' => false,
+                ]
+            );
+
+            // Hapus foto lama jika ada di storage publik
+            if ($profile->photo_path && Storage::disk('public')->exists($profile->photo_path)) {
+                Storage::disk('public')->delete($profile->photo_path);
+            }
+
+            $profile->update([
+                'photo_path' => $storedPath,
+            ]);
+
+            return redirect()->route('profile.show')->with('success', 'Pas foto profil berhasil diperbarui.');
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Profile photo upload error: ' . $e->getMessage());
+
+            return redirect()->route('profile.show')->withErrors(['photo' => 'Terjadi kendala saat menyimpan foto. Silakan coba lagi.']);
+        }
+    }
+
+    /**
+     * Hapus foto profil pelamar.
+     */
+    public function destroyPhoto(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+        $profile = $user->applicantProfile;
+
+        if ($profile && $profile->photo_path) {
+            if (Storage::disk('public')->exists($profile->photo_path)) {
+                Storage::disk('public')->delete($profile->photo_path);
+            }
+            $profile->update([
+                'photo_path' => null,
+            ]);
+        }
+
+        return redirect()->route('profile.show')->with('success', 'Foto profil berhasil dihapus.');
     }
 }

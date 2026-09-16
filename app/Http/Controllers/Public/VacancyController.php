@@ -91,6 +91,15 @@ class VacancyController extends Controller
             'selectionStages',
         ]);
 
-        return view('public.vacancies.show', compact('jobVacancy'));
+        $existingApplication = null;
+        if (auth()->check()) {
+            $existingApplication = auth()->user()
+                ->jobApplications()
+                ->where('recruitment_period_id', $jobVacancy->recruitment_period_id)
+                ->with(['jobVacancy', 'documents'])
+                ->first();
+        }
+
+        return view('public.vacancies.show', compact('jobVacancy', 'existingApplication'));
     }
 }

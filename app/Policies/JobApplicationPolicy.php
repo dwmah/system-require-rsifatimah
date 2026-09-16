@@ -28,11 +28,28 @@ class JobApplicationPolicy
     }
 
     /**
-     * Determine whether the user can delete documents from the job application.
+     * Determine whether the user can delete documents or the draft application itself.
      */
     public function delete(User $user, JobApplication $application): bool
     {
-        return $this->update($user, $application);
+        return $this->update($user, $application)
+            && $application->submitted_at === null;
+    }
+
+    /**
+     * Determine whether the user can cancel their draft application.
+     */
+    public function cancelDraft(User $user, JobApplication $application): bool
+    {
+        return $this->delete($user, $application);
+    }
+
+    /**
+     * Determine whether the user can change vacancy on their draft application.
+     */
+    public function changeVacancy(User $user, JobApplication $application): bool
+    {
+        return $this->delete($user, $application);
     }
 
     /**

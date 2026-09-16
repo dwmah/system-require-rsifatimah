@@ -71,7 +71,7 @@
                         <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-200 text-slate-700 text-xs font-bold">1</span>
                         <span class="text-[11px] font-semibold text-rsi-700 flex items-center gap-1">
                             <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
-                            Terkunci
+                            {{ $jobApplication->isDraft() ? 'Dapat Diganti' : 'Terkunci' }}
                         </span>
                     </div>
                     <div class="text-xs font-bold text-slate-800">Formasi & Profil</div>
@@ -199,7 +199,7 @@
                 </div>
                 <div>
                     <span class="text-slate-500 block">Jenis Kelamin:</span>
-                    <span class="text-slate-800">{{ $profile?->gender?->label() ?? '-' }}</span>
+                    <span class="text-slate-800">{{ is_object($profile?->gender) ? $profile->gender->label() : ($profile?->gender ?? '-') }}</span>
                 </div>
                 <div>
                     <span class="text-slate-500 block">Agama:</span>
@@ -241,7 +241,7 @@
                             <div class="py-3 first:pt-0 last:pb-0 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
                                 <div>
                                     <div class="font-bold text-slate-900">{{ $edu->institution_name }}</div>
-                                    <div class="text-slate-500">{{ $edu->education_level->label() }} - {{ $edu->study_program }} (Akreditasi: {{ $edu->accreditation ?? '-' }})</div>
+                                    <div class="text-slate-500">{{ is_object($edu->education_level) ? $edu->education_level->label() : $edu->education_level }} - {{ $edu->study_program }} (Akreditasi: {{ $edu->accreditation ?? '-' }})</div>
                                 </div>
                                 <div class="text-slate-600 sm:text-right">
                                     <span>Lulus: <strong>{{ $edu->graduation_year }}</strong></span>

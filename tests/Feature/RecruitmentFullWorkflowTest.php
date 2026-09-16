@@ -62,6 +62,7 @@ class RecruitmentFullWorkflowTest extends TestCase
             'address_ktp' => 'Jl. Basuki Rahmat No. 10',
             'address_domicile' => 'Jl. Basuki Rahmat No. 10',
             'phone' => '08123456789',
+            'photo_path' => 'profile-photos/test.jpg',
         ]);
 
         $this->applicant->applicantProfile->educations()->create([

@@ -47,25 +47,26 @@ class ApplicationSubmissionController extends Controller
 
         $user = $jobApplication->user;
         $user->loadMissing([
-            'applicantProfile',
-            'applicantEducations',
-            'applicantLicenses',
-            'applicantCertifications',
-            'applicantWorkExperiences',
+            'applicantProfile.educations',
+            'applicantProfile.licenses',
+            'applicantProfile.certifications',
+            'applicantProfile.workExperiences',
         ]);
 
         $missingRequirements = $documentService->missingRequiredDocuments($jobApplication);
         $isProfileComplete = $completenessService->isComplete($user);
         $isVacancyOpen = $jobApplication->jobVacancy->isCurrentlyOpen();
 
+        $profile = $user->applicantProfile;
+
         return view('portal.applications.review', [
             'jobApplication' => $jobApplication,
             'user' => $user,
-            'profile' => $user->applicantProfile,
-            'educations' => $user->applicantEducations,
-            'licenses' => $user->applicantLicenses,
-            'certifications' => $user->applicantCertifications,
-            'workExperiences' => $user->applicantWorkExperiences,
+            'profile' => $profile,
+            'educations' => $profile?->educations ?? collect(),
+            'licenses' => $profile?->licenses ?? collect(),
+            'certifications' => $profile?->certifications ?? collect(),
+            'workExperiences' => $profile?->workExperiences ?? collect(),
             'missingRequirements' => $missingRequirements,
             'isProfileComplete' => $isProfileComplete,
             'isVacancyOpen' => $isVacancyOpen,

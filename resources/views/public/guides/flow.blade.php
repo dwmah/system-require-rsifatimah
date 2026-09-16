@@ -124,10 +124,5 @@
                 </div>
             </div>
         </div>
-
-        {{-- Help Banner --}}
-        <x-ui.alert type="info" title="Informasi Penting Pendaftaran">
-            Seluruh tahapan rekrutmen SDM RSI Fatimah Banyuwangi <strong class="text-slate-900">tidak dipungut biaya apapun (gratis)</strong>. Hati-hati terhadap pihak yang mengatasnamakan panitia rekrutmen dengan meminta imbalan finansial.
-        </x-ui.alert>
     </div>
 </x-layouts.public>

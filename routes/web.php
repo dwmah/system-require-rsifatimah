@@ -44,8 +44,10 @@ Route::middleware('recruitment.open')->group(function () {
 
 // Registrasi Pelamar Baru (Hanya bisa saat recruitment terbuka & guest)
 Route::middleware(['recruitment.open', 'guest'])->group(function () {
-    Route::get('/daftar', [RegisteredUserController::class, 'create'])->name('register');
-    Route::post('/daftar', [RegisteredUserController::class, 'store'])->name('register.store');
+    Route::get('/daftar/{jobVacancy?}', [RegisteredUserController::class, 'create'])->name('register');
+    Route::post('/daftar', [RegisteredUserController::class, 'store'])
+        ->middleware('throttle:registration')
+        ->name('register.store');
 });
 
 // Autentikasi Pelamar & Admin (Guest Only)
@@ -54,7 +56,9 @@ Route::middleware('guest')->group(function () {
     Route::post('/masuk', [AuthenticatedSessionController::class, 'store'])->name('login.store');
 
     Route::get('/lupa-password', [PasswordResetLinkController::class, 'create'])->name('password.request');
-    Route::post('/lupa-password', [PasswordResetLinkController::class, 'store'])->name('password.email');
+    Route::post('/lupa-password', [PasswordResetLinkController::class, 'store'])
+        ->middleware('throttle:password-reset-link')
+        ->name('password.email');
     Route::get('/reset-password/{token}', [NewPasswordController::class, 'create'])->name('password.reset');
     Route::post('/reset-password', [NewPasswordController::class, 'store'])->name('password.update');
 });
@@ -69,6 +73,8 @@ Route::middleware('auth')->group(function () {
 
     // Profil Pelamar
     Route::get('/portal/profil', [\App\Http\Controllers\Portal\ProfileController::class, 'show'])->name('profile.show');
+    Route::post('/portal/profil/foto', [\App\Http\Controllers\Portal\ProfileController::class, 'updatePhoto'])->name('profile.photo.update');
+    Route::delete('/portal/profil/foto', [\App\Http\Controllers\Portal\ProfileController::class, 'destroyPhoto'])->name('profile.photo.destroy');
     Route::patch('/portal/profil/data-pribadi', [\App\Http\Controllers\Portal\ProfileController::class, 'updatePersonal'])->name('profile.personal.update');
     Route::patch('/portal/profil/alamat-kontak', [\App\Http\Controllers\Portal\ProfileController::class, 'updateContact'])->name('profile.contact.update');
 
@@ -99,6 +105,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/portal/lamaran/{jobApplication}', [\App\Http\Controllers\Portal\ApplicationController::class, 'show'])
         ->whereNumber('jobApplication')
         ->name('portal.applications.show');
+    Route::match(['delete', 'post'], '/portal/lamaran/{jobApplication}/batal', [\App\Http\Controllers\Portal\ApplicationController::class, 'cancelDraft'])
+        ->whereNumber('jobApplication')
+        ->name('portal.applications.cancel-draft');
+    Route::post('/portal/lamaran/{jobApplication}/ganti-formasi', [\App\Http\Controllers\Portal\ApplicationController::class, 'switchVacancy'])
+        ->whereNumber('jobApplication')
+        ->name('portal.applications.switch-vacancy');
 
     // Berkas Persyaratan & Final Submit (Fase 8B)
     Route::get('/portal/lamaran/{jobApplication}/berkas', [\App\Http\Controllers\Portal\ApplicationDocumentController::class, 'index'])
@@ -140,6 +152,8 @@ Route::middleware(['auth', 'applicant'])->prefix('portal')->name('portal.')->gro
 
     // Profil Pelamar
     Route::get('/profil', [ProfileController::class, 'show'])->name('profile.show');
+    Route::post('/profil/foto', [ProfileController::class, 'updatePhoto'])->name('profile.photo.update');
+    Route::delete('/profil/foto', [ProfileController::class, 'destroyPhoto'])->name('profile.photo.destroy');
     Route::patch('/profil/data-pribadi', [ProfileController::class, 'updatePersonal'])->name('profile.personal.update');
     Route::patch('/profil/alamat-kontak', [ProfileController::class, 'updateContact'])->name('profile.contact.update');
 
@@ -169,6 +183,8 @@ Route::middleware(['auth', 'applicant'])->prefix('portal')->name('portal.')->gro
 // Backward compatibility profile alias for existing tests/views
 Route::middleware(['auth', 'applicant'])->prefix('portal/profil')->name('profile.')->group(function () {
     Route::get('/', [ProfileController::class, 'show'])->name('show');
+    Route::post('/foto', [ProfileController::class, 'updatePhoto'])->name('photo.update');
+    Route::delete('/foto', [ProfileController::class, 'destroyPhoto'])->name('photo.destroy');
     Route::patch('/data-pribadi', [ProfileController::class, 'updatePersonal'])->name('personal.update');
     Route::patch('/alamat-kontak', [ProfileController::class, 'updateContact'])->name('contact.update');
     Route::post('/pendidikan', [ApplicantEducationController::class, 'store'])->name('educations.store');

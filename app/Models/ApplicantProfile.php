@@ -22,6 +22,7 @@ class ApplicantProfile extends Model
         'birth_place',
         'birth_date',
         'gender',
+        'photo_path',
         'address_ktp',
         'address_domicile',
         'same_as_ktp',
@@ -38,6 +39,18 @@ class ApplicantProfile extends Model
             'birth_date' => 'date',
             'same_as_ktp' => 'boolean',
         ];
+    }
+
+    /**
+     * URL publik foto profil jika berkas ada di storage publik.
+     */
+    public function getPhotoUrlAttribute(): ?string
+    {
+        if ($this->photo_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($this->photo_path)) {
+            return asset('storage/' . $this->photo_path);
+        }
+
+        return null;
     }
 
     /**

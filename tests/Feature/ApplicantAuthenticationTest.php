@@ -66,13 +66,24 @@ class ApplicantAuthenticationTest extends TestCase
 
     public function test_registration_page_accessible_when_recruitment_is_active(): void
     {
-        $this->createActiveRecruitment();
+        $vacancy = $this->createActiveRecruitment();
 
-        $response = $this->get(route('register'));
+        $response = $this->get(route('register', ['lowongan' => $vacancy->id]));
 
         $response->assertStatus(200);
         $response->assertSee('Registrasi Akun Pelamar');
         $response->assertSee('Saya menyetujui Syarat & Ketentuan');
+        $response->assertSee($vacancy->title);
+    }
+
+    public function test_registration_without_vacancy_redirects_to_vacancies_index(): void
+    {
+        $this->createActiveRecruitment();
+
+        $response = $this->get(route('register'));
+
+        $response->assertRedirect(route('vacancies.index'));
+        $response->assertSessionHas('info');
     }
 
     public function test_registration_page_redirects_to_closed_when_no_active_recruitment(): void
@@ -100,7 +111,7 @@ class ApplicantAuthenticationTest extends TestCase
 
     public function test_registration_creates_user_with_registration_number_profile_and_consent_timestamps(): void
     {
-        $this->createActiveRecruitment();
+        $vacancy = $this->createActiveRecruitment();
 
         $response = $this->post(route('register.store'), [
             'name' => 'Ahmad Pelamar',
@@ -110,10 +121,15 @@ class ApplicantAuthenticationTest extends TestCase
             'password' => 'Rahasia123',
             'password_confirmation' => 'Rahasia123',
             'terms' => '1',
+            'job_vacancy_id' => $vacancy->id,
         ]);
 
-        $response->assertRedirect(route('portal.home'));
+        $response->assertRedirect(route('portal.applications.index'));
         $this->assertAuthenticated();
+        $this->assertDatabaseHas('job_applications', [
+            'job_vacancy_id' => $vacancy->id,
+            'status' => 'draft',
+        ]);
 
         $user = User::where('email', 'ahmad@example.com')->first();
         $this->assertNotNull($user);

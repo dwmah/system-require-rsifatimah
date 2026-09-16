@@ -60,7 +60,9 @@ class UserLifecycleService
 
             // 2. Hapus profile photo jika ada
             if ($user->applicantProfile && $user->applicantProfile->photo_path) {
-                if (Storage::exists($user->applicantProfile->photo_path)) {
+                if (Storage::disk('public')->exists($user->applicantProfile->photo_path)) {
+                    Storage::disk('public')->delete($user->applicantProfile->photo_path);
+                } elseif (Storage::exists($user->applicantProfile->photo_path)) {
                     Storage::delete($user->applicantProfile->photo_path);
                 }
             }

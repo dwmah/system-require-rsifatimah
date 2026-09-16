@@ -41,6 +41,7 @@ class RegisterRequest extends FormRequest
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'confirmed', 'min:8', 'regex:/^(?=.*[A-Za-z])(?=.*\d).+$/'],
             'terms' => ['required', 'accepted'],
+            'job_vacancy_id' => ['nullable', 'exists:job_vacancies,id'],
         ];
     }
 
@@ -59,6 +60,7 @@ class RegisterRequest extends FormRequest
             'password' => 'Password',
             'password_confirmation' => 'Konfirmasi Password',
             'terms' => 'Persetujuan Syarat & Ketentuan',
+            'job_vacancy_id' => 'Formasi Lowongan',
         ];
     }
 

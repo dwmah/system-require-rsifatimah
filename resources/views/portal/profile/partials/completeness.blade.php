@@ -43,9 +43,10 @@
     </div>
 
     {{-- Checklist Grid --}}
-    <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 pt-4 border-t border-slate-100 text-xs">
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-2.5 pt-4 border-t border-slate-100 text-xs">
         @php
             $items = [
+                'photo' => 'Pas Foto 3x4',
                 'name' => 'Nama Lengkap',
                 'nik' => 'NIK Terdaftar',
                 'email' => 'Alamat Email',

@@ -36,13 +36,13 @@
     />
 
     {{-- Mobile Menu Drawer --}}
-    <x-navigation.mobile-menu variant="applicant" />
+    <x-navigation.mobile-menu variant="applicant" :active-menu="$activeMenu" />
 
     {{-- Body Shell: Applicant Sidebar + Main Content --}}
-    <div class="flex-1 flex w-full max-w-7xl mx-auto">
+    <div class="pt-16 flex-1 flex w-full max-w-7xl mx-auto">
         {{-- Desktop Left Sidebar --}}
-        <div class="hidden lg:block shrink-0">
-            <x-navigation.applicant-sidebar :active-menu="$activeMenu" class="h-full sticky top-16" />
+        <div class="hidden lg:block shrink-0 sticky top-16 h-[calc(100vh-4rem)]">
+            <x-navigation.applicant-sidebar :active-menu="$activeMenu" class="h-full" />
         </div>
 
         {{-- Main Page Content --}}

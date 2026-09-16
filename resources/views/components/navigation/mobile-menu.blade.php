@@ -1,6 +1,11 @@
 @props([
     'variant' => 'public', // 'public' or 'applicant'
+    'activeMenu' => null,
 ])
+
+@php
+    $isApplicant = $variant === 'applicant' || (auth()->check() && !auth()->user()->isAdmin());
+@endphp
 
 {{-- Mobile Drawer Backdrop & Container (Alpine.js controlled) --}}
 <div
@@ -54,10 +59,10 @@
 
             {{-- Sidebar Content --}}
             <div class="flex-1 overflow-y-auto">
-                @if ($variant === 'applicant')
-                    <x-navigation.applicant-sidebar class="w-full border-r-0 min-h-0" />
+                @if ($isApplicant)
+                    <x-navigation.applicant-sidebar :active-menu="$activeMenu" class="w-full border-r-0 min-h-0" />
                 @else
-                    <x-navigation.public-sidebar class="w-full border-r-0 min-h-0" />
+                    <x-navigation.public-sidebar :active-menu="$activeMenu" class="w-full border-r-0 min-h-0" />
                 @endif
             </div>
         </div>

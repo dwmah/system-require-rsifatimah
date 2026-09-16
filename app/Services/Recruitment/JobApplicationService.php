@@ -21,6 +21,7 @@ use App\Services\Profile\ProfileCompletenessService;
 use DomainException;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class JobApplicationService
 {
@@ -234,5 +235,117 @@ class JobApplicationService
             ],
             $historyAttributes
         );
+    }
+
+    /**
+     * Menghapus record draft lamaran beserta seluruh berkas dokumen fisik dan riwayat terkait.
+     */
+    public function deleteApplicationAndFiles(JobApplication $application): void
+    {
+        // Hapus berkas fisik dan record dokumen lamaran draft
+        $documents = $application->documents()->get();
+        $disk = Storage::disk(ApplicationDocumentService::DISK_NAME);
+
+        foreach ($documents as $document) {
+            if ($document->stored_path && $disk->exists($document->stored_path)) {
+                $disk->delete($document->stored_path);
+            }
+            $document->delete();
+        }
+
+        // Bersihkan direktori aplikasi jika ada
+        $disk->deleteDirectory((string) $application->id);
+
+        // Hapus stage histories jika ada
+        $application->stageHistories()->delete();
+
+        // Hapus record JobApplication draft itu sendiri
+        $application->delete();
+    }
+
+    /**
+     * Membatalkan draft lamaran pekerjaan yang sedang aktif.
+     * Sesuai aturan bisnis: pelamar tidak boleh memiliki akun jika tidak ada lamaran yang diajukan.
+     * Oleh karena itu, jika pelamar tidak memiliki lamaran lain, pembatalan draft akan sekaligus
+     * menghapus akun pengguna (User) beserta seluruh data profil dan berkas fisiknya.
+     *
+     * Invariants:
+     * - Hanya lamaran dengan status DRAFT yang belum di-submit dan belum dikunci yang boleh dibatalkan
+     * - Dilakukan dalam database transaction dengan lockForUpdate untuk mencegah race condition
+     *
+     * @throws DomainException
+     */
+    public function cancelDraft(User $user, JobApplication $application): void
+    {
+        DB::transaction(function () use ($user, $application) {
+            /** @var JobApplication $lockedApplication */
+            $lockedApplication = JobApplication::where('id', $application->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($lockedApplication->user_id !== $user->id) {
+                throw new DomainException('Otorisasi gagal: Lamaran bukan milik akun pengguna yang aktif.');
+            }
+
+            if ($lockedApplication->status !== JobApplicationStatus::DRAFT || $lockedApplication->locked_at !== null || $lockedApplication->submitted_at !== null) {
+                throw new DomainException('Lamaran yang telah diajukan atau dikunci tidak dapat dibatalkan.');
+            }
+
+            // Hapus berkas fisik dan record lamaran draft
+            $this->deleteApplicationAndFiles($lockedApplication);
+
+            // Sesuai aturan bisnis: pelamar tanpa lamaran tidak boleh memiliki akun.
+            // Jika pengguna tidak lagi memiliki lamaran pekerjaan apapun,
+            // hapus akun pengguna (User) beserta foto profilnya.
+            if ($user->jobApplications()->count() === 0) {
+                if ($user->applicantProfile && $user->applicantProfile->photo_path) {
+                    Storage::disk('public')->delete($user->applicantProfile->photo_path);
+                }
+                $user->delete();
+            }
+        });
+    }
+
+    /**
+     * Mengganti formasi lowongan pada draft lamaran pekerjaan yang belum difinalisasi.
+     *
+     * Invariants:
+     * - Hanya draft lamaran yang belum difinalisasi/dikunci yang dapat diganti formulasinya
+     * - Draft lama dibatalkan beserta berkas dokumennya secara atomik
+     * - Profil dan seluruh riwayat pelamar tetap tersimpan (akun TIDAK dihapus)
+     * - Formasi baru harus currently open dan memenuhi syarat
+     * - Dibuat draft baru untuk lowongan tujuan
+     *
+     * @throws IncompleteProfileException
+     * @throws InactiveVacancyException
+     * @throws DuplicateApplicationException
+     * @throws DomainException
+     */
+    public function switchVacancy(User $user, JobApplication $application, JobVacancy $newVacancy): JobApplication
+    {
+        return DB::transaction(function () use ($user, $application, $newVacancy) {
+            /** @var JobApplication $lockedApplication */
+            $lockedApplication = JobApplication::where('id', $application->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($lockedApplication->user_id !== $user->id) {
+                throw new DomainException('Otorisasi gagal: Lamaran bukan milik akun pengguna yang aktif.');
+            }
+
+            if ($lockedApplication->status !== JobApplicationStatus::DRAFT || $lockedApplication->locked_at !== null || $lockedApplication->submitted_at !== null) {
+                throw new DomainException('Lamaran yang telah diajukan atau dikunci tidak dapat diganti formulasinya.');
+            }
+
+            if ($lockedApplication->job_vacancy_id === $newVacancy->id) {
+                return $lockedApplication;
+            }
+
+            // 1. Bersihkan draft lama dan seluruh dokumen fisik beserta record-nya (akun pelamar tetap utuh)
+            $this->deleteApplicationAndFiles($lockedApplication);
+
+            // 2. Buat draft baru untuk formasi baru
+            return $this->startDraft($user, $newVacancy);
+        });
     }
 }

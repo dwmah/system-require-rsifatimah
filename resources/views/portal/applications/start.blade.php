@@ -105,38 +105,63 @@
                     </div>
                 @endif
 
-                {{-- Critical Warning Box --}}
-                <div class="p-4 rounded-xl bg-amber-50 border border-amber-200 flex items-start gap-3 text-amber-900">
-                    <svg class="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                    <div class="space-y-1 text-xs">
-                        <p class="font-bold text-amber-950">
-                            PENTING: Formasi Terkunci untuk Periode Ini
-                        </p>
-                        <p class="text-amber-800 leading-relaxed text-[11px]">
-                            Setelah Anda membuat draft lamaran ini, pilihan formasi pada periode rekrutmen ini <strong>tidak dapat diganti atau dipindahkan</strong> secara mandiri. Setiap pelamar hanya dapat mengajukan <strong>1 formasi</strong> per periode seleksi.
-                        </p>
+                {{-- Information / Switch Warning Box --}}
+                @if (!empty($existingDraft))
+                    <div class="p-4 rounded-xl bg-amber-50 border border-amber-300 flex items-start gap-3 text-amber-900">
+                        <svg class="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        <div class="space-y-1 text-xs">
+                            <p class="font-bold text-amber-950">
+                                Perhatian: Konfirmasi Penggantian Formasi Lamaran
+                            </p>
+                            <p class="text-amber-800 leading-relaxed text-[11px]">
+                                Anda saat ini memiliki draft aktif pada formasi <strong>{{ $existingDraft->jobVacancy->title }}</strong>.
+                                Melanjutkan tindakan ini akan <strong>mengganti formasi</strong> dan menghapus dokumen persyaratan khusus draft sebelumnya dari server.
+                                Seluruh data profil dasar, riwayat pendidikan, STR/lisensi, sertifikasi, dan pengalaman kerja Anda <strong>tetap aman tersimpan</strong>.
+                            </p>
+                        </div>
                     </div>
-                </div>
+                @else
+                    <div class="p-4 rounded-xl bg-sky-50 border border-sky-200 flex items-start gap-3 text-sky-900">
+                        <svg class="w-5 h-5 text-sky-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <div class="space-y-1 text-xs">
+                            <p class="font-bold text-sky-950">
+                                Informasi Pemilihan Formasi
+                            </p>
+                            <p class="text-sky-800 leading-relaxed text-[11px]">
+                                Selama lamaran masih berstatus <strong>Draft</strong>, Anda diperbolehkan mengganti formasi atau membatalkan draft. Seluruh pilihan formasi dan berkas akan <strong>terkunci permanen</strong> hanya setelah Anda melakukan <strong>Final Submit</strong>. 1 user maksimal 1 lamaran aktif per periode rekrutmen.
+                            </p>
+                        </div>
+                    </div>
+                @endif
 
                 {{-- Action Form --}}
                 <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <p class="text-[11px] text-slate-400">
-                        Dengan menekan tombol di samping, Anda mengonfirmasi pilihan formasi ini.
+                        @if (!empty($existingDraft))
+                            Tekan tombol untuk mengonfirmasi pergantian formasi ke {{ $jobVacancy->title }}.
+                        @else
+                            Dengan menekan tombol di samping, Anda mengonfirmasi pilihan formasi ini.
+                        @endif
                     </p>
 
                     <form method="POST" action="{{ route('portal.applications.store', $jobVacancy) }}">
                         @csrf
+                        @if (!empty($existingDraft))
+                            <input type="hidden" name="confirm_switch" value="1">
+                        @endif
                         <div class="flex items-center gap-3">
                             <a
-                                href="{{ route('vacancies.show', $jobVacancy) }}"
+                                href="{{ !empty($existingDraft) ? route('portal.applications.show', $existingDraft) : route('vacancies.show', $jobVacancy) }}"
                                 class="px-4 py-2.5 text-xs font-semibold text-slate-600 hover:text-slate-900 transition-colors"
                             >
                                 Batal
                             </a>
                             <x-ui.button type="submit" variant="primary" size="md">
-                                <span>Buat Draft Lamaran</span>
+                                <span>{{ !empty($existingDraft) ? 'Ganti Formasi & Buat Draft Baru' : 'Buat Draft Lamaran' }}</span>
                                 <svg class="w-4 h-4 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                                 </svg>

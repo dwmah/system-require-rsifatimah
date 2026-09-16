@@ -59,6 +59,7 @@ class ApplicationDocumentAndSubmissionTest extends TestCase
                 'address_ktp' => 'Jl. Ikan Hiu No. 12 Banyuwangi',
                 'address_domicile' => 'Jl. Ikan Hiu No. 12 Banyuwangi',
                 'same_as_ktp' => true,
+                'photo_path' => 'profile-photos/test.jpg',
             ]);
 
             ApplicantEducation::create([
@@ -869,5 +870,44 @@ class ApplicationDocumentAndSubmissionTest extends TestCase
         $response->assertOk();
         $response->assertSee('Peringatan Integritas Data');
         $response->assertDontSee('IMMUTABLE SNAPSHOT');
+    }
+
+    public function test_review_page_loads_successfully_without_relation_not_found_exception(): void
+    {
+        $user = $this->createApplicantUser(true);
+        [$period, $vacancy, $requirements] = $this->createVacancyWithRequirements();
+        $application = $this->createDraftApplication($user, $vacancy);
+
+        $response = $this->actingAs($user)->get(route('portal.applications.review', $application));
+
+        $response->assertOk();
+        $response->assertSee('Review & Konfirmasi Final Lamaran', false);
+        $response->assertSee($user->name);
+        $response->assertSee($vacancy->title);
+    }
+
+    public function test_documents_page_disables_step_3_button_when_mandatory_documents_missing(): void
+    {
+        $user = $this->createApplicantUser(true);
+        [$period, $vacancy, $requirements] = $this->createVacancyWithRequirements();
+        $application = $this->createDraftApplication($user, $vacancy);
+
+        // Kasus 1: Dokumen wajib belum diunggah
+        $responseIncomplete = $this->actingAs($user)->get(route('portal.applications.documents.index', $application));
+        $responseIncomplete->assertOk();
+        $responseIncomplete->assertSee('Lengkapi 2 berkas wajib sebelum mengirim lamaran.');
+        $responseIncomplete->assertSee('<button', false);
+        $responseIncomplete->assertSee('disabled', false);
+
+        // Kasus 2: Dokumen wajib sudah diunggah
+        $file1 = UploadedFile::fake()->create('surat.pdf', 300, 'application/pdf');
+        $file2 = UploadedFile::fake()->create('ijazah.pdf', 300, 'application/pdf');
+        $this->actingAs($user)->post(route('portal.applications.documents.store', [$application, $requirements[0]]), ['file' => $file1]);
+        $this->actingAs($user)->post(route('portal.applications.documents.store', [$application, $requirements[1]]), ['file' => $file2]);
+
+        $responseComplete = $this->actingAs($user)->get(route('portal.applications.documents.index', $application));
+        $responseComplete->assertOk();
+        $responseComplete->assertDontSee('Lengkapi 2 berkas wajib sebelum mengirim lamaran.');
+        $responseComplete->assertSee(route('portal.applications.review', $application));
     }
 }

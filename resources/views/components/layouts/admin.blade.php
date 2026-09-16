@@ -23,7 +23,7 @@
 </head>
 <body class="min-h-screen flex flex-col bg-[#F6FAFF] antialiased" x-data="{ mobileMenuOpen: false }">
     <!-- ================= TOP NAVBAR (ADMIN) ================= -->
-    <header class="sticky top-0 z-40 bg-[#0179B5] text-white shadow-xs border-b border-[#016699]">
+    <header class="fixed top-0 inset-x-0 z-40 bg-[#0179B5] text-white shadow-xs border-b border-[#016699]">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <!-- Sisi Kiri: Trigger Mobile & Logo RS -->
             <div class="flex items-center gap-3">
@@ -99,7 +99,7 @@
     </header>
 
     <!-- BODY WRAPPER -->
-    <div class="flex-1 max-w-[1536px] w-full mx-auto flex">
+    <div class="pt-16 flex-1 max-w-[1536px] w-full mx-auto flex">
         <!-- Desktop Sidebar -->
         <x-navigation.admin-sidebar />
 

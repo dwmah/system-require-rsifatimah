@@ -3,37 +3,135 @@
         <!-- Candidate Greeting Header -->
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div class="flex items-center gap-4">
-                <div class="w-14 h-14 rounded-2xl bg-[#0179B5] text-white font-bold text-xl flex items-center justify-center shadow-md shrink-0">
-                    {{ strtoupper(substr($user->name, 0, 2)) }}
-                </div>
+                @if($user->profile_photo_url)
+                    <img src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}" class="w-14 h-14 rounded-2xl object-cover shadow-md shrink-0 border border-slate-200" style="width: 56px; height: 56px; min-width: 56px; min-height: 56px; max-width: 56px; max-height: 56px; object-fit: cover; border-radius: 16px;">
+                @else
+                    <div class="w-14 h-14 rounded-2xl bg-[#0179B5] text-white font-bold text-xl flex items-center justify-center shadow-md shrink-0">
+                        {{ strtoupper(substr($user->name, 0, 2)) }}
+                    </div>
+                @endif
                 <div>
                     <h1 class="text-xl font-bold text-slate-900 leading-tight">Selamat Datang, {{ $user->name }}!</h1>
-                    <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500 mt-1">
+                    <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500 mt-1">
                         <span>No. Registrasi: <strong class="font-mono text-slate-700">{{ $user->registration_number ?? '-' }}</strong></span>
-                        <span>&bull;</span>
                         <span>Email: <strong class="text-slate-700">{{ $user->email }}</strong></span>
                     </div>
                 </div>
             </div>
 
             <!-- Profile Completeness Widget -->
-            <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl min-w-[260px]">
-                <div class="flex items-center justify-between text-xs font-semibold mb-1.5">
-                    <span class="text-slate-600">Kelengkapan Profil Dasar</span>
-                    <span class="text-[#0179B5] font-bold">{{ $percentage }}% Selesai</span>
+            <div class="p-4 sm:p-5 bg-slate-50 border border-slate-200 rounded-xl w-full md:w-[380px] lg:w-[440px] shrink-0">
+                <div class="flex items-center justify-between text-xs font-semibold mb-2 gap-3">
+                    <span class="text-slate-700 font-medium">
+                        {{ $percentage >= 100 ? 'Profil Anda Sudah Lengkap' : 'Kelengkapan Profil Dasar' }}
+                    </span>
+                    <span class="{{ $percentage >= 100 ? 'text-emerald-600' : 'text-[#0179B5]' }} font-bold shrink-0">
+                        {{ $percentage >= 100 ? '100% Selesai' : $percentage . '% Selesai' }}
+                    </span>
                 </div>
                 <div class="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
-                    <div class="bg-[#0179B5] h-2 rounded-full transition-all duration-500" style="width: {{ $percentage }}%"></div>
+                    <div class="{{ $percentage >= 100 ? 'bg-emerald-600' : 'bg-[#0179B5]' }} h-2 rounded-full transition-all duration-500" style="width: {{ min(100, $percentage) }}%"></div>
                 </div>
-                <div class="mt-2 text-right">
-                    <a href="{{ route('profile.show') }}" class="text-[11px] font-semibold text-[#0179B5] hover:underline">
-                        Lengkapi Profil Sekarang &rarr;
+                <div class="mt-2.5 text-right">
+                    <a href="{{ route('profile.show') }}" class="text-[11px] font-semibold {{ $percentage >= 100 ? 'text-emerald-700 hover:text-emerald-800' : 'text-[#0179B5] hover:text-[#016293]' }} hover:underline inline-flex items-center gap-1">
+                        <span>{{ $percentage >= 100 ? 'Lihat / Edit Profil' : 'Lengkapi Profil Sekarang' }}</span>
+                        <span>&rarr;</span>
                     </a>
                 </div>
             </div>
         </div>
 
-        {{-- Published Final Result Banner (If Available) --}}
+        <!-- SELECTION TIMELINE TRACKER (DYNAMIC) -->
+        <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-4 border-b border-slate-100">
+                <div>
+                    <h2 class="text-sm sm:text-base font-bold text-slate-900">Timeline Alur Seleksi Karyawan</h2>
+                    <p class="text-xs text-slate-500 mt-0.5">Pantau perkembangan tahapan seleksi secara transparan</p>
+                </div>
+                @if($activePeriod && $activePeriod->submission_deadline)
+                    <div class="text-xs text-slate-600 bg-rose-50 border border-rose-100 px-3 py-1 rounded-lg self-start sm:self-auto">
+                        Batas Submit Berkas: <strong class="text-rose-600 font-semibold">{{ \Carbon\Carbon::parse($activePeriod->submission_deadline)->locale('id')->translatedFormat('d F Y, H.i') }} WIB</strong>
+                    </div>
+                @endif
+            </div>
+
+            @php
+                $stageCount = count($timelineStages);
+                $gridColsClass = match(true) {
+                    $stageCount === 1 => 'grid-cols-1 max-w-md',
+                    $stageCount === 2 => 'grid-cols-1 sm:grid-cols-2',
+                    $stageCount === 3 => 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
+                    $stageCount === 4 => 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
+                    $stageCount === 5 => 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5',
+                    default => 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
+                };
+            @endphp
+
+            <div class="grid {{ $gridColsClass }} gap-3 sm:gap-4">
+                @forelse($timelineStages as $index => $stage)
+                    @php
+                        $state = $stage['public_state'] ?? 'waiting';
+                        $isPassed = in_array($state, ['passed', 'completed']);
+                        $isFailed = $state === 'failed';
+                        $isInProgress = $state === 'in_progress' || !empty($stage['is_current']);
+
+                        $cardBg = match(true) {
+                            $isPassed => 'bg-emerald-50/60 border-emerald-200 ring-1 ring-emerald-200/50',
+                            $isFailed => 'bg-rose-50/60 border-rose-200 ring-1 ring-rose-200/50',
+                            $isInProgress => 'bg-sky-50/80 border-sky-300 ring-1 ring-sky-300',
+                            default => 'bg-slate-50/70 border-slate-200/80 hover:bg-white hover:border-slate-300',
+                        };
+
+                        $stepBadgeBg = match(true) {
+                            $isPassed => 'bg-emerald-600 text-white shadow-xs',
+                            $isFailed => 'bg-rose-600 text-white shadow-xs',
+                            $isInProgress => 'bg-[#0179B5] text-white shadow-xs',
+                            default => 'bg-slate-200 text-slate-700',
+                        };
+                    @endphp
+                    <div class="p-3.5 sm:p-4 rounded-xl border {{ $cardBg }} flex flex-col justify-between transition-all min-h-[125px]">
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="w-6 h-6 rounded-full {{ $stepBadgeBg }} font-bold text-xs flex items-center justify-center shrink-0">
+                                    {{ $stage['sort_order'] ?? ($index + 1) }}
+                                </span>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold border {{ $stage['badge_class'] ?? 'bg-slate-100 text-slate-600 border-slate-200' }}">
+                                    {{ $stage['label'] ?? 'Belum Dimulai' }}
+                                </span>
+                            </div>
+
+                            <h3 class="font-bold text-xs text-slate-900 leading-snug">
+                                {{ $stage['name'] }}
+                            </h3>
+
+                            @if(!empty($stage['description']))
+                                <p class="text-[11px] text-slate-500 leading-relaxed line-clamp-2">
+                                    {{ $stage['description'] }}
+                                </p>
+                            @endif
+
+                            @if(!empty($stage['applicant_message']))
+                                <div class="mt-1.5 p-2 rounded bg-white/90 border border-slate-200 text-[11px] text-slate-700 leading-relaxed">
+                                    {{ $stage['applicant_message'] }}
+                                </div>
+                            @endif
+                        </div>
+
+                        @if(!empty($stage['published_at']))
+                            <div class="mt-2 pt-2 border-t border-slate-200/50 text-[10px] text-slate-400">
+                                {{ \Carbon\Carbon::parse($stage['published_at'])->locale('id')->translatedFormat('d M Y') }}
+                            </div>
+                        @endif
+                    </div>
+                @empty
+                    <div class="col-span-full py-8 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                        <p class="text-xs text-slate-500">Informasi tahapan seleksi akan ditampilkan setelah Anda memilih formasi lowongan.</p>
+                    </div>
+                @endforelse
+            </div>
+        </div>
+
+        {{-- Published Final Result Banner (If Officially Published) --}}
         @if (!empty($finalResult))
             <div class="p-6 rounded-2xl {{ $finalResult['status'] === 'accepted' ? 'bg-emerald-50 border border-emerald-200 text-emerald-950' : 'bg-slate-50 border border-slate-200 text-slate-900' }} shadow-sm space-y-2">
                 <div class="flex items-center gap-2 font-bold text-base {{ $finalResult['status'] === 'accepted' ? 'text-emerald-900' : 'text-slate-900' }}">
@@ -57,7 +155,7 @@
 
                 @if (!empty($finalResult['published_at']))
                     <div class="text-[11px] {{ $finalResult['status'] === 'accepted' ? 'text-emerald-700' : 'text-slate-500' }} pt-1">
-                        Diumumkan resmi pada: {{ $finalResult['published_at']->translatedFormat('d F Y, H:i') }} WIB
+                        Diumumkan resmi pada: {{ $finalResult['published_at']->locale('id')->translatedFormat('d F Y, H.i') }} WIB
                     </div>
                 @endif
             </div>
@@ -65,156 +163,299 @@
 
         <!-- MAJOR STATUS ANNOUNCEMENT BANNERS -->
         @if($application)
-            @if($application->isPassedAdministration())
-                <!-- BANNER HIJAU: LOLOS SELEKSI ADMINISTRASI -->
-                <div class="bg-gradient-to-r from-emerald-600 to-teal-700 rounded-2xl p-6 text-white shadow-md space-y-4">
-                    <div class="flex items-start justify-between gap-4">
-                        <div class="flex items-start gap-3.5">
-                            <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0 text-white">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            </div>
-                            <div>
-                                <span class="px-2.5 py-0.5 bg-white/20 text-white text-[10px] font-bold uppercase tracking-wider rounded-full inline-block mb-1">Pengumuman Kelulusan Berkas</span>
-                                <h2 class="text-lg sm:text-xl font-extrabold tracking-tight">SELAMAT! ANDA LOLOS TAHAP SELEKSI ADMINISTRASI</h2>
-                                <p class="text-xs sm:text-sm text-emerald-100 mt-1 max-w-2xl leading-relaxed">
-                                    Berkas lamaran Anda untuk posisi <strong>{{ $application->jobVacancy->title }}</strong> telah diverifikasi oleh Tim SDI RSI Fatimah Banyuwangi dan dinyatakan <strong>LENGKAP & MEMENUHI SYARAT</strong>.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="pt-3 border-t border-white/20 flex flex-wrap items-center justify-between gap-3 text-xs">
-                        <span class="text-emerald-100">
-                            @if($application->currentStage)
-                                Tahapan Selanjutnya: <strong>{{ $application->currentStage->stage_name }}</strong>
-                            @else
-                                Berkas telah diverifikasi. Menunggu instruksi tahapan lanjutan.
-                            @endif
-                        </span>
-                        <a href="{{ route('portal.applications.index') }}" class="px-4 py-2 bg-white text-emerald-800 hover:bg-emerald-50 font-bold rounded-lg transition-colors shadow-sm text-xs">
-                            Lihat Rincian Lamaran
-                        </a>
-                    </div>
-                </div>
-            @elseif($application->isRejected())
-                <!-- BANNER MERAH: TIDAK LOLOS DENGAN ALASAN PENOLAKAN -->
-                <div class="bg-gradient-to-r from-rose-700 to-red-800 rounded-2xl p-6 text-white shadow-md space-y-4">
-                    <div class="flex items-start gap-3.5">
-                        <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0 text-white">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        </div>
-                        <div class="flex-1">
-                            <span class="px-2.5 py-0.5 bg-white/20 text-white text-[10px] font-bold uppercase tracking-wider rounded-full inline-block mb-1">Hasil Evaluasi Berkas</span>
-                            <h2 class="text-lg sm:text-xl font-extrabold tracking-tight">MOHON MAAF, ANDA BELUM LOLOS SELEKSI ADMINISTRASI</h2>
-                            <p class="text-xs sm:text-sm text-rose-100 mt-1 max-w-2xl leading-relaxed">
-                                Terima kasih atas partisipasi Anda pada lowongan <strong>{{ $application->jobVacancy->title }}</strong>. Berdasarkan verifikasi dokumen oleh Tim SDI, berkas Anda dinyatakan belum memenuhi kriteria kualifikasi.
-                            </p>
-
-                            @if($application->rejection_reason)
-                                <div class="mt-3 p-3 bg-black/20 rounded-xl border border-white/20 text-xs">
-                                    <strong class="text-rose-200">Catatan Alasan Penolakan:</strong>
-                                    <p class="mt-0.5 text-white leading-relaxed">{{ $application->rejection_reason }}</p>
-                                </div>
-                            @endif
-                        </div>
-                    </div>
-
-                    <div class="pt-3 border-t border-white/20 flex flex-wrap items-center justify-between gap-3 text-xs">
-                        @if(is_null($application->announcement_seen_at) && Route::has('portal.applications.acknowledge'))
-                            <form method="POST" action="{{ route('portal.applications.acknowledge', $application) }}">
-                                @csrf
-                                <button type="submit" class="px-4 py-2 bg-white text-rose-800 hover:bg-rose-50 font-bold rounded-lg transition-colors shadow-sm text-xs">
-                                    Saya Mengerti & Konfirmasi Hasil
-                                </button>
-                            </form>
-                        @elseif($application->announcement_seen_at)
-                            <span class="text-rose-200 text-xs">✓ Anda telah mengonfirmasi hasil pengumuman ini pada {{ $application->announcement_seen_at->format('d M Y, H:i') }} WIB.</span>
-                        @endif
-                    </div>
-                </div>
-            @elseif($application->isSubmitted())
-                <!-- BANNER AMBER: MENUNGGU VERIFIKASI -->
+            @if($application->status === \App\Enums\JobApplicationStatus::SUBMITTED)
+                <!-- BANNER SUBMITTED: MENUNGGU VERIFIKASI DOKUMEN -->
                 <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6 shadow-sm flex items-start gap-4">
                     <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
                     </div>
                     <div class="flex-1">
                         <span class="px-2.5 py-0.5 bg-amber-200 text-amber-900 text-[10px] font-bold uppercase tracking-wider rounded-full inline-block mb-1">Status Berkas</span>
                         <h2 class="text-base font-bold text-amber-950">Berkas Telah Disubmit — Menunggu Verifikasi Tim SDI</h2>
                         <p class="text-xs text-amber-800 mt-1 leading-relaxed">
-                            Lamaran Anda pada formasi <strong>{{ $application->jobVacancy->title }}</strong> telah diterima. Tim verifikator SDI RSI Fatimah sedang memeriksa keabsahan dan kelengkapan dokumen persyaratan Anda.
+                            Lamaran Anda pada formasi <strong>{{ $application->jobVacancy->title ?? 'Lowongan' }}</strong> telah diterima. Tim verifikator SDI RSI Fatimah sedang memeriksa keabsahan dan kelengkapan dokumen persyaratan Anda.
                         </p>
                     </div>
                 </div>
-            @else
-                <!-- BANNER DRAFT: PERLU DIKIRIM -->
-                <div class="bg-sky-50 border border-sky-200 rounded-2xl p-6 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div class="flex items-start gap-3.5">
-                        <div class="w-10 h-10 rounded-xl bg-sky-100 text-[#0179B5] flex items-center justify-center shrink-0">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                        </div>
-                        <div>
-                            <span class="px-2.5 py-0.5 bg-sky-100 text-[#0179B5] text-[10px] font-bold uppercase tracking-wider rounded-full inline-block mb-1">Formulir Draft</span>
-                            <h2 class="text-base font-bold text-slate-900">Lamaran Belum Difinalisasi (Submit)</h2>
-                            <p class="text-xs text-slate-600 mt-0.5">
-                                Anda telah memilih formasi <strong>{{ $application->jobVacancy->title }}</strong>. Segera lengkapi dan unggah seluruh dokumen persyaratan sebelum batas akhir submit.
-                            </p>
-                        </div>
+            @elseif($application->status !== \App\Enums\JobApplicationStatus::DRAFT && empty($finalResult))
+                <!-- BANNER PROSES SELEKSI BERJALAN / MENUNGGU PENGUMUMAN (ANTI-LEAK) -->
+                <div class="bg-indigo-50 border border-indigo-200 rounded-2xl p-6 shadow-sm flex items-start gap-4">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
                     </div>
-
-                    <a href="{{ route('portal.applications.documents.index', $application) }}" class="px-5 py-2.5 bg-[#0179B5] hover:bg-[#016293] text-white text-xs font-bold rounded-lg shadow-sm transition-colors text-center whitespace-nowrap">
-                        Unggah Berkas Persyaratan &rarr;
-                    </a>
+                    <div class="flex-1">
+                        <span class="px-2.5 py-0.5 bg-indigo-200 text-indigo-900 text-[10px] font-bold uppercase tracking-wider rounded-full inline-block mb-1">Proses Seleksi</span>
+                        <h2 class="text-base font-bold text-indigo-950">Proses Seleksi Sedang Berlangsung</h2>
+                        <p class="text-xs text-indigo-800 mt-1 leading-relaxed">
+                            Lamaran Anda pada formasi <strong>{{ $application->jobVacancy->title ?? 'Lowongan' }}</strong> sedang dalam tahapan evaluasi seleksi. Pantau perkembangan setiap tahapan pada timeline di bawah.
+                        </p>
+                    </div>
                 </div>
             @endif
 
-            <!-- PRIMARY APPLICATION SUMMARY CARD -->
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
-                    <h2 class="text-base font-bold text-slate-900">
+            <!-- PRIMARY APPLICATION SUMMARY CARD (UNIFIED STATUS LAMARAN AKTIF) -->
+            <div x-data="{ showCancelModal: false }" class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 sm:p-6 space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                    <h2 class="text-sm sm:text-base font-bold text-slate-900">
                         Status Lamaran Aktif
                     </h2>
                     <a href="{{ route('portal.applications.index') }}" class="text-xs font-semibold text-[#0179B5] hover:underline">
-                        Semua Lamaran Saya &rarr;
+                        Lamaran Saya &rarr;
                     </a>
                 </div>
 
-                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
-                    <div class="space-y-2">
-                        <div class="flex flex-wrap items-center gap-2">
-                            <span class="font-mono text-xs font-bold text-[#0179B5] bg-sky-50 px-2.5 py-0.5 rounded border border-sky-100">
-                                {{ $application->jobVacancy->code ?? 'VAC' }}
-                            </span>
-                            <span class="text-xs text-slate-400">&bull;</span>
-                            <span class="text-xs font-medium text-slate-500">
-                                {{ $application->recruitmentPeriod->name ?? '-' }}
-                            </span>
+                @if ($application->status === \App\Enums\JobApplicationStatus::DRAFT)
+                    <div class="space-y-4">
+                        <!-- Header & Judul Formasi -->
+                        <div class="space-y-1.5">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="font-mono text-xs font-bold text-[#0179B5] bg-sky-50 px-2.5 py-0.5 rounded-md border border-sky-100">
+                                    {{ $application->jobVacancy->code ?? 'VAC' }}
+                                </span>
+                                <span class="text-xs text-slate-300">&bull;</span>
+                                <span class="text-xs font-medium text-slate-500">
+                                    {{ $application->recruitmentPeriod->name ?? '-' }}
+                                </span>
+                                <span class="text-xs text-slate-300">&bull;</span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider {{ $isDocumentsComplete ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200' }}">
+                                    {{ $isDocumentsComplete ? 'Siap Dikirim' : 'Draft' }}
+                                </span>
+                            </div>
+
+                            <h3 class="text-base sm:text-lg lg:text-xl font-bold text-slate-900 leading-tight">
+                                {{ $application->jobVacancy->title ?? '-' }}
+                            </h3>
                         </div>
 
-                        <h3 class="text-lg font-bold text-slate-900">
-                            {{ $application->jobVacancy->title ?? '-' }}
-                        </h3>
-
-                        <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500">
-                            <div>
-                                <span>Nomor Lamaran: </span>
-                                <strong class="text-slate-800 font-mono">
-                                    {{ $application->application_number ?? 'Draft (Belum Diterbitkan)' }}
-                                </strong>
-                            </div>
-                            @if ($application->submitted_at)
-                                <div>
-                                    <span>Dikirim: </span>
-                                    <strong class="text-slate-700">
-                                        {{ $application->submitted_at->translatedFormat('d M Y, H:i') }} WIB
-                                    </strong>
+                        <!-- Progress Bar Kelengkapan Berkas (Full Width) -->
+                        @if (($documentProgress['total'] ?? 0) > 0)
+                            <div class="space-y-1.5 pt-1">
+                                <div class="flex items-center justify-between text-xs">
+                                    <span class="font-semibold text-slate-700">
+                                        Kelengkapan Berkas:
+                                        <span class="text-slate-500 font-normal">
+                                            {{ $documentProgress['completed'] }} dari {{ $documentProgress['total'] }} dokumen
+                                        </span>
+                                    </span>
+                                    <span class="font-bold {{ $isDocumentsComplete ? 'text-emerald-700' : 'text-[#0179B5]' }} font-mono">
+                                        {{ $documentProgress['percentage'] }}%
+                                    </span>
                                 </div>
-                            @endif
+                                <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden border border-slate-200/50">
+                                    <div
+                                        class="h-2.5 rounded-full transition-all duration-500 {{ $isDocumentsComplete ? 'bg-emerald-600' : 'bg-[#0179B5]' }}"
+                                        style="width: {{ min(100, $documentProgress['percentage']) }}%"
+                                    ></div>
+                                </div>
+                                <p class="text-xs text-slate-500">
+                                    @if (! $isDocumentsComplete)
+                                        Masih ada <strong>{{ $documentProgress['missing'] }}</strong> dokumen yang belum dilengkapi sebelum lamaran dapat dikirim.
+                                    @else
+                                        Semua dokumen persyaratan telah lengkap. Periksa kembali data Anda sebelum mengirim lamaran.
+                                    @endif
+                                </p>
+                            </div>
+                        @endif
+
+                        <!-- Action Bar: Tombol Aksi Simpel & Terpadu -->
+                        <div class="pt-3 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <a
+                                    href="{{ route('vacancies.index') }}"
+                                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 transition-colors shadow-2xs"
+                                >
+                                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                                    </svg>
+                                    <span>Ganti Formasi</span>
+                                </a>
+
+                                <button
+                                    type="button"
+                                    @click="showCancelModal = true"
+                                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-rose-600 bg-white hover:bg-rose-50 border border-rose-200 hover:border-rose-300 transition-colors shadow-2xs cursor-pointer"
+                                >
+                                    <svg class="w-3.5 h-3.5 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                    <span>Batalkan Draft</span>
+                                </button>
+                            </div>
+
+                            <div class="flex items-center sm:justify-end">
+                                @if (! $isDocumentsComplete)
+                                    <a
+                                        href="{{ route('portal.applications.documents.index', $application) }}"
+                                        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#0179B5] hover:bg-[#016293] text-white text-xs font-bold rounded-xl shadow-xs transition-colors"
+                                    >
+                                        <span>Lengkapi Berkas</span>
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                        </svg>
+                                    </a>
+                                @else
+                                    <a
+                                        href="{{ route('portal.applications.review', $application) }}"
+                                        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs transition-colors"
+                                    >
+                                        <span>Review &amp; Kirim Lamaran</span>
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                        </svg>
+                                    </a>
+                                @endif
+                            </div>
                         </div>
                     </div>
 
-                    @if(!empty($quickAction))
-                        <div class="flex flex-col sm:flex-row lg:flex-col items-start lg:items-end gap-3 shrink-0">
+                    <!-- MODAL KONFIRMASI: BATALKAN DRAFT LAMARAN & HAPUS AKUN -->
+                    <template x-teleport="body">
+                        <div
+                            x-show="showCancelModal"
+                            x-cloak
+                            class="fixed inset-0 z-50 overflow-y-auto"
+                            role="dialog"
+                            aria-modal="true"
+                        >
+                            <div
+                                x-show="showCancelModal"
+                                x-transition:enter="ease-out duration-200"
+                                x-transition:enter-start="opacity-0"
+                                x-transition:enter-end="opacity-100"
+                                x-transition:leave="ease-in duration-150"
+                                x-transition:leave-start="opacity-100"
+                                x-transition:leave-end="opacity-0"
+                                class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs transition-opacity"
+                                @click="showCancelModal = false"
+                                aria-hidden="true"
+                            ></div>
+
+                            <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0 relative z-10 pointer-events-none">
+                                <div
+                                    x-show="showCancelModal"
+                                    x-transition:enter="ease-out duration-200"
+                                    x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                                    x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                                    x-transition:leave="ease-in duration-150"
+                                    x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                                    x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                                    class="relative w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-2xl rounded-2xl border border-slate-200 pointer-events-auto space-y-4"
+                                >
+                                    <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-10 h-10 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+                                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <h3 class="text-base font-bold text-slate-900">Batalkan Draft & Hapus Akun?</h3>
+                                                <p class="text-xs text-slate-500">Formasi: {{ $application->jobVacancy->title }}</p>
+                                            </div>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            @click="showCancelModal = false"
+                                            class="text-slate-400 hover:text-slate-600 focus:outline-hidden cursor-pointer"
+                                        >
+                                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    </div>
+
+                                    <div class="space-y-2.5 text-xs">
+                                        <div class="p-3 bg-rose-50 rounded-xl border border-rose-200 text-rose-900 leading-relaxed">
+                                            <strong class="block font-bold text-rose-950 flex items-center gap-1.5 mb-0.5">
+                                                <svg class="w-4 h-4 text-rose-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                                </svg>
+                                                Peringatan Pembatalan Akun & Lamaran:
+                                            </strong>
+                                            Sesuai kebijakan RSI Fatimah, akun pelamar wajib memiliki formasi lamaran aktif. Membatalkan draft lamaran ini akan <strong>menghapus akun dan seluruh data pendaftaran Anda</strong> dari sistem, serta sesi login Anda akan diakhiri.
+                                        </div>
+
+                                        <div class="p-3 bg-sky-50 rounded-xl border border-sky-200 text-sky-900 leading-relaxed">
+                                            <strong class="block font-bold text-sky-950 flex items-center gap-1.5 mb-0.5">
+                                                <svg class="w-4 h-4 text-sky-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                                                </svg>
+                                                Hanya Ingin Mengganti Formasi?
+                                            </strong>
+                                            Jika Anda hanya ingin melamar posisi lowongan lain, <strong>jangan batalkan draft</strong>. Klik tombol Kembali dan gunakan tombol <strong>Ganti Formasi</strong> agar data profil Anda tetap tersimpan.
+                                        </div>
+
+                                        <p class="text-slate-500 text-[11px] leading-relaxed">
+                                            Sebanyak <strong>{{ $application->documents ? $application->documents->count() : 0 }} berkas</strong> dokumen yang telah diunggah untuk formasi ini juga akan dihapus secara permanen dari server.
+                                        </p>
+                                    </div>
+
+                                    <form method="POST" action="{{ route('portal.applications.cancel-draft', $application) }}">
+                                        @csrf
+                                        @method('DELETE')
+                                        <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+                                            <button
+                                                type="button"
+                                                @click="showCancelModal = false"
+                                                class="px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                                            >
+                                                Kembali
+                                            </button>
+                                            <button
+                                                type="submit"
+                                                class="px-4 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-lg shadow-xs transition-colors cursor-pointer"
+                                            >
+                                                Ya, Batalkan Draft & Hapus Akun
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                @else
+                    <!-- SUBMITTED / ONGOING SELECTION STATUS -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="space-y-1.5 min-w-0">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="font-mono text-xs font-bold text-[#0179B5] bg-sky-50 px-2.5 py-0.5 rounded border border-sky-100">
+                                    {{ $application->jobVacancy->code ?? 'VAC' }}
+                                </span>
+                                <span class="text-xs text-slate-300">&bull;</span>
+                                <span class="text-xs font-medium text-slate-500">
+                                    {{ $application->recruitmentPeriod->name ?? '-' }}
+                                </span>
+                            </div>
+
+                            <h3 class="text-base sm:text-lg font-bold text-slate-900 truncate">
+                                {{ $application->jobVacancy->title ?? '-' }}
+                            </h3>
+
+                            <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500 pt-0.5">
+                                @if ($application->application_number)
+                                    <div>
+                                        <span>Nomor Lamaran: </span>
+                                        <strong class="text-slate-800 font-mono">
+                                            {{ $application->application_number }}
+                                        </strong>
+                                    </div>
+                                @endif
+                                @if ($application->submitted_at)
+                                    <div>
+                                        <span>Dikirim: </span>
+                                        <strong class="text-slate-700">
+                                            {{ $application->submitted_at->locale('id')->translatedFormat('d F Y, H.i') }} WIB
+                                        </strong>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+
+                        <div class="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
                             @if (!empty($publicStatus))
                                 <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border {{ $publicStatus['badge_class'] ?? '' }}">
                                     {{ $publicStatus['label'] ?? '' }}
@@ -231,8 +472,8 @@
                                 </svg>
                             </a>
                         </div>
-                    @endif
-                </div>
+                    </div>
+                @endif
             </div>
         @else
             <!-- BANNER BELUM MEMILIH FORMASI -->
@@ -254,111 +495,5 @@
                 @endif
             </div>
         @endif
-
-        <!-- SELECTION TIMELINE TRACKER -->
-        <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-6">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-4 border-b border-slate-200">
-                <div>
-                    <h2 class="text-base font-bold text-slate-900">Timeline Alur Seleksi Karyawan</h2>
-                    <p class="text-xs text-slate-500 mt-0.5">Pantau perkembangan tahapan seleksi secara transparan</p>
-                </div>
-                @if($activePeriod)
-                    <div class="text-xs text-slate-500">
-                        Batas Submit Berkas: <strong class="text-rose-600">{{ $activePeriod->submission_deadline ? \Carbon\Carbon::parse($activePeriod->submission_deadline)->format('d F Y, 23:59') : '-' }} WIB</strong>
-                    </div>
-                @endif
-            </div>
-
-            <!-- Timeline Bullets Stepper -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <!-- Step 1: Pendaftaran & Unggah Berkas -->
-                <div class="p-4 rounded-xl border {{ $application && $application->isSubmitted() ? 'bg-emerald-50/60 border-emerald-300' : 'bg-sky-50 border-sky-200' }}">
-                    <div class="flex items-center gap-2.5 mb-2">
-                        <span class="w-6 h-6 rounded-full {{ $application && $application->isSubmitted() ? 'bg-emerald-600' : 'bg-[#0179B5]' }} text-white font-bold text-xs flex items-center justify-center">1</span>
-                        <span class="font-bold text-xs text-slate-900">Buka Pendaftaran & Upload</span>
-                    </div>
-                    <p class="text-[11px] text-slate-500">Registrasi akun, pengisian profil, dan upload berkas wajib.</p>
-                    <div class="mt-2 text-[10px] font-semibold {{ $application && $application->isSubmitted() ? 'text-emerald-700' : 'text-[#0179B5]' }}">
-                        {{ $application && $application->isSubmitted() ? '✓ Berkas Terkirim' : 'Tahap Aktif' }}
-                    </div>
-                </div>
-
-                <!-- Step 2: Verifikasi Berkas Administrasi -->
-                <div class="p-4 rounded-xl border {{ $application && $application->isPassedAdministration() ? 'bg-emerald-50/60 border-emerald-300' : ($application && $application->isRejected() ? 'bg-rose-50/60 border-rose-300' : ($application && $application->isSubmitted() ? 'bg-amber-50 border-amber-200' : 'bg-slate-50 border-slate-200')) }}">
-                    <div class="flex items-center gap-2.5 mb-2">
-                        <span class="w-6 h-6 rounded-full {{ $application && $application->isPassedAdministration() ? 'bg-emerald-600' : ($application && $application->isRejected() ? 'bg-rose-600' : ($application && $application->isSubmitted() ? 'bg-amber-600' : 'bg-slate-300 text-slate-700')) }} text-white font-bold text-xs flex items-center justify-center">2</span>
-                        <span class="font-bold text-xs text-slate-900">Verifikasi Berkas SDI</span>
-                    </div>
-                    <p class="text-[11px] text-slate-500">Pemeriksaan keabsahan dokumen persyaratan oleh tim HRD.</p>
-                    <div class="mt-2 text-[10px] font-semibold">
-                        @if($application && $application->isPassedAdministration())
-                            <span class="text-emerald-700">✓ Lolos Administrasi</span>
-                        @elseif($application && $application->isRejected())
-                            <span class="text-rose-700">✕ Tidak Lolos</span>
-                        @elseif($application && $application->isSubmitted())
-                            <span class="text-amber-700">Sedang Diverifikasi</span>
-                        @else
-                            <span class="text-slate-400">Menunggu Submit</span>
-                        @endif
-                    </div>
-                </div>
-
-                <!-- Step 3: Tes Tulis & Wawancara -->
-                <div class="p-4 rounded-xl border {{ $application && in_array($application->status, [\App\Enums\JobApplicationStatus::IN_SELECTION, \App\Enums\JobApplicationStatus::ACCEPTED]) ? 'bg-emerald-50/60 border-emerald-300' : 'bg-slate-50 border-slate-200' }}">
-                    <div class="flex items-center gap-2.5 mb-2">
-                        <span class="w-6 h-6 rounded-full {{ $application && in_array($application->status, [\App\Enums\JobApplicationStatus::IN_SELECTION, \App\Enums\JobApplicationStatus::ACCEPTED]) ? 'bg-emerald-600 text-white' : 'bg-slate-300 text-slate-700' }} font-bold text-xs flex items-center justify-center">3</span>
-                        <span class="font-bold text-xs text-slate-900">Ujian Tulis & Wawancara</span>
-                    </div>
-                    <p class="text-[11px] text-slate-500">Uji kompetensi teknis bidang dan wawancara direksi/SDI.</p>
-                    <div class="mt-2 text-[10px] font-semibold text-slate-400">
-                        {{ $application && $application->currentStage ? $application->currentStage->stage_name : 'Menunggu Jadwal' }}
-                    </div>
-                </div>
-
-                <!-- Step 4: Pengumuman Akhir & MCU -->
-                @php
-                    $isFinalAccepted = !empty($finalResult) && ($finalResult['status'] ?? null) === 'accepted';
-                @endphp
-                <div class="p-4 rounded-xl border {{ $isFinalAccepted ? 'bg-teal-50 border-teal-300' : 'bg-slate-50 border-slate-200' }}">
-                    <div class="flex items-center gap-2.5 mb-2">
-                        <span class="w-6 h-6 rounded-full {{ $isFinalAccepted ? 'bg-teal-700 text-white' : 'bg-slate-300 text-slate-700' }} font-bold text-xs flex items-center justify-center">4</span>
-                        <span class="font-bold text-xs text-slate-900">Pengumuman Akhir / MCU</span>
-                    </div>
-                    <p class="text-[11px] text-slate-500">Pemeriksaan kesehatan kerja dan penetapan karyawan baru.</p>
-                    <div class="mt-2 text-[10px] font-semibold {{ $isFinalAccepted ? 'text-teal-800' : 'text-slate-400' }}">
-                        {{ $isFinalAccepted ? '✓ Diterima Menjadi Karyawan' : 'Jadwal Akhir' }}
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Quick Links Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <a href="{{ route('portal.applications.index') }}" class="p-5 bg-white rounded-xl border border-slate-200 hover:border-[#0179B5] shadow-sm flex items-center justify-between group transition-colors">
-                <div class="flex items-center gap-3.5">
-                    <div class="w-10 h-10 rounded-xl bg-sky-50 text-[#0179B5] flex items-center justify-center group-hover:bg-[#0179B5] group-hover:text-white transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    </div>
-                    <div>
-                        <h3 class="text-sm font-bold text-slate-900">Workspace Lamaran Saya</h3>
-                        <p class="text-xs text-slate-500">Kelola unggahan berkas & cek verifikasi dokumen</p>
-                    </div>
-                </div>
-                <span class="text-slate-400 group-hover:text-[#0179B5]">&rarr;</span>
-            </a>
-
-            <a href="{{ route('profile.show') }}" class="p-5 bg-white rounded-xl border border-slate-200 hover:border-[#0179B5] shadow-sm flex items-center justify-between group transition-colors">
-                <div class="flex items-center gap-3.5">
-                    <div class="w-10 h-10 rounded-xl bg-sky-50 text-[#0179B5] flex items-center justify-center group-hover:bg-[#0179B5] group-hover:text-white transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                    </div>
-                    <div>
-                        <h3 class="text-sm font-bold text-slate-900">Lengkapi Profil & Riwayat</h3>
-                        <p class="text-xs text-slate-500">Update pendidikan, STR/Lisensi, sertifikasi, & pengalaman</p>
-                    </div>
-                </div>
-                <span class="text-slate-400 group-hover:text-[#0179B5]">&rarr;</span>
-            </a>
-        </div>
     </div>
 </x-layouts.applicant>

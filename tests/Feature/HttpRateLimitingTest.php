@@ -81,7 +81,7 @@ class HttpRateLimitingTest extends TestCase
                 'terms' => '1',
             ]);
 
-        $response->assertRedirect(route('portal.home'));
+        $response->assertRedirect(route('portal.applications.index'));
         $this->assertDatabaseHas('users', ['email' => 'pelamar1@example.com']);
     }
 
@@ -126,7 +126,7 @@ class HttpRateLimitingTest extends TestCase
 
     public function test_get_registration_page_is_not_blocked_when_post_limiter_is_exceeded(): void
     {
-        $this->createActiveRecruitment();
+        $vacancy = $this->createActiveRecruitment();
 
         $ip = '192.168.10.2';
 
@@ -141,7 +141,7 @@ class HttpRateLimitingTest extends TestCase
 
         // GET /daftar must remain accessible (200 OK)
         $getResponse = $this->withServerVariables(['REMOTE_ADDR' => $ip])
-            ->get(route('register'));
+            ->get(route('register', ['lowongan' => $vacancy->id]));
 
         $getResponse->assertStatus(200);
         $getResponse->assertSee('Registrasi Akun Pelamar');

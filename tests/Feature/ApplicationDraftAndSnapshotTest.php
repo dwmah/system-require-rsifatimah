@@ -56,6 +56,7 @@ class ApplicationDraftAndSnapshotTest extends TestCase
                 'address_ktp' => 'Jl. Jendral Sudirman No. 45 Banyuwangi',
                 'address_domicile' => 'Jl. Jendral Sudirman No. 45 Banyuwangi',
                 'same_as_ktp' => true,
+                'photo_path' => 'profile-photos/test.jpg',
             ], $profileAttributes));
 
             ApplicantEducation::create([

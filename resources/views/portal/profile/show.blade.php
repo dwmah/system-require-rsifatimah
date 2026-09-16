@@ -47,7 +47,13 @@
             </div>
         @endif
 
-        {{-- 1. Profile Completeness Overview --}}
+        {{-- 1. Pas Foto Formal Pelamar (3:4) --}}
+        @include('portal.profile.partials.photo', [
+            'user' => $user,
+            'profile' => $profile,
+        ])
+
+        {{-- 2. Profile Completeness Overview --}}
         @include('portal.profile.partials.completeness', [
             'percentage' => $percentage,
             'isComplete' => $isComplete,
@@ -72,22 +78,7 @@
             'educations' => $profile?->educations ?? collect(),
         ])
 
-        {{-- 5. STR / Lisensi Profesi --}}
-        @include('portal.profile.partials.licenses', [
-            'licenses' => $profile?->licenses ?? collect(),
-        ])
-
-        {{-- 6. Sertifikasi & Pelatihan --}}
-        @include('portal.profile.partials.certifications', [
-            'certifications' => $profile?->certifications ?? collect(),
-        ])
-
-        {{-- 7. Riwayat Pengalaman Kerja --}}
-        @include('portal.profile.partials.work-experiences', [
-            'workExperiences' => $profile?->workExperiences ?? collect(),
-        ])
-
-        {{-- 8. Ringkasan Kesiapan Profil --}}
+        {{-- 5. Ringkasan Kesiapan Profil --}}
         @include('portal.profile.partials.readiness-review', [
             'percentage' => $percentage,
             'isComplete' => $isComplete,

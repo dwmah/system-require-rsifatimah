@@ -106,9 +106,13 @@
                             <tr class="hover:bg-slate-50 transition-colors">
                                 <td class="py-3.5 px-4">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-8 h-8 rounded-full bg-slate-100 text-[#0179B5] font-bold text-xs flex items-center justify-center border border-slate-200 flex-shrink-0">
-                                            {{ strtoupper(substr($app->user->name, 0, 2)) }}
-                                        </div>
+                                        @if($app->user->profile_photo_url)
+                                            <img src="{{ $app->user->profile_photo_url }}" alt="{{ $app->user->name }}" class="w-8 h-8 rounded-full object-cover border border-slate-200 flex-shrink-0" style="width: 32px; height: 32px; min-width: 32px; min-height: 32px; max-width: 32px; max-height: 32px; object-fit: cover; border-radius: 9999px;">
+                                        @else
+                                            <div class="w-8 h-8 rounded-full bg-slate-100 text-[#0179B5] font-bold text-xs flex items-center justify-center border border-slate-200 flex-shrink-0">
+                                                {{ strtoupper(substr($app->user->name, 0, 2)) }}
+                                            </div>
+                                        @endif
                                         <div>
                                             <div class="font-bold text-slate-900 text-sm">{{ $app->user->name }}</div>
                                             <div class="text-[11px] text-slate-500">{{ $app->user->email }} &bull; {{ $app->user->phone ?? '-' }}</div>
