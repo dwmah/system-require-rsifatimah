@@ -16,11 +16,13 @@
 
     <title>{{ $title ? $title . ' - ' : '' }}Sistem Rekrutmen SDM RSI Fatimah Banyuwangi</title>
 
-    {{-- Typography: Inter / Modern Clean Sans --}}
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700" rel="stylesheet" />
-
-    <style>[x-cloak] { display: none !important; }</style>
+    <style>
+        [x-cloak] { display: none !important; }
+        body, html {
+            font-family: 'Tahoma', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+            font-size: 15px;
+        }
+    </style>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>

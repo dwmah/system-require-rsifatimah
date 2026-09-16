@@ -30,7 +30,7 @@
             <!-- Total Pelamar -->
             <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
                 <div>
-                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Pelamar</span>
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Total Pelamar</span>
                     <div class="text-2xl font-extrabold text-slate-900 mt-1">{{ $totalApplicants }}</div>
                     <span class="text-xs text-slate-500 mt-0.5 inline-block">{{ $totalApplications }} Berkas Masuk</span>
                 </div>
@@ -42,9 +42,9 @@
             <!-- Menunggu Verifikasi -->
             <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
                 <div>
-                    <span class="text-xs font-semibold uppercase tracking-wider text-amber-600">Menunggu Verifikasi</span>
+                    <span class="text-xs font-bold uppercase tracking-wider text-amber-600">Menunggu Verifikasi</span>
                     <div class="text-2xl font-extrabold text-amber-700 mt-1">{{ $pendingVerification }}</div>
-                    <a href="{{ route('admin.applications.index', ['status' => 'submitted']) }}" class="text-xs text-amber-600 hover:underline mt-0.5 inline-block font-medium">Periksa Berkas &rarr;</a>
+                    <a href="{{ route('admin.applications.index', ['status' => 'submitted']) }}" class="text-xs text-amber-600 hover:underline mt-0.5 inline-block font-semibold">Periksa Berkas &rarr;</a>
                 </div>
                 <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -54,9 +54,9 @@
             <!-- Lolos Administrasi -->
             <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
                 <div>
-                    <span class="text-xs font-semibold uppercase tracking-wider text-emerald-600">Lolos Administrasi</span>
+                    <span class="text-xs font-bold uppercase tracking-wider text-emerald-600">Lolos Administrasi</span>
                     <div class="text-2xl font-extrabold text-emerald-700 mt-1">{{ $passedAdministration }}</div>
-                    <span class="text-xs text-emerald-600 mt-0.5 inline-block font-medium">Memenuhi Syarat</span>
+                    <span class="text-xs text-emerald-600 mt-0.5 inline-block font-semibold">Memenuhi Syarat</span>
                 </div>
                 <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -66,7 +66,7 @@
             <!-- Tidak Lolos -->
             <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
                 <div>
-                    <span class="text-xs font-semibold uppercase tracking-wider text-rose-600">Tidak Lolos / Ditolak</span>
+                    <span class="text-xs font-bold uppercase tracking-wider text-rose-600">Tidak Lolos / Ditolak</span>
                     <div class="text-2xl font-extrabold text-rose-700 mt-1">{{ $rejectedCount }}</div>
                     <span class="text-xs text-slate-500 mt-0.5 inline-block">Berkas Tidak Lengkap</span>
                 </div>
@@ -79,19 +79,19 @@
         <!-- Secondary Metrics Breakdown -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div class="bg-white p-4 rounded-xl border border-slate-200 text-center">
-                <span class="text-xs text-slate-500">Lowongan Aktif</span>
+                <span class="text-xs font-medium text-slate-500">Lowongan Aktif</span>
                 <div class="text-xl font-bold text-slate-800 mt-1">{{ $activeVacancies }} / {{ $totalVacancies }}</div>
             </div>
             <div class="bg-white p-4 rounded-xl border border-slate-200 text-center">
-                <span class="text-xs text-slate-500">Dalam Tahap Seleksi</span>
+                <span class="text-xs font-medium text-slate-500">Dalam Tahap Seleksi</span>
                 <div class="text-xl font-bold text-sky-700 mt-1">{{ $inSelection }}</div>
             </div>
             <div class="bg-white p-4 rounded-xl border border-slate-200 text-center">
-                <span class="text-xs text-slate-500">Diterima / Lolos Akhir</span>
+                <span class="text-xs font-medium text-slate-500">Diterima / Lolos Akhir</span>
                 <div class="text-xl font-bold text-teal-700 mt-1">{{ $acceptedCount }}</div>
             </div>
             <div class="bg-white p-4 rounded-xl border border-slate-200 text-center">
-                <span class="text-xs text-slate-500">Draft Pelamar</span>
+                <span class="text-xs font-medium text-slate-500">Draft Pelamar</span>
                 <div class="text-xl font-bold text-slate-600 mt-1">{{ $draftCount }}</div>
             </div>
         </div>
@@ -102,17 +102,17 @@
             <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
                 <div class="p-5 border-b border-slate-200 flex items-center justify-between">
                     <div>
-                        <h2 class="text-base font-bold text-slate-900">Lamaran Terbaru Masuk</h2>
-                        <p class="text-xs text-slate-500 mt-0.5">Daftar berkas pendaftaran yang siap diperiksa oleh tim SDI</p>
+                        <h2 class="text-lg font-bold text-slate-900">Lamaran Terbaru Masuk</h2>
+                        <p class="text-sm text-slate-500 mt-0.5">Daftar berkas pendaftaran yang siap diperiksa oleh tim SDI</p>
                     </div>
-                    <a href="{{ route('admin.applications.index') }}" class="text-xs font-semibold text-[#0179B5] hover:underline">
+                    <a href="{{ route('admin.applications.index') }}" class="text-sm font-semibold text-[#0179B5] hover:underline">
                         Lihat Semua &rarr;
                     </a>
                 </div>
 
                 <div class="overflow-x-auto flex-1">
-                    <table class="w-full text-left text-xs">
-                        <thead class="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
                             <tr>
                                 <th class="py-3 px-4">Pelamar</th>
                                 <th class="py-3 px-4">Formasi</th>
@@ -126,29 +126,29 @@
                                 <tr class="hover:bg-slate-50 transition-colors">
                                     <td class="py-3 px-4">
                                         <div class="font-semibold text-slate-900">{{ $app->user->name }}</div>
-                                        <div class="text-[11px] text-slate-500">{{ $app->user->email }}</div>
+                                        <div class="text-xs text-slate-500">{{ $app->user->email }}</div>
                                     </td>
                                     <td class="py-3 px-4 font-medium text-slate-700">
                                         {{ $app->jobVacancy->title }}
                                     </td>
-                                    <td class="py-3 px-4 text-slate-500">
+                                    <td class="py-3 px-4 text-slate-500 text-xs">
                                         {{ $app->submitted_at ? $app->submitted_at->format('d M Y, H:i') : '-' }}
                                     </td>
                                     <td class="py-3 px-4">
-                                        <span class="inline-block px-2.5 py-1 text-[11px] font-semibold rounded-full border {{ $app->status->badgeClass() }}">
+                                        <span class="inline-block px-2.5 py-1 text-xs font-semibold rounded-full border {{ $app->status->badgeClass() }}">
                                             {{ $app->status->label() }}
                                         </span>
                                     </td>
                                     <td class="py-3 px-4 text-right">
-                                        <a href="{{ route('admin.applications.show', $app) }}" class="inline-flex items-center gap-1 px-2.5 py-1 bg-sky-50 text-[#0179B5] hover:bg-sky-100 font-semibold rounded text-[11px] transition-colors">
+                                        <a href="{{ route('admin.applications.show', $app) }}" class="inline-flex items-center gap-1 px-3 py-1.5 bg-sky-50 text-[#0179B5] hover:bg-sky-100 font-semibold rounded-lg text-xs transition-colors">
                                             <span>Verifikasi</span>
-                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                                         </a>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="py-8 text-center text-slate-400">
+                                    <td colspan="5" class="py-8 text-center text-slate-400 text-sm">
                                         Belum ada lamaran yang disubmit.
                                     </td>
                                 </tr>
@@ -162,37 +162,37 @@
             <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col justify-between">
                 <div>
                     <div class="flex items-center justify-between pb-4 border-b border-slate-200">
-                        <h2 class="text-base font-bold text-slate-900">Formasi Lowongan</h2>
-                        <a href="{{ route('admin.vacancies.index') }}" class="text-xs font-semibold text-[#0179B5] hover:underline">Kelola &rarr;</a>
+                        <h2 class="text-lg font-bold text-slate-900">Formasi Lowongan</h2>
+                        <a href="{{ route('admin.vacancies.index') }}" class="text-sm font-semibold text-[#0179B5] hover:underline">Kelola &rarr;</a>
                     </div>
 
                     <div class="mt-4 space-y-3">
                         @forelse ($vacanciesWithStats as $vac)
-                            <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg hover:border-[#0179B5] transition-colors">
+                            <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-lg hover:border-[#0179B5] transition-colors">
                                 <div class="flex items-start justify-between gap-2">
                                     <div>
-                                        <h3 class="text-xs font-bold text-slate-900">{{ $vac->title }}</h3>
-                                        <span class="text-[11px] text-slate-500">{{ $vac->department }}</span>
+                                        <h3 class="text-sm font-bold text-slate-900">{{ $vac->title }}</h3>
+                                        <span class="text-xs text-slate-500">{{ $vac->department }}</span>
                                     </div>
                                     @if($vac->is_published)
-                                        <span class="px-2 py-0.5 text-[10px] font-semibold bg-emerald-100 text-emerald-800 rounded-full">Aktif</span>
+                                        <span class="px-2.5 py-0.5 text-xs font-semibold bg-emerald-100 text-emerald-800 rounded-full">Aktif</span>
                                     @else
-                                        <span class="px-2 py-0.5 text-[10px] font-semibold bg-slate-200 text-slate-700 rounded-full">Tutup</span>
+                                        <span class="px-2.5 py-0.5 text-xs font-semibold bg-slate-200 text-slate-700 rounded-full">Tutup</span>
                                     @endif
                                 </div>
-                                <div class="mt-2 pt-2 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-600">
+                                <div class="mt-2 pt-2 border-t border-slate-200 flex items-center justify-between text-xs text-slate-600">
                                     <span>Kuota: <strong>{{ $vac->quota }}</strong></span>
                                     <span>Pelamar: <strong>{{ $vac->total_applicants }}</strong> ({{ $vac->pending_count }} review)</span>
                                 </div>
                             </div>
                         @empty
-                            <p class="text-xs text-slate-400 text-center py-4">Belum ada formasi lowongan dibuat.</p>
+                            <p class="text-sm text-slate-400 text-center py-4">Belum ada formasi lowongan dibuat.</p>
                         @endforelse
                     </div>
                 </div>
 
                 <div class="mt-6 pt-4 border-t border-slate-200">
-                    <a href="{{ route('admin.timelines.index') }}" class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold rounded-lg text-center block transition-colors">
+                    <a href="{{ route('admin.timelines.index') }}" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-sm font-semibold rounded-lg text-center block transition-colors">
                         Atur Timeline & Jadwal Seleksi
                     </a>
                 </div>
