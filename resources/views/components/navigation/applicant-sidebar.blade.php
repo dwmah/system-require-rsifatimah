@@ -24,7 +24,7 @@
 @endphp
 
 <aside {{ $attributes->merge(['class' => 'w-64 shrink-0 bg-white border-r border-slate-200 flex flex-col justify-between py-4 px-3.5 h-full overflow-hidden']) }}>
-    <div class="flex-1 overflow-y-auto space-y-5 pr-1 -mr-1 py-1">
+    <div class="flex-1 overflow-y-auto space-y-3 pr-1 -mr-1 py-1">
         {{-- PORTAL PELAMAR --}}
         <div>
             <p class="px-3 text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">

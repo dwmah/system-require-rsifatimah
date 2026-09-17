@@ -194,19 +194,27 @@
                     <div class="space-y-3 text-xs">
                         <div class="flex justify-between py-1.5 border-b border-slate-100">
                             <span class="text-slate-500">Mulai Pendaftaran:</span>
-                            <span class="font-semibold text-slate-900">{{ $jobVacancy->open_at->translatedFormat('d M Y') }}</span>
+                            <span class="font-semibold text-slate-900">{{ $jobVacancy->open_at ? $jobVacancy->open_at->locale('id')->translatedFormat('d M Y') : '-' }}</span>
                         </div>
                         <div class="flex justify-between py-1.5 border-b border-slate-100">
-                            <span class="text-slate-500">Batas Akhir:</span>
-                            <span class="font-semibold text-red-600">{{ $jobVacancy->close_at->translatedFormat('d M Y') }}</span>
+                            <span class="text-slate-500">Batas Pendaftaran:</span>
+                            <span class="font-semibold text-red-600">
+                                {{ $jobVacancy->close_at ? $jobVacancy->close_at->locale('id')->translatedFormat('d M Y') . ($jobVacancy->close_at->format('H:i') !== '00:00' ? ', ' . $jobVacancy->close_at->format('H:i') . ' WIB' : ' (23:59 WIB)') : '-' }}
+                            </span>
                         </div>
                         <div class="flex justify-between py-1.5 border-b border-slate-100">
                             <span class="text-slate-500">Kebutuhan Kuota:</span>
-                            <span class="font-semibold text-slate-900">{{ $jobVacancy->quota }} Orang</span>
+                            <span class="font-semibold text-slate-900">{{ $jobVacancy->quota ? $jobVacancy->quota . ' Orang' : 'Sesuai Kebutuhan' }}</span>
                         </div>
-                        <div class="flex justify-between py-1.5 border-b border-slate-100">
+                        <div class="flex justify-between items-center py-1.5 border-b border-slate-100">
                             <span class="text-slate-500">Status Seleksi:</span>
-                            <span class="font-semibold text-emerald-600">Terbuka untuk Umum</span>
+                            @if (! $jobVacancy->isCurrentlyOpen())
+                                <x-ui.badge variant="neutral" size="sm">Ditutup</x-ui.badge>
+                            @elseif ($isClosingSoon)
+                                <x-ui.badge variant="warning" dot size="sm">Segera Ditutup (Sisa {{ $daysRemaining }} hari)</x-ui.badge>
+                            @else
+                                <x-ui.badge variant="success" dot size="sm">Pendaftaran Dibuka</x-ui.badge>
+                            @endif
                         </div>
                         <div class="flex justify-between py-1.5">
                             <span class="text-slate-500">Penempatan:</span>
@@ -418,7 +426,7 @@
                                     href="{{ route('register', ['lowongan' => $jobVacancy->id]) }}"
                                     class="w-full inline-flex items-center justify-center gap-2 font-semibold rounded-lg text-sm px-4 py-2.5 bg-rsi-700 hover:bg-rsi-800 text-white shadow-xs transition-colors cursor-pointer"
                                 >
-                                    <span>Lamar Posisi Ini Sekarang</span>
+                                    <span>Daftar Akun & Melamar</span>
                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                                     </svg>
@@ -439,6 +447,14 @@
                                 </p>
                             @endif
                         @endauth
+                    </div>
+
+                    {{-- Ketentuan 1 Formasi per Periode --}}
+                    <div class="mt-3 pt-3 border-t border-slate-100 flex items-start gap-1.5 text-[11px] text-slate-500 leading-relaxed">
+                        <svg class="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>Ketentuan: Setiap pelamar hanya dapat memilih <strong>1 formasi lamaran</strong> dalam satu periode seleksi.</span>
                     </div>
                 </x-ui.card>
 

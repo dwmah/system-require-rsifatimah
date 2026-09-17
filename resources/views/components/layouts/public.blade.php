@@ -35,7 +35,7 @@
     <x-navigation.mobile-menu :variant="$isApplicant ? 'applicant' : 'public'" :active-menu="$activeMenu" />
 
     {{-- Body Shell: Sidebar + Main Content --}}
-    <div class="pt-16 flex-1 flex w-full max-w-7xl mx-auto">
+    <div class="pt-16 flex-1 flex w-full">
         {{-- Desktop Left Sidebar --}}
         <div class="hidden lg:block shrink-0 sticky top-16 h-[calc(100vh-4rem)]">
             @if ($isApplicant)
@@ -46,7 +46,7 @@
         </div>
 
         {{-- Main Page Content --}}
-        <main class="flex-1 min-w-0 px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+        <main class="flex-1 min-w-0 max-w-7xl px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
             {{ $slot }}
         </main>
     </div>
