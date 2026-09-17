@@ -54,7 +54,7 @@ class SelectionTrackingService
                 'label' => 'Lamaran Terkirim',
                 'badge_class' => 'bg-blue-50 text-blue-700 border-blue-200',
             ],
-            JobApplicationStatus::IN_PROCESS => [
+            JobApplicationStatus::IN_PROCESS, JobApplicationStatus::IN_SELECTION, JobApplicationStatus::PASSED_ADMINISTRATION => [
                 'key' => 'in_process',
                 'label' => 'Proses Seleksi',
                 'badge_class' => 'bg-indigo-50 text-indigo-700 border-indigo-200',
@@ -74,7 +74,7 @@ class SelectionTrackingService
                 ? [
                     'key' => 'rejected',
                     'label' => 'Tidak Lolos',
-                    'badge_class' => 'bg-red-50 text-red-700 border-red-200',
+                    'badge_class' => 'bg-rose-50 text-rose-700 border-rose-200',
                 ]
                 : [
                     'key' => 'waiting_final_result',
@@ -105,7 +105,7 @@ class SelectionTrackingService
             return [
                 'status' => 'accepted',
                 'title' => 'Selamat, Anda dinyatakan diterima.',
-                'published_at' => $application->final_result_published_at,
+                'published_at' => $application->final_result_published_at ?? now(),
                 'message' => $application->final_result_message,
             ];
         }
@@ -113,8 +113,8 @@ class SelectionTrackingService
         return [
             'status' => 'rejected',
             'title' => 'Terima kasih telah mengikuti proses rekrutmen. Anda belum berhasil pada proses rekrutmen ini.',
-            'published_at' => $application->final_result_published_at,
-            'message' => $application->final_result_message,
+            'published_at' => $application->final_result_published_at ?? $application->rejected_at ?? $application->verified_at ?? now(),
+            'message' => $application->rejection_reason ?? $application->final_result_message ?? 'Terima kasih telah mengikuti proses rekrutmen. Anda belum berhasil pada tahapan seleksi ini.',
         ];
     }
 
@@ -159,8 +159,11 @@ class SelectionTrackingService
         $hasFailedBefore = false;
         $currentStageIdentified = false;
 
+        $liveStages = $application->jobVacancy?->selectionStages?->keyBy('id') ?? collect();
+
         foreach ($stages as $stage) {
             $stageId = (int) ($stage['id'] ?? 0);
+            $liveStage = $liveStages->get($stageId);
             $history = $histories->get($stageId);
             $isPublished = $this->isStagePublished($history);
 
@@ -220,16 +223,18 @@ class SelectionTrackingService
                 $isCurrent = false;
             }
 
-            $startAt = !empty($stage['start_at']) ? \Carbon\Carbon::parse($stage['start_at']) : null;
-            $endAt = !empty($stage['end_at']) ? \Carbon\Carbon::parse($stage['end_at']) : null;
+            $stageName = (string) ($stage['name'] ?? ($liveStage?->name ?? 'Tahapan Seleksi'));
+            $stageDescription = $stage['description'] ?? ($liveStage?->description ?? null);
+            $startAt = ($liveStage && $liveStage->start_at) ? $liveStage->start_at : (!empty($stage['start_at']) ? \Carbon\Carbon::parse($stage['start_at']) : null);
+            $endAt = ($liveStage && $liveStage->end_at) ? $liveStage->end_at : (!empty($stage['end_at']) ? \Carbon\Carbon::parse($stage['end_at']) : null);
             $daysRemaining = $endAt ? (int) ceil(now()->diffInDays($endAt->endOfDay(), false)) : null;
             $isDeadlineApproaching = $endAt && $daysRemaining !== null && $daysRemaining >= 0 && $daysRemaining <= 3;
             $isPastDeadline = $endAt ? $endAt->endOfDay()->isPast() : false;
 
             $stagesOutput[] = [
                 'id' => $stageId,
-                'name' => (string) ($stage['name'] ?? 'Tahapan Seleksi'),
-                'description' => $stage['description'] ?? null,
+                'name' => $stageName,
+                'description' => $stageDescription,
                 'sort_order' => (int) ($stage['sort_order'] ?? 1),
                 'public_state' => $publicState,
                 'label' => $publicLabel,

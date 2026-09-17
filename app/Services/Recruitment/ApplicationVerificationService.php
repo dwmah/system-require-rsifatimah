@@ -2,6 +2,7 @@
 
 namespace App\Services\Recruitment;
 
+use App\Enums\ApplicationStageStatus;
 use App\Enums\JobApplicationStatus;
 use App\Models\ApplicationDocument;
 use App\Models\ApplicationStageHistory;
@@ -56,7 +57,7 @@ class ApplicationVerificationService
 
             // Catat riwayat tahap seleksi administrasi
             $adminStage = $application->jobVacancy->selectionStages()
-                ->where('stage_name', 'like', '%Administrasi%')
+                ->where('name', 'like', '%Administrasi%')
                 ->first();
 
             if ($adminStage) {
@@ -66,16 +67,18 @@ class ApplicationVerificationService
                         'vacancy_selection_stage_id' => $adminStage->id,
                     ],
                     [
-                        'status' => 'passed',
+                        'status' => ApplicationStageStatus::PASSED,
                         'decided_at' => now(),
                         'note' => $adminNote ?? 'Berkas lengkap dan sesuai kualifikasi.',
+                        'published_at' => now(),
+                        'applicant_message' => $adminNote ?? 'Selamat, berkas administrasi Anda telah diverifikasi dan dinyatakan Lolos.',
                     ]
                 );
 
                 // Set tahapan berikutnya jika ada
                 $nextStage = $application->jobVacancy->selectionStages()
-                    ->where('sequence_order', '>', $adminStage->sequence_order)
-                    ->orderBy('sequence_order', 'asc')
+                    ->where('sort_order', '>', $adminStage->sort_order)
+                    ->orderBy('sort_order', 'asc')
                     ->first();
 
                 if ($nextStage) {
@@ -87,8 +90,9 @@ class ApplicationVerificationService
                             'vacancy_selection_stage_id' => $nextStage->id,
                         ],
                         [
-                            'status' => 'pending',
+                            'status' => ApplicationStageStatus::PENDING,
                             'started_at' => now(),
+                            'published_at' => now(),
                         ]
                     );
                 }
@@ -113,11 +117,13 @@ class ApplicationVerificationService
                 'rejection_reason' => $rejectionReason,
                 'verified_at' => now(),
                 'verified_by' => $adminUser->id,
+                'final_result_published_at' => now(),
+                'final_result_message' => $rejectionReason,
             ]);
 
             // Catat riwayat tahap seleksi administrasi ditolak
             $adminStage = $application->jobVacancy->selectionStages()
-                ->where('stage_name', 'like', '%Administrasi%')
+                ->where('name', 'like', '%Administrasi%')
                 ->first();
 
             if ($adminStage) {
@@ -127,9 +133,11 @@ class ApplicationVerificationService
                         'vacancy_selection_stage_id' => $adminStage->id,
                     ],
                     [
-                        'status' => 'rejected',
+                        'status' => ApplicationStageStatus::FAILED,
                         'decided_at' => now(),
                         'note' => $rejectionReason,
+                        'published_at' => now(),
+                        'applicant_message' => $rejectionReason,
                     ]
                 );
             }
@@ -147,27 +155,36 @@ class ApplicationVerificationService
     public function updateSelectionStage(
         JobApplication $application,
         VacancySelectionStage $stage,
-        string $status, // passed, rejected, pending, in_progress
+        string $status, // passed, rejected/failed, pending, in_progress
         ?string $note = null
     ): JobApplication {
-        return DB::transaction(function () use ($application, $stage, $status, $note) {
+        $stageStatus = match ($status) {
+            'passed' => ApplicationStageStatus::PASSED,
+            'rejected', 'failed' => ApplicationStageStatus::FAILED,
+            'in_progress' => ApplicationStageStatus::IN_PROGRESS,
+            default => ApplicationStageStatus::PENDING,
+        };
+
+        return DB::transaction(function () use ($application, $stage, $stageStatus, $note) {
             ApplicationStageHistory::updateOrCreate(
                 [
                     'job_application_id' => $application->id,
                     'vacancy_selection_stage_id' => $stage->id,
                 ],
                 [
-                    'status' => $status,
-                    'decided_at' => in_array($status, ['passed', 'rejected']) ? now() : null,
+                    'status' => $stageStatus,
+                    'decided_at' => in_array($stageStatus, [ApplicationStageStatus::PASSED, ApplicationStageStatus::FAILED]) ? now() : null,
                     'note' => $note,
+                    'published_at' => now(),
+                    'applicant_message' => $note,
                 ]
             );
 
-            if ($status === 'passed') {
+            if ($stageStatus === ApplicationStageStatus::PASSED) {
                 // Cek apakah ada tahapan berikutnya
                 $nextStage = $application->jobVacancy->selectionStages()
-                    ->where('sequence_order', '>', $stage->sequence_order)
-                    ->orderBy('sequence_order', 'asc')
+                    ->where('sort_order', '>', $stage->sort_order)
+                    ->orderBy('sort_order', 'asc')
                     ->first();
 
                 if ($nextStage) {
@@ -182,7 +199,7 @@ class ApplicationVerificationService
                             'vacancy_selection_stage_id' => $nextStage->id,
                         ],
                         [
-                            'status' => 'pending',
+                            'status' => ApplicationStageStatus::PENDING,
                             'started_at' => now(),
                         ]
                     );
@@ -193,6 +210,8 @@ class ApplicationVerificationService
                     $application->update([
                         'status' => JobApplicationStatus::ACCEPTED,
                         'accepted_at' => now(),
+                        'final_result_published_at' => now(),
+                        'final_result_message' => $note ?? 'Selamat, Anda dinyatakan diterima sebagai karyawan RSI Fatimah Banyuwangi.',
                     ]);
 
                     $this->notificationService->notifyStageUpdate(
@@ -201,11 +220,13 @@ class ApplicationVerificationService
                         $note ?? 'Selamat atas kelulusan akhir Anda.'
                     );
                 }
-            } elseif ($status === 'rejected') {
+            } elseif ($stageStatus === ApplicationStageStatus::FAILED) {
                 $application->update([
                     'status' => JobApplicationStatus::REJECTED,
                     'rejected_at' => now(),
                     'rejection_reason' => $note ?? "Tidak lolos pada tahapan: {$stage->stage_name}",
+                    'final_result_published_at' => now(),
+                    'final_result_message' => $note ?? "Tidak lolos pada tahapan: {$stage->stage_name}",
                 ]);
 
                 $this->notificationService->notifyVerificationResult($application, false);

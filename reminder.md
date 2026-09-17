@@ -510,3 +510,5 @@ Keduanya tetap berada dalam **satu codebase dan satu sistem**.
 > **Selalu periksa dampak perubahan terhadap seluruh sistem sebelum melakukan perubahan besar.**
 
 > **Tujuan utama bukan hanya membuat fitur bekerja, tetapi membuat Admin Side dan User Side tetap kompatibel, stabil, dan terintegrasi.**
+
+> **Jangan pernah sekali-kali untuk di hardcode untuk Admin side maupun User side**

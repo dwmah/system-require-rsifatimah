@@ -144,12 +144,25 @@
                             <div>
                                 <label class="block text-sm font-semibold text-slate-700 mb-1">Jenis Formasi <span class="text-rose-500">*</span></label>
                                 <select name="formation_type" required class="w-full h-11 px-3 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:border-[#0179B5]">
-                                    <option value="Tenaga Medis" {{ $vacancy->formation_type == 'Tenaga Medis' || $vacancy->employment_type == 'Tenaga Medis' ? 'selected' : '' }}>Tenaga Medis</option>
-                                    <option value="Tenaga Keperawatan" {{ $vacancy->formation_type == 'Tenaga Keperawatan' || $vacancy->employment_type == 'Tenaga Keperawatan' ? 'selected' : '' }}>Tenaga Keperawatan</option>
-                                    <option value="Tenaga Kebidanan" {{ $vacancy->formation_type == 'Tenaga Kebidanan' || $vacancy->employment_type == 'Tenaga Kebidanan' ? 'selected' : '' }}>Tenaga Kebidanan</option>
-                                    <option value="Tenaga Kefarmasian" {{ $vacancy->formation_type == 'Tenaga Kefarmasian' || $vacancy->employment_type == 'Tenaga Kefarmasian' ? 'selected' : '' }}>Tenaga Kefarmasian</option>
-                                    <option value="Tenaga Penunjang Medis" {{ $vacancy->formation_type == 'Tenaga Penunjang Medis' || $vacancy->employment_type == 'Tenaga Penunjang Medis' ? 'selected' : '' }}>Tenaga Penunjang Medis</option>
-                                    <option value="Tenaga Non-Medis / Umum" {{ $vacancy->formation_type == 'Tenaga Non-Medis / Umum' || $vacancy->employment_type == 'Tenaga Non-Medis / Umum' ? 'selected' : '' }}>Tenaga Non-Medis / Umum</option>
+                                    @php
+                                        $currentFormation = old('formation_type', $vacancy->formation_type ?? $vacancy->employment_type);
+                                        $standardFormations = [
+                                            'Tenaga Medis',
+                                            'Tenaga Keperawatan',
+                                            'Tenaga Kebidanan',
+                                            'Tenaga Kefarmasian',
+                                            'Tenaga Penunjang Medis',
+                                            'Tenaga Non-Medis / Umum',
+                                            'PKWT',
+                                            'PKWTT',
+                                        ];
+                                    @endphp
+                                    @foreach($standardFormations as $fOption)
+                                        <option value="{{ $fOption }}" {{ $currentFormation == $fOption ? 'selected' : '' }}>{{ $fOption }}</option>
+                                    @endforeach
+                                    @if($currentFormation && !in_array($currentFormation, $standardFormations, true))
+                                        <option value="{{ $currentFormation }}" selected>{{ $currentFormation }}</option>
+                                    @endif
                                 </select>
                             </div>
                             <div>

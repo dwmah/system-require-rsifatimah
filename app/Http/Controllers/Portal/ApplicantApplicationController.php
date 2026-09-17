@@ -200,9 +200,9 @@ class ApplicantApplicationController extends Controller
     }
 
     /**
-     * Konfirmasi pelamar telah melihat pengumuman penolakan (Acknowledge).
+     * Konfirmasi pelamar telah melihat pengumuman penolakan (Acknowledge) & akhiri akun sesuai lifecycle.
      */
-    public function acknowledgeAnnouncement(JobApplication $application): RedirectResponse
+    public function acknowledgeAnnouncement(Request $request, JobApplication $application): RedirectResponse
     {
         $user = Auth::user();
 
@@ -210,10 +210,24 @@ class ApplicantApplicationController extends Controller
             abort(403);
         }
 
-        if ($application->isRejected() && is_null($application->announcement_seen_at)) {
-            $application->update([
-                'announcement_seen_at' => now(),
-            ]);
+        if ($application->isRejected()) {
+            if (is_null($application->announcement_seen_at)) {
+                $application->update([
+                    'announcement_seen_at' => now(),
+                ]);
+            }
+
+            // Jalankan cleanup data dan berkas fisik pelamar
+            $lifecycleService = app(\App\Services\Lifecycle\UserLifecycleService::class);
+
+            // Logout sesi terlebih dahulu
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            $lifecycleService->cleanupRejectedApplicant($user);
+
+            return redirect()->route('login')->with('info', 'Terima kasih telah mengonfirmasi hasil pengumuman rekrutmen. Sesuai ketentuan RSI Fatimah Banyuwangi, data akun dan berkas lamaran Anda telah dibersihkan dari sistem kami.');
         }
 
         return back()->with('info', 'Terima kasih telah mengonfirmasi status hasil pengumuman.');

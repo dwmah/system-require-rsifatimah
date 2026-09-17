@@ -45,6 +45,37 @@
             $snapshot = $jobApplication->snapshot;
         @endphp
 
+        @if ($jobApplication->isRejected())
+            {{-- Rejection Announcement Alert --}}
+            <div class="bg-rose-50 border border-rose-200 rounded-2xl p-6 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+                <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0 shadow-xs">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="space-y-1">
+                        <span class="px-2.5 py-0.5 bg-rose-200 text-rose-900 text-[10px] font-bold uppercase tracking-wider rounded-full inline-block">Hasil Seleksi</span>
+                        <h2 class="text-base font-bold text-rose-950">Berkas Lamaran Belum Memenuhi Syarat (Tidak Lolos)</h2>
+                        <p class="text-xs text-rose-800 leading-relaxed max-w-2xl">
+                            <strong>Alasan Penolakan:</strong> {{ $jobApplication->rejection_reason ?? 'Berkas tidak lengkap atau belum memenuhi kualifikasi.' }}
+                        </p>
+                        <p class="text-[11px] text-slate-500 pt-1">
+                            Sesuai ketentuan RSI Fatimah Banyuwangi, data akun pelamar yang tidak lolos akan dibersihkan dari sistem setelah Anda mengonfirmasi pengumuman ini.
+                        </p>
+                    </div>
+                </div>
+
+                <form method="POST" action="{{ route('portal.applications.acknowledge', $jobApplication) }}" class="shrink-0 w-full md:w-auto">
+                    @csrf
+                    <button type="submit" onclick="return confirm('Apakah Anda yakin telah membaca pengumuman ini? Akun dan berkas Anda akan dibersihkan dan sesi login akan diakhiri.')" class="w-full md:w-auto px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                        <span>Konfirmasi &amp; Akhiri Akun</span>
+                    </button>
+                </form>
+            </div>
+        @endif
+
         {{-- Application Status Banner --}}
         <div class="bg-white rounded-2xl border border-slate-200 shadow-2xs p-6 sm:p-7 flex flex-col md:flex-row md:items-center justify-between gap-5">
             <div class="space-y-1.5">

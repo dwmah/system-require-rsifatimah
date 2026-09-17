@@ -256,10 +256,10 @@ class RecruitmentFullWorkflowTest extends TestCase
         $this->assertEquals('STR telah kedaluwarsa dan ijazah belum dilegalisir asli.', $application->rejection_reason);
 
         // Applicant sees and acknowledges rejection
-        $this->actingAs($this->applicant)->post(route('portal.applications.acknowledge', $application));
-        $application->refresh();
-
-        $this->assertNotNull($application->announcement_seen_at);
+        $response = $this->actingAs($this->applicant)->post(route('portal.applications.acknowledge', $application));
+        $response->assertRedirect(route('login'));
+        $this->assertGuest();
+        $this->assertDatabaseMissing('users', ['id' => $this->applicant->id]);
     }
 
     public function test_user_lifecycle_service_handles_deactivation_and_cleanup(): void

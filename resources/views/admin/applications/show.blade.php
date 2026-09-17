@@ -195,23 +195,156 @@
                                     </td>
                                     <td class="py-4 px-4 text-right">
                                         @if($doc)
-                                            <div class="flex items-center justify-end gap-2" x-data="{ docModalOpen: false }">
-                                                <!-- Download Button -->
-                                                <a href="{{ route('documents.download', $doc) }}" target="_blank" class="px-3 py-1.5 bg-sky-50 text-[#0179B5] hover:bg-sky-100 font-semibold rounded-lg text-xs transition-colors inline-flex items-center gap-1 cursor-pointer">
-                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                                                    <span>Lihat File</span>
-                                                </a>
+                                            <div class="flex items-center justify-end gap-2" x-data="{ previewModalOpen: false, statusModalOpen: false }">
+                                                <!-- Preview & Verifikasi Button -->
+                                                <button type="button" @click="previewModalOpen = true" class="px-3 py-1.5 bg-[#0179B5]/10 text-[#0179B5] hover:bg-[#0179B5]/20 font-semibold rounded-lg text-xs transition-colors inline-flex items-center gap-1.5 cursor-pointer shadow-2xs" title="Lihat dokumen langsung tanpa unduh">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                                    <span>Lihat Berkas</span>
+                                                </button>
 
                                                 <!-- Quick Status Trigger -->
-                                                <button type="button" @click="docModalOpen = true" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg text-xs transition-colors cursor-pointer">
+                                                <button type="button" @click="statusModalOpen = true" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg text-xs transition-colors cursor-pointer" title="Ubah status verifikasi berkas">
                                                     Status
                                                 </button>
 
-                                                <!-- Per-Document Verification Modal -->
-                                                <div x-show="docModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4">
-                                                    <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm" @click="docModalOpen = false"></div>
+                                                <!-- Interactive In-Browser Document Preview & Verification Modal -->
+                                                <div x-show="previewModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6" @keydown.escape.window="previewModalOpen = false">
+                                                    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" @click="previewModalOpen = false"></div>
+                                                    
+                                                    <div class="relative bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col w-full max-w-6xl h-[92vh] overflow-hidden z-10 text-left">
+                                                        
+                                                        <!-- Modal Top Bar -->
+                                                        <div class="px-5 py-3.5 bg-slate-900 text-white flex items-center justify-between gap-4 shrink-0 border-b border-slate-800">
+                                                            <div class="flex items-center gap-3 min-w-0">
+                                                                <div class="w-9 h-9 rounded-xl bg-[#0179B5] text-white flex items-center justify-center shrink-0">
+                                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                                                </div>
+                                                                <div class="truncate">
+                                                                    <div class="flex items-center gap-2">
+                                                                        <h3 class="font-bold text-sm sm:text-base text-white truncate">{{ $req->document_name }}</h3>
+                                                                        <span class="px-2 py-0.5 text-[10px] font-bold uppercase rounded {{ $doc->verification_status === 'valid' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : ($doc->verification_status === 'invalid' ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30') }}">
+                                                                            {{ $doc->verification_status === 'valid' ? 'Valid' : ($doc->verification_status === 'invalid' ? 'Tidak Valid' : 'Menunggu Review') }}
+                                                                        </span>
+                                                                    </div>
+                                                                    <p class="text-xs text-slate-300 truncate mt-0.5">
+                                                                        {{ $doc->original_name }} &bull; {{ round($doc->file_size / 1024, 1) }} KB &bull; Pelamar: <strong class="text-white">{{ $user->name }}</strong>
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="flex items-center gap-2 shrink-0">
+                                                                <!-- Open New Tab -->
+                                                                <a href="{{ route('documents.preview', $doc) }}" target="_blank" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg transition-colors inline-flex items-center gap-1.5" title="Buka di tab browser baru">
+                                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                                                                    <span class="hidden sm:inline">Review</span>
+                                                                </a>
+
+                                                                <!-- Download Button -->
+                                                                <a href="{{ route('documents.download', $doc) }}" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg transition-colors inline-flex items-center gap-1.5" title="Unduh file ke komputer">
+                                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                                                    <span class="hidden sm:inline">Unduh</span>
+                                                                </a>
+
+                                                                <!-- Close Button -->
+                                                                <button type="button" @click="previewModalOpen = false" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-rose-600 text-slate-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer ml-1" title="Tutup">
+                                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Modal Main Content (Split View: Preview Viewer + Verification Form) -->
+                                                        <div class="flex-1 flex flex-col lg:flex-row overflow-hidden min-h-0 bg-slate-100">
+                                                            
+                                                            <!-- Left: Document Interactive Viewer -->
+                                                            <div class="flex-1 h-full p-2 sm:p-3 overflow-hidden flex flex-col min-h-0">
+                                                                @if(str_contains(strtolower($doc->mime_type ?? ''), 'pdf') || str_ends_with(strtolower($doc->original_name ?? ''), '.pdf'))
+                                                                    <iframe src="{{ route('documents.preview', $doc) }}" class="w-full h-full bg-white rounded-xl border border-slate-300 shadow-inner" style="min-height: 100%;"></iframe>
+                                                                @elseif(str_contains(strtolower($doc->mime_type ?? ''), 'image') || in_array(strtolower(pathinfo($doc->original_name ?? '', PATHINFO_EXTENSION)), ['jpg', 'jpeg', 'png', 'webp']))
+                                                                    <div class="w-full h-full bg-slate-900 rounded-xl border border-slate-300 overflow-auto flex items-center justify-center p-4">
+                                                                        <img src="{{ route('documents.preview', $doc) }}" alt="{{ $doc->original_name }}" class="max-h-full max-w-full object-contain rounded shadow-lg">
+                                                                    </div>
+                                                                @else
+                                                                    <div class="w-full h-full bg-white rounded-xl border border-slate-300 flex flex-col items-center justify-center p-8 text-center">
+                                                                        <svg class="w-16 h-16 text-slate-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                                                        <p class="font-bold text-slate-800 text-base mb-1">{{ $doc->original_name }}</p>
+                                                                        <p class="text-xs text-slate-500 mb-4">Preview langsung tidak didukung untuk format ini ({{ $doc->mime_type }}).</p>
+                                                                        <a href="{{ route('documents.download', $doc) }}" class="px-4 py-2 bg-[#0179B5] text-white text-xs font-semibold rounded-lg shadow-sm hover:bg-[#016293] transition-colors inline-flex items-center gap-2">
+                                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                                                            <span>Unduh File</span>
+                                                                        </a>
+                                                                    </div>
+                                                                @endif
+                                                            </div>
+
+                                                            <!-- Right: Live Verification Form & Details Panel -->
+                                                            <div class="w-full lg:w-96 bg-white border-t lg:border-t-0 lg:border-l border-slate-200 p-5 flex flex-col justify-between overflow-y-auto shrink-0 shadow-sm">
+                                                                <form method="POST" action="{{ route('admin.applications.documents.verify', $doc) }}" class="space-y-4">
+                                                                    @csrf
+                                                                    
+                                                                    <div>
+                                                                        <h4 class="text-xs font-bold uppercase tracking-wider text-[#0179B5] mb-0.5">Verifikasi Berkas</h4>
+                                                                        <p class="text-xs text-slate-500">Tentukan status keabsahan dokumen persyaratan ini</p>
+                                                                    </div>
+
+                                                                    <!-- Status Selection -->
+                                                                    <div class="space-y-2">
+                                                                        <label class="block text-xs font-bold text-slate-800">Status Keabsahan <span class="text-rose-500">*</span></label>
+                                                                        
+                                                                        <div class="space-y-1.5">
+                                                                            <label class="flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/40 cursor-pointer transition-all has-[:checked]:border-emerald-600 has-[:checked]:bg-emerald-50 has-[:checked]:ring-1 has-[:checked]:ring-emerald-500/30">
+                                                                                <input type="radio" name="verification_status" value="valid" {{ $doc->verification_status === 'valid' ? 'checked' : '' }} class="w-4 h-4 text-emerald-600 focus:ring-emerald-500 border-slate-300">
+                                                                                <div>
+                                                                                    <span class="block text-xs font-bold text-slate-900">✓ Valid (Sesuai Syarat)</span>
+                                                                                    <span class="block text-[11px] text-slate-500">Berkas lengkap dan sesuai</span>
+                                                                                </div>
+                                                                            </label>
+
+                                                                            <label class="flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-200 hover:border-rose-500 hover:bg-rose-50/40 cursor-pointer transition-all has-[:checked]:border-rose-600 has-[:checked]:bg-rose-50 has-[:checked]:ring-1 has-[:checked]:ring-rose-500/30">
+                                                                                <input type="radio" name="verification_status" value="invalid" {{ $doc->verification_status === 'invalid' ? 'checked' : '' }} class="w-4 h-4 text-rose-600 focus:ring-rose-500 border-slate-300">
+                                                                                <div>
+                                                                                    <span class="block text-xs font-bold text-slate-900">✕ Tidak Valid</span>
+                                                                                    <span class="block text-[11px] text-slate-500">Berkas buram/tidak memenuhi syarat</span>
+                                                                                </div>
+                                                                            </label>
+
+                                                                            <label class="flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-200 hover:border-amber-500 hover:bg-amber-50/40 cursor-pointer transition-all has-[:checked]:border-amber-600 has-[:checked]:bg-amber-50 has-[:checked]:ring-1 has-[:checked]:ring-amber-500/30">
+                                                                                <input type="radio" name="verification_status" value="pending" {{ in_array($doc->verification_status, ['pending', null], true) ? 'checked' : '' }} class="w-4 h-4 text-amber-600 focus:ring-amber-500 border-slate-300">
+                                                                                <div>
+                                                                                    <span class="block text-xs font-bold text-slate-900">⏳ Menunggu Review</span>
+                                                                                    <span class="block text-[11px] text-slate-500">Pemeriksaan lanjutan</span>
+                                                                                </div>
+                                                                            </label>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- Verification Note -->
+                                                                    <div>
+                                                                        <label class="block text-xs font-bold text-slate-800 mb-1">Catatan Verifikator (Opsional)</label>
+                                                                        <input type="text" name="verification_note" value="{{ $doc->verification_note }}" placeholder="Contoh: Legalisir cap basah valid"
+                                                                               class="w-full h-10 px-3 text-xs bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-[#0179B5] focus:bg-white transition-all">
+                                                                    </div>
+
+                                                                    <!-- Submit Buttons -->
+                                                                    <div class="pt-3 border-t border-slate-200 flex items-center justify-end gap-2">
+                                                                        <button type="button" @click="previewModalOpen = false" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition-colors cursor-pointer">
+                                                                            Tutup
+                                                                        </button>
+                                                                        <button type="submit" class="px-4 py-2 bg-[#0179B5] hover:bg-[#016293] text-white text-xs font-bold rounded-lg shadow-sm transition-colors flex items-center gap-1.5 cursor-pointer">
+                                                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                                                            <span>Simpan Status</span>
+                                                                        </button>
+                                                                    </div>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Per-Document Quick Status Modal -->
+                                                <div x-show="statusModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4" @keydown.escape.window="statusModalOpen = false">
+                                                    <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm" @click="statusModalOpen = false"></div>
                                                     <div class="relative bg-white rounded-xl shadow-xl border border-slate-200 p-6 max-w-sm w-full text-left">
-                                                        <h3 class="text-base font-bold text-slate-900 mb-1">Verifikasi Berkas</h3>
+                                                        <h3 class="text-base font-bold text-slate-900 mb-1">Status Verifikasi Berkas</h3>
                                                         <p class="text-xs text-slate-500 mb-4">{{ $req->document_name }}</p>
 
                                                         <form method="POST" action="{{ route('admin.applications.documents.verify', $doc) }}" class="space-y-4">
@@ -232,7 +365,7 @@
                                                             </div>
 
                                                             <div class="flex justify-end gap-2 pt-2">
-                                                                <button type="button" @click="docModalOpen = false" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-lg cursor-pointer">Batal</button>
+                                                                <button type="button" @click="statusModalOpen = false" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-lg cursor-pointer">Batal</button>
                                                                 <button type="submit" class="px-4 py-2 bg-[#0179B5] hover:bg-[#016293] text-white text-sm font-semibold rounded-lg cursor-pointer">Simpan</button>
                                                             </div>
                                                         </form>
@@ -375,11 +508,12 @@
                     @foreach ($selectionStages as $stg)
                         @php
                             $hist = $stageHistories->get($stg->id);
+                            $histStatus = $hist ? ($hist->status instanceof \App\Enums\ApplicationStageStatus ? $hist->status->value : (string)$hist->status) : null;
                         @endphp
-                        <div class="p-4 rounded-xl border {{ $hist && $hist->status === 'passed' ? 'bg-emerald-50/50 border-emerald-200' : ($hist && $hist->status === 'rejected' ? 'bg-rose-50/50 border-rose-200' : 'bg-slate-50 border-slate-200') }} flex items-start justify-between gap-4">
+                        <div class="p-4 rounded-xl border {{ $histStatus === 'passed' ? 'bg-emerald-50/50 border-emerald-200' : (in_array($histStatus, ['failed', 'rejected']) ? 'bg-rose-50/50 border-rose-200' : ($histStatus === 'in_progress' ? 'bg-blue-50/50 border-blue-200' : 'bg-slate-50 border-slate-200')) }} flex items-start justify-between gap-4">
                             <div class="flex items-start gap-3">
-                                <div class="w-8 h-8 rounded-full {{ $hist && $hist->status === 'passed' ? 'bg-emerald-600 text-white' : ($hist && $hist->status === 'rejected' ? 'bg-rose-600 text-white' : 'bg-slate-300 text-slate-700') }} font-bold text-sm flex items-center justify-center flex-shrink-0">
-                                    {{ $stg->sequence_order }}
+                                <div class="w-8 h-8 rounded-full {{ $histStatus === 'passed' ? 'bg-emerald-600 text-white' : (in_array($histStatus, ['failed', 'rejected']) ? 'bg-rose-600 text-white' : ($histStatus === 'in_progress' ? 'bg-blue-600 text-white' : 'bg-slate-300 text-slate-700')) }} font-bold text-sm flex items-center justify-center flex-shrink-0">
+                                    {{ $stg->sequence_order ?? $stg->sort_order }}
                                 </div>
                                 <div>
                                     <div class="font-bold text-slate-900 text-sm">{{ $stg->stage_name }}</div>
@@ -394,12 +528,14 @@
 
                             <div>
                                 @if($hist)
-                                    @if($hist->status === 'passed')
+                                    @if($histStatus === 'passed')
                                         <span class="px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full">✓ Lolos</span>
-                                    @elseif($hist->status === 'rejected')
+                                    @elseif($histStatus === 'failed' || $histStatus === 'rejected')
                                         <span class="px-3 py-1 bg-rose-100 text-rose-800 text-xs font-bold rounded-full">✕ Tidak Lolos</span>
+                                    @elseif($histStatus === 'in_progress')
+                                        <span class="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-bold rounded-full">Sedang Berlangsung</span>
                                     @else
-                                        <span class="px-3 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-full">Sedang Diproses</span>
+                                        <span class="px-3 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-full">Menunggu</span>
                                     @endif
                                 @else
                                     <span class="px-3 py-1 bg-slate-200 text-slate-600 text-xs font-semibold rounded-full">Belum Dimulai</span>

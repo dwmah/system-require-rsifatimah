@@ -163,7 +163,39 @@
 
         <!-- MAJOR STATUS ANNOUNCEMENT BANNERS -->
         @if($application)
-            @if($application->status === \App\Enums\JobApplicationStatus::SUBMITTED)
+            @if($application->isRejected() && !empty($finalResult))
+                <!-- BANNER REJECTED / TIDAK LOLOS SELEKSI -->
+                <div class="bg-rose-50 border border-rose-200 rounded-2xl p-6 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0 shadow-xs">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-2">
+                                <span class="px-2.5 py-0.5 bg-rose-200 text-rose-900 text-[10px] font-bold uppercase tracking-wider rounded-full inline-block">Hasil Seleksi</span>
+                                <span class="text-xs text-rose-700 font-semibold">{{ $application->jobVacancy->title ?? 'Lowongan' }}</span>
+                            </div>
+                            <h2 class="text-base font-bold text-rose-950">Hasil Verifikasi: Berkas Belum Memenuhi Syarat (Tidak Lolos)</h2>
+                            <p class="text-xs text-rose-800 leading-relaxed max-w-2xl">
+                                <strong>Alasan Penolakan:</strong> {{ $application->rejection_reason ?? ($finalResult['message'] ?? 'Berkas persyaratan belum lengkap atau tidak sesuai kualifikasi yang dipersyaratkan.') }}
+                            </p>
+                            <p class="text-[11px] text-slate-500 pt-1">
+                                Sesuai SOP privasi RSI Fatimah Banyuwangi, seluruh data akun dan berkas fisik pelamar yang tidak lolos akan dibersihkan setelah Anda mengonfirmasi pengumuman ini.
+                            </p>
+                        </div>
+                    </div>
+
+                    <form method="POST" action="{{ route('portal.applications.acknowledge', $application) }}" class="shrink-0 w-full md:w-auto">
+                        @csrf
+                        <button type="submit" onclick="return confirm('Apakah Anda yakin telah membaca pengumuman ini? Sesuai ketentuan, akun dan berkas lamaran Anda akan dibersihkan dari sistem dan sesi login akan diakhiri.')" class="w-full md:w-auto px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                            <span>Konfirmasi &amp; Akhiri Akun</span>
+                        </button>
+                    </form>
+                </div>
+            @elseif($application->status === \App\Enums\JobApplicationStatus::SUBMITTED)
                 <!-- BANNER SUBMITTED: MENUNGGU VERIFIKASI DOKUMEN -->
                 <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6 shadow-sm flex items-start gap-4">
                     <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
@@ -193,6 +225,57 @@
                         <p class="text-xs text-indigo-800 mt-1 leading-relaxed">
                             Lamaran Anda pada formasi <strong>{{ $application->jobVacancy->title ?? 'Lowongan' }}</strong> sedang dalam tahapan evaluasi seleksi. Pantau perkembangan setiap tahapan pada timeline di bawah.
                         </p>
+                    </div>
+                </div>
+            @endif
+
+            @if($application->isRejected() && !empty($finalResult) && is_null($application->announcement_seen_at))
+                <!-- MODAL POPUP PENGUMUMAN TIDAK LOLOS (AUTO-OPEN) -->
+                <div x-data="{ open: true }" x-show="open" x-cloak class="fixed inset-0 z-50 overflow-y-auto" role="dialog" aria-modal="true">
+                    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"></div>
+                    <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0 relative z-10">
+                        <div class="relative w-full max-w-lg p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-2xl rounded-2xl border border-slate-200 space-y-5">
+                            <div class="flex items-center gap-3.5 pb-3 border-b border-slate-100">
+                                <div class="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-slate-900">Pengumuman Hasil Seleksi</h3>
+                                    <p class="text-xs text-slate-500">Formasi: {{ $application->jobVacancy->title ?? 'Lowongan' }}</p>
+                                </div>
+                            </div>
+
+                            <div class="space-y-3 text-xs leading-relaxed">
+                                <div class="p-4 bg-rose-50 rounded-xl border border-rose-200 text-rose-900 space-y-1.5">
+                                    <strong class="text-sm font-bold block text-rose-950">Status: Berkas Belum Memenuhi Syarat (Tidak Lolos)</strong>
+                                    <p class="text-rose-800">
+                                        <strong>Catatan Alasan Penolakan:</strong><br>
+                                        {{ $application->rejection_reason ?? ($finalResult['message'] ?? 'Berkas persyaratan belum lengkap atau tidak sesuai kualifikasi yang dipersyaratkan.') }}
+                                    </p>
+                                </div>
+
+                                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-slate-600 space-y-1">
+                                    <p>
+                                        Terima kasih atas minat dan antusiasme Anda untuk berpartisipasi dalam Rekrutmen <strong>RS Islam Fatimah Banyuwangi</strong>.
+                                    </p>
+                                    <p class="text-[11px] text-slate-500">
+                                        Sesuai ketentuan tata kelola privasi data pelamar, setelah Anda menekan tombol konfirmasi di bawah, akun Anda akan dibersihkan dari sistem dan sesi login Anda akan diakhiri.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-3">
+                                <form method="POST" action="{{ route('portal.applications.acknowledge', $application) }}" class="w-full">
+                                    @csrf
+                                    <button type="submit" class="w-full px-5 py-3 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                        <span>Saya Mengerti, Konfirmasi &amp; Akhiri Akun</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 </div>
             @endif

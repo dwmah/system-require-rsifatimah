@@ -138,10 +138,12 @@ class AdminApplicationController extends Controller
 
         if ($request->action === 'approve') {
             $this->verificationService->approveAdministration($application, $admin, $request->admin_note);
-            return back()->with('success', "Lamaran atas nama {$application->user->name} berhasil DISETUJUI (Lolos Administrasi). Notifikasi telah dikirim ke pelamar.");
+            return redirect()->route('admin.applications.show', $application)
+                ->with('success', "Lamaran atas nama {$application->user->name} berhasil DISETUJUI (Lolos Administrasi). Notifikasi telah dikirim ke pelamar.");
         } else {
             $this->verificationService->rejectAdministration($application, $admin, $request->rejection_reason);
-            return back()->with('info', "Lamaran atas nama {$application->user->name} telah DITOLAK dengan alasan: {$request->rejection_reason}. Notifikasi telah dikirim ke pelamar.");
+            return redirect()->route('admin.applications.show', $application)
+                ->with('info', "Lamaran atas nama {$application->user->name} telah DITOLAK dengan alasan: {$request->rejection_reason}. Notifikasi telah dikirim ke pelamar.");
         }
     }
 
@@ -161,7 +163,8 @@ class AdminApplicationController extends Controller
             $request->verification_note
         );
 
-        return back()->with('success', "Status dokumen '{$document->documentRequirement->document_name}' berhasil diperbarui.");
+        return redirect()->route('admin.applications.show', $document->jobApplication)
+            ->with('success', "Status dokumen '{$document->documentRequirement->document_name}' berhasil diperbarui.");
     }
 
     /**
@@ -171,14 +174,15 @@ class AdminApplicationController extends Controller
     {
         $request->validate([
             'stage_id' => 'required|exists:vacancy_selection_stages,id',
-            'status' => 'required|in:passed,rejected,in_progress,pending',
+            'status' => 'required|in:passed,rejected,failed,in_progress,pending',
             'stage_note' => 'nullable|string|max:1000',
         ]);
 
         $stage = VacancySelectionStage::findOrFail($request->stage_id);
 
         if ($stage->job_vacancy_id !== $application->job_vacancy_id) {
-            return back()->with('error', 'Tahapan seleksi tidak valid untuk formasi ini.');
+            return redirect()->route('admin.applications.show', $application)
+                ->with('error', 'Tahapan seleksi tidak valid untuk formasi ini.');
         }
 
         $this->verificationService->updateSelectionStage(
@@ -188,6 +192,7 @@ class AdminApplicationController extends Controller
             $request->stage_note
         );
 
-        return back()->with('success', "Tahapan seleksi '{$stage->stage_name}' berhasil diperbarui.");
+        return redirect()->route('admin.applications.show', $application)
+            ->with('success', "Tahapan seleksi '{$stage->stage_name}' berhasil diperbarui.");
     }
 }

@@ -111,7 +111,54 @@ class ApplicantDocumentController extends Controller
     }
 
     /**
-     * Download / preview berkas dokumen secara aman.
+     * Cari disk dan path penyimpanan berkas dokumen yang valid.
+     *
+     * @return array{\Illuminate\Contracts\Filesystem\Filesystem, string}
+     */
+    protected function getDocumentDiskAndPath(ApplicationDocument $document): array
+    {
+        if (!$document->stored_path) {
+            abort(404, 'Berkas dokumen tidak memiliki path penyimpanan.');
+        }
+
+        if (Storage::disk('applicant_documents')->exists($document->stored_path)) {
+            return [Storage::disk('applicant_documents'), $document->stored_path];
+        }
+
+        if (Storage::disk('local')->exists($document->stored_path)) {
+            return [Storage::disk('local'), $document->stored_path];
+        }
+
+        abort(404, 'Berkas dokumen fisik tidak ditemukan di penyimpanan server.');
+    }
+
+    /**
+     * Preview berkas dokumen secara langsung (inline) di browser tanpa unduh.
+     */
+    public function preview(ApplicationDocument $document): StreamedResponse
+    {
+        $user = Auth::user();
+        $application = $document->jobApplication;
+
+        if (!$user) {
+            abort(403);
+        }
+
+        // Cek hak akses: Pemilik dokumen ATAU Admin HRD
+        if ($user->id !== $application->user_id && !$user->isAdmin()) {
+            abort(403, 'Anda tidak memiliki akses ke dokumen ini.');
+        }
+
+        [$disk, $path] = $this->getDocumentDiskAndPath($document);
+
+        return $disk->response($path, $document->original_name, [
+            'Content-Type' => $document->mime_type ?: 'application/pdf',
+            'Content-Disposition' => 'inline; filename="' . $document->original_name . '"',
+        ]);
+    }
+
+    /**
+     * Download berkas dokumen secara aman.
      * Hanya pemilik dokumen atau Admin HRD yang dapat mengakses.
      */
     public function download(ApplicationDocument $document): StreamedResponse
@@ -128,12 +175,10 @@ class ApplicantDocumentController extends Controller
             abort(403, 'Anda tidak memiliki akses ke dokumen ini.');
         }
 
-        if (!$document->stored_path || !Storage::exists($document->stored_path)) {
-            abort(404, 'Berkas dokumen fisik tidak ditemukan di penyimpanan server.');
-        }
+        [$disk, $path] = $this->getDocumentDiskAndPath($document);
 
-        return Storage::response($document->stored_path, $document->original_name, [
-            'Content-Type' => $document->mime_type ?? 'application/pdf',
+        return $disk->download($path, $document->original_name, [
+            'Content-Type' => $document->mime_type ?: 'application/octet-stream',
         ]);
     }
 }

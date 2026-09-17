@@ -125,6 +125,8 @@
                                     <option value="Tenaga Kefarmasian">Tenaga Kefarmasian</option>
                                     <option value="Tenaga Penunjang Medis">Tenaga Penunjang Medis</option>
                                     <option value="Tenaga Non-Medis / Umum">Tenaga Non-Medis / Umum</option>
+                                    <option value="PKWT">PKWT (Perjanjian Kerja Waktu Tertentu)</option>
+                                    <option value="PKWTT">PKWTT (Tetap)</option>
                                 </select>
                             </div>
                             <div>

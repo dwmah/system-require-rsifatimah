@@ -378,6 +378,11 @@ class AdminVacancyController extends Controller
                     $mimes = !empty($docMimes[$idx]) ? $docMimes[$idx] : 'application/pdf,image/jpeg,image/png';
                     $maxSize = !empty($docMaxSizes[$idx]) ? (int) $docMaxSizes[$idx] : 5120;
 
+                    // Jika docId tidak ada, cari requirement lama yang belum terproses dengan nama yang sama
+                    if (!$docId && $existingDoc = $existingDocReqs->whereNotIn('id', $processedIds)->firstWhere('name', trim($docName))) {
+                        $docId = $existingDoc->id;
+                    }
+
                     if ($docId && $existingDoc = $existingDocReqs->firstWhere('id', $docId)) {
                         $existingDoc->update([
                             'name' => trim($docName),
@@ -437,6 +442,11 @@ class AdminVacancyController extends Controller
                     $desc = $stageDescriptions[$idx] ?? null;
                     $startAt = !empty($stageStartAts[$idx]) ? \Carbon\Carbon::parse($stageStartAts[$idx]) : null;
                     $endAt = !empty($stageEndAts[$idx]) ? \Carbon\Carbon::parse($stageEndAts[$idx]) : null;
+
+                    // Jika stageId tidak ada, cari tahapan lama yang belum terproses dengan nama yang sama
+                    if (!$stageId && $existingStage = $existingStages->whereNotIn('id', $processedStageIds)->firstWhere('name', trim($stageName))) {
+                        $stageId = $existingStage->id;
+                    }
 
                     if ($stageId && $existingStage = $existingStages->firstWhere('id', $stageId)) {
                         $existingStage->update([

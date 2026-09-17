@@ -67,6 +67,7 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('/keluar', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
+    Route::get('/dokumen/preview/{document}', [ApplicantDocumentController::class, 'preview'])->name('documents.preview');
     Route::get('/dokumen/download/{document}', [ApplicantDocumentController::class, 'download'])->name('documents.download');
 
     Route::get('/portal', [PortalHomeController::class, 'index'])->name('portal.home');
@@ -222,8 +223,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/applications', [AdminApplicationController::class, 'index'])->name('applications.index');
     Route::get('/applications/{application}', [AdminApplicationController::class, 'show'])->name('applications.show');
     Route::post('/applications/{application}/verify', [AdminApplicationController::class, 'verify'])->name('applications.verify');
+    Route::get('/applications/{application}/verify', fn (\App\Models\JobApplication $application) => redirect()->route('admin.applications.show', $application));
     Route::post('/applications/documents/{document}/verify', [AdminApplicationController::class, 'verifyDocument'])->name('applications.documents.verify');
     Route::post('/applications/{application}/update-stage', [AdminApplicationController::class, 'updateStage'])->name('applications.update-stage');
+    Route::get('/applications/{application}/update-stage', fn (\App\Models\JobApplication $application) => redirect()->route('admin.applications.show', $application));
 
     // Manajemen Timeline & Kalender Seleksi
     Route::get('/timelines', [AdminTimelineController::class, 'index'])->name('timelines.index');

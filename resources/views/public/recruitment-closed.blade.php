@@ -40,7 +40,7 @@
                 @endauth
 
                 <a
-                    href="https://rsifatimah.co.id"
+                    href="https://rsifatimahbanyuwangi.com"
                     target="_blank"
                     rel="noopener noreferrer"
                     class="text-xs font-medium text-slate-500 hover:text-slate-700 transition-colors flex items-center gap-1.5 focus:outline-hidden focus:underline"
@@ -116,7 +116,7 @@
                 @endauth
 
                 <a
-                    href="https://rsifatimah.co.id"
+                    href="https://rsifatimahbanyuwangi.com"
                     target="_blank"
                     rel="noopener noreferrer"
                     class="w-full sm:w-auto inline-flex items-center justify-center font-medium rounded-lg text-xs px-4 py-2.5 bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors"
