@@ -62,43 +62,6 @@
             </div>
         </div>
 
-        {{-- Application Workflow Stepper --}}
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-2xs p-5">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                {{-- STEP 1: Formasi --}}
-                <a href="{{ route('portal.applications.show', $jobApplication) }}" class="p-3.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-colors">
-                    <div class="flex items-center justify-between mb-1">
-                        <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-200 text-slate-700 text-xs font-bold">1</span>
-                        <span class="text-[11px] font-semibold text-rsi-700 flex items-center gap-1">
-                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
-                            {{ $jobApplication->isDraft() ? 'Dapat Diganti' : 'Terkunci' }}
-                        </span>
-                    </div>
-                    <div class="text-xs font-bold text-slate-800">Formasi & Profil</div>
-                </a>
-
-                {{-- STEP 2: Unggah Berkas --}}
-                <a href="{{ route('portal.applications.documents.index', $jobApplication) }}" class="p-3.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-colors">
-                    <div class="flex items-center justify-between mb-1">
-                        <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-200 text-slate-700 text-xs font-bold">2</span>
-                        <span class="text-[11px] font-semibold text-rsi-700 flex items-center gap-1">
-                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
-                            {{ $missingRequirements->isEmpty() ? 'Lengkap' : 'Belum Lengkap' }}
-                        </span>
-                    </div>
-                    <div class="text-xs font-bold text-slate-800">Unggah Berkas Persyaratan</div>
-                </a>
-
-                {{-- STEP 3: Review & Kirim --}}
-                <div class="p-3.5 rounded-xl border-2 border-rsi-600 bg-rsi-50/50">
-                    <div class="flex items-center justify-between mb-1">
-                        <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-rsi-700 text-white text-xs font-bold">3</span>
-                        <span class="text-[11px] font-bold text-rsi-800">Tahap Akhir</span>
-                    </div>
-                    <div class="text-xs font-bold text-slate-900">Review & Final Submit</div>
-                </div>
-            </div>
-        </div>
 
         {{-- Verification Status Alerts --}}
         @php
@@ -257,110 +220,11 @@
             </div>
         </div>
 
-        {{-- Review Section 4: Lisensi / STR --}}
+        {{-- Review Section 4: Dokumen Persyaratan yang Diunggah --}}
         <div class="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
             <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
                 <h2 class="text-xs font-bold text-slate-900 uppercase tracking-wider">
-                    4. STR / Lisensi Profesi ({{ $licenses->count() }})
-                </h2>
-                <a href="{{ route('profile.show') }}" class="text-xs font-semibold text-rsi-700 hover:underline">
-                    Kelola di Profil &rarr;
-                </a>
-            </div>
-            <div class="p-6">
-                @if ($licenses->isNotEmpty())
-                    <div class="divide-y divide-slate-100">
-                        @foreach ($licenses as $lic)
-                            <div class="py-3 first:pt-0 last:pb-0 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-                                <div>
-                                    <div class="font-bold text-slate-900">{{ $lic->license_type ?? 'STR' }}</div>
-                                    <div class="font-mono text-slate-600">Nomor: {{ $lic->license_number }}</div>
-                                </div>
-                                <div class="text-slate-600 sm:text-right">
-                                    @if ($lic->is_lifetime)
-                                        <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[11px] font-bold">Seumur Hidup</span>
-                                    @else
-                                        <span>Berlaku s/d: <strong>{{ $lic->valid_until?->translatedFormat('d M Y') ?? '-' }}</strong></span>
-                                    @endif
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                @else
-                    <div class="text-center py-4 text-xs text-slate-400">Tidak ada STR / lisensi profesi (opsional bagi non-nakes).</div>
-                @endif
-            </div>
-        </div>
-
-        {{-- Review Section 5: Sertifikasi & Pelatihan --}}
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
-            <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-                <h2 class="text-xs font-bold text-slate-900 uppercase tracking-wider">
-                    5. Sertifikasi & Pelatihan ({{ $certifications->count() }})
-                </h2>
-                <a href="{{ route('profile.show') }}" class="text-xs font-semibold text-rsi-700 hover:underline">
-                    Kelola di Profil &rarr;
-                </a>
-            </div>
-            <div class="p-6">
-                @if ($certifications->isNotEmpty())
-                    <div class="divide-y divide-slate-100">
-                        @foreach ($certifications as $cert)
-                            <div class="py-3 first:pt-0 last:pb-0 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-                                <div>
-                                    <div class="font-bold text-slate-900">{{ $cert->certificate_name }}</div>
-                                    <div class="text-slate-500">Penerbit: {{ $cert->issuing_organization }} (Tahun: {{ $cert->issue_year }})</div>
-                                </div>
-                                <div class="text-slate-600 sm:text-right">
-                                    <span>Berlaku s/d: <strong>{{ $cert->valid_until?->translatedFormat('d M Y') ?? 'Tidak Ada Batas' }}</strong></span>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                @else
-                    <div class="text-center py-4 text-xs text-slate-400">Tidak ada sertifikasi yang dicantumkan (opsional).</div>
-                @endif
-            </div>
-        </div>
-
-        {{-- Review Section 6: Pengalaman Kerja --}}
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
-            <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-                <h2 class="text-xs font-bold text-slate-900 uppercase tracking-wider">
-                    6. Riwayat Pengalaman Kerja ({{ $workExperiences->count() }})
-                </h2>
-                <a href="{{ route('profile.show') }}" class="text-xs font-semibold text-rsi-700 hover:underline">
-                    Kelola di Profil &rarr;
-                </a>
-            </div>
-            <div class="p-6">
-                @if ($workExperiences->isNotEmpty())
-                    <div class="divide-y divide-slate-100">
-                        @foreach ($workExperiences as $exp)
-                            <div class="py-3 first:pt-0 last:pb-0 space-y-1 text-xs">
-                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-                                    <strong class="text-slate-900">{{ $exp->position }} &bull; {{ $exp->company_name }}</strong>
-                                    <span class="text-slate-500">
-                                        {{ $exp->start_date?->translatedFormat('M Y') }} s/d {{ $exp->is_current ? 'Sekarang' : ($exp->end_date?->translatedFormat('M Y') ?? '-') }}
-                                    </span>
-                                </div>
-                                @if ($exp->job_description)
-                                    <p class="text-slate-600 text-[11px] leading-relaxed">{{ $exp->job_description }}</p>
-                                @endif
-                            </div>
-                        @endforeach
-                    </div>
-                @else
-                    <div class="text-center py-4 text-xs text-slate-400">Tidak ada pengalaman kerja yang dicantumkan (Fresh Graduate).</div>
-                @endif
-            </div>
-        </div>
-
-        {{-- Review Section 7: Dokumen Persyaratan yang Diunggah --}}
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
-            <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-                <h2 class="text-xs font-bold text-slate-900 uppercase tracking-wider">
-                    7. Dokumen Persyaratan Terlampir ({{ $jobApplication->documents->count() }})
+                    4. Dokumen Persyaratan Terlampir ({{ $jobApplication->documents->count() }})
                 </h2>
                 <a href="{{ route('portal.applications.documents.index', $jobApplication) }}" class="text-xs font-semibold text-rsi-700 hover:underline">
                     Kelola Berkas &rarr;

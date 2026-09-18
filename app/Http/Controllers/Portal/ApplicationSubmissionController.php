@@ -37,6 +37,12 @@ class ApplicationSubmissionController extends Controller
             return redirect()->route('portal.applications.show', $jobApplication);
         }
 
+        // Guard: profil harus 100% lengkap sebelum bisa akses review
+        if (! $completenessService->isComplete($jobApplication->user)) {
+            return redirect()->route('profile.show')
+                ->with('warning', 'Lengkapi profil dasar Anda terlebih dahulu sebelum mereview lamaran.');
+        }
+
         $jobApplication->loadMissing([
             'jobVacancy.qualifications',
             'jobVacancy.documentRequirements',

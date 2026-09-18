@@ -105,48 +105,6 @@
             </div>
         </div>
 
-        {{-- Application Workflow Stepper --}}
-        <div class="bg-white rounded-xl border border-slate-200 shadow-2xs p-2.5">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs">
-                {{-- STEP 1: Formasi --}}
-                <a href="{{ route('portal.applications.show', $jobApplication) }}" class="flex items-center gap-2.5 p-2 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors">
-                    <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[10px] font-bold flex items-center justify-center shrink-0">1</span>
-                    <div class="truncate">
-                        <span class="font-bold text-slate-800 block truncate">Formasi & Profil</span>
-                        <span class="text-[10px] text-rsi-700 font-semibold">&check; {{ $jobApplication->isDraft() ? 'Dapat Diganti' : 'Terkunci' }}</span>
-                    </div>
-                </a>
-
-                {{-- STEP 2: Unggah Berkas --}}
-                <div class="flex items-center gap-2.5 p-2 rounded-lg bg-rsi-50/70 border border-rsi-200">
-                    <span class="w-5 h-5 rounded-full bg-rsi-700 text-white text-[10px] font-bold flex items-center justify-center shrink-0">2</span>
-                    <div class="truncate">
-                        <span class="font-bold text-rsi-900 block truncate">Unggah Berkas Persyaratan</span>
-                        <span class="text-[10px] text-rsi-700 font-bold">Sedang Aktif</span>
-                    </div>
-                </div>
-
-                {{-- STEP 3: Review & Kirim --}}
-                @if ($missingRequirements->isNotEmpty())
-                    <div class="flex items-center gap-2.5 p-2 rounded-lg bg-slate-50/70 opacity-60">
-                        <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-400 text-[10px] font-bold flex items-center justify-center shrink-0">3</span>
-                        <div class="truncate">
-                            <span class="font-semibold text-slate-500 block truncate">Review & Final Submit</span>
-                            <span class="text-[10px] text-slate-400">Terkunci</span>
-                        </div>
-                    </div>
-                @else
-                    <a href="{{ route('portal.applications.review', $jobApplication) }}" class="flex items-center gap-2.5 p-2 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors">
-                        <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[10px] font-bold flex items-center justify-center shrink-0">3</span>
-                        <div class="truncate">
-                            <span class="font-bold text-slate-800 block truncate">Review & Final Submit</span>
-                            <span class="text-[10px] text-rsi-700 font-semibold">Siap Ditinjau &rarr;</span>
-                        </div>
-                    </a>
-                @endif
-            </div>
-        </div>
-
         {{-- Requirements List Container --}}
         <div class="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
             <div class="px-5 py-3 bg-slate-50/80 border-b border-slate-200 flex items-center justify-between">

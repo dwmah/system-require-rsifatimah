@@ -129,13 +129,21 @@ class ApplicantDashboardService
                 // Reuse existing domain service validation using is_required
                 $isDocumentsComplete = $this->documentService->hasAllRequiredDocuments($primaryApp);
 
-                $quickAction = [
-                    'label' => 'Lanjutkan Lamaran',
-                    'url' => $isDocumentsComplete
-                        ? route('portal.applications.review', $primaryApp)
-                        : route('portal.applications.documents.index', $primaryApp),
-                    'type' => $isDocumentsComplete ? 'draft_complete' : 'draft_incomplete',
-                ];
+                if (! $isComplete) {
+                    $quickAction = [
+                        'label' => 'Lengkapi Profil Anda',
+                        'url' => route('profile.show'),
+                        'type' => 'profile_incomplete',
+                    ];
+                } else {
+                    $quickAction = [
+                        'label' => 'Lanjutkan Lamaran',
+                        'url' => $isDocumentsComplete
+                            ? route('portal.applications.review', $primaryApp)
+                            : route('portal.applications.documents.index', $primaryApp),
+                        'type' => $isDocumentsComplete ? 'draft_complete' : 'draft_incomplete',
+                    ];
+                }
 
                 // Pure read-only structural stages using already eager-loaded collection (zero extra queries)
                 $stagesCollection = $primaryApp->jobVacancy?->selectionStages

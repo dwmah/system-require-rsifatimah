@@ -5,6 +5,8 @@ namespace Tests\Feature;
 use App\Enums\JobApplicationStatus;
 use App\Enums\JobVacancyStatus;
 use App\Enums\RecruitmentPeriodStatus;
+use App\Models\ApplicantEducation;
+use App\Models\ApplicantProfile;
 use App\Models\JobApplication;
 use App\Models\JobVacancy;
 use App\Models\RecruitmentPeriod;
@@ -38,8 +40,32 @@ class AdminVacancyCustomDocumentsAndTimelineTest extends TestCase
         $this->applicant = User::factory()->create([
             'name' => 'Pelamar Test',
             'email' => 'pelamar@gmail.com',
+            'phone' => '081234567890',
             'role' => User::ROLE_APPLICANT,
             'is_active' => true,
+        ]);
+
+        $profile = ApplicantProfile::create([
+            'user_id' => $this->applicant->id,
+            'nik' => '3510123456780001',
+            'birth_place' => 'Banyuwangi',
+            'birth_date' => '1998-05-15',
+            'gender' => 'Laki-laki',
+            'religion' => 'Islam',
+            'address_ktp' => 'Jl. Jember No. 10 Banyuwangi',
+            'address_domicile' => 'Jl. Jember No. 10 Banyuwangi',
+            'same_as_ktp' => true,
+            'photo_path' => 'profile-photos/test.jpg',
+        ]);
+
+        ApplicantEducation::create([
+            'applicant_profile_id' => $profile->id,
+            'education_level' => 'D3',
+            'institution_name' => 'Poltekkes Kemenkes',
+            'study_program' => 'Analis Kesehatan',
+            'accreditation' => 'A',
+            'gpa' => '3.75',
+            'graduation_year' => 2021,
         ]);
 
         $this->period = RecruitmentPeriod::create([
@@ -329,6 +355,6 @@ class AdminVacancyCustomDocumentsAndTimelineTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Alur & Tahapan Seleksi', false);
         $response->assertSee('Seleksi Administrasi &amp; Berkas', false);
-        $response->assertSee('Pengingat Batas Waktu: Seleksi Administrasi &amp; Berkas', false);
+        $response->assertSee('Dalam Antrean Verifikasi Panitia', false);
     }
 }

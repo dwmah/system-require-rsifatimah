@@ -119,16 +119,6 @@
                         <div class="pt-3 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                             @if ($isDraft)
                                 <div class="flex items-center gap-2 flex-wrap">
-                                    <a
-                                        href="{{ route('vacancies.index') }}"
-                                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white border border-rsi-200 text-rsi-700 hover:bg-rsi-50 transition-colors shadow-2xs"
-                                    >
-                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                                        </svg>
-                                        <span>Ganti Formasi</span>
-                                    </a>
-
                                     <button
                                         type="button"
                                         @click="showCancelModal = true"
@@ -137,7 +127,7 @@
                                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                         </svg>
-                                        <span>Batalkan Draft</span>
+                                        <span>Batalkan Lamaran</span>
                                     </button>
                                 </div>
 
@@ -219,7 +209,7 @@
                                                         </svg>
                                                     </div>
                                                     <div>
-                                                        <h3 class="text-base font-bold text-slate-900">Batalkan Draft & Hapus Akun?</h3>
+                                                        <h3 class="text-base font-bold text-slate-900">Batalkan Lamaran & Hapus Akun?</h3>
                                                         <p class="text-xs text-slate-500">Formasi: {{ $app->jobVacancy->title }}</p>
                                                     </div>
                                                 </div>
@@ -242,7 +232,7 @@
                                                         </svg>
                                                         Peringatan Pembatalan Akun & Lamaran:
                                                     </strong>
-                                                    Sesuai kebijakan RSI Fatimah, akun pelamar wajib memiliki formasi lamaran aktif. Membatalkan draft lamaran ini akan <strong>menghapus akun dan seluruh data pendaftaran Anda</strong> dari sistem, serta sesi login Anda akan diakhiri.
+                                                    Sesuai kebijakan RSI Fatimah, akun pelamar wajib memiliki formasi lamaran aktif. Membatalkan lamaran ini akan <strong>menghapus akun dan seluruh data pendaftaran Anda</strong> dari sistem, serta sesi login Anda akan diakhiri.
                                                 </div>
 
                                                 <div class="p-3 bg-sky-50 rounded-xl border border-sky-200 text-sky-900 leading-relaxed">
@@ -250,9 +240,9 @@
                                                         <svg class="w-4 h-4 text-sky-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                                             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
                                                         </svg>
-                                                        Hanya Ingin Mengganti Formasi?
+                                                        Ingin Melamar Posisi Lain?
                                                     </strong>
-                                                    Jika Anda hanya ingin melamar posisi lowongan lain, <strong>jangan batalkan draft</strong>. Klik tombol Kembali dan gunakan tombol <strong>Ganti Formasi</strong> agar data profil Anda tetap tersimpan.
+                                                    Formasi yang telah dipilih <strong>tidak dapat diganti</strong>. Jika ingin melamar posisi lain, batalkan lamaran ini (akun Anda akan dihapus), lalu daftar ulang dan pilih formasi baru.
                                                 </div>
 
                                                 <p class="text-slate-500 text-[11px] leading-relaxed">
@@ -275,7 +265,7 @@
                                                         type="submit"
                                                         class="px-4 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-lg shadow-xs transition-colors cursor-pointer"
                                                     >
-                                                        Ya, Batalkan Draft & Hapus Akun
+                                                        Ya, Batalkan Lamaran & Hapus Akun
                                                     </button>
                                                 </div>
                                             </form>

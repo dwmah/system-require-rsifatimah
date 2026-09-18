@@ -67,22 +67,12 @@
             'profile' => $profile,
         ])
 
-        {{-- 3. Alamat & Kontak --}}
-        @include('portal.profile.partials.contact-address', [
-            'user' => $user,
-            'profile' => $profile,
-        ])
 
         {{-- 4. Riwayat Pendidikan --}}
         @include('portal.profile.partials.educations', [
             'educations' => $profile?->educations ?? collect(),
         ])
 
-        {{-- 5. Ringkasan Kesiapan Profil --}}
-        @include('portal.profile.partials.readiness-review', [
-            'percentage' => $percentage,
-            'isComplete' => $isComplete,
-            'missingItems' => $missingItems,
-        ])
+
     </div>
 </x-layouts.applicant>

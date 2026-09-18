@@ -910,4 +910,50 @@ class ApplicationDocumentAndSubmissionTest extends TestCase
         $responseComplete->assertDontSee('Lengkapi 2 berkas wajib sebelum mengirim lamaran.');
         $responseComplete->assertSee(route('portal.applications.review', $application));
     }
+
+    public function test_document_management_is_blocked_when_profile_is_incomplete(): void
+    {
+        $user = $this->createApplicantUser(false); // Incomplete profile
+        [$period, $vacancy, $requirements] = $this->createVacancyWithRequirements();
+        $application = $this->createDraftApplication($user, $vacancy);
+
+        // 1. Akses halaman kelola berkas
+        $indexResponse = $this->actingAs($user)->get(route('portal.applications.documents.index', $application));
+        $indexResponse->assertRedirect(route('profile.show'));
+        $indexResponse->assertSessionHas('warning');
+
+        // 2. Mengunggah dokumen berkas
+        $file = UploadedFile::fake()->create('surat.pdf', 300, 'application/pdf');
+        $storeResponse = $this->actingAs($user)->post(route('portal.applications.documents.store', [$application, $requirements[0]]), ['file' => $file]);
+        $storeResponse->assertRedirect(route('profile.show'));
+        $storeResponse->assertSessionHas('warning');
+
+        // 3. Mengakses halaman review lamaran
+        $reviewResponse = $this->actingAs($user)->get(route('portal.applications.review', $application));
+        $reviewResponse->assertRedirect(route('profile.show'));
+        $reviewResponse->assertSessionHas('warning');
+    }
+
+    public function test_application_show_displays_correct_profile_completeness_state(): void
+    {
+        // 1. Profil belum lengkap
+        $incompleteUser = $this->createApplicantUser(false);
+        [$period, $vacancy, $requirements] = $this->createVacancyWithRequirements();
+        $incompleteApp = $this->createDraftApplication($incompleteUser, $vacancy);
+
+        $resIncomplete = $this->actingAs($incompleteUser)->get(route('portal.applications.show', $incompleteApp));
+        $resIncomplete->assertOk();
+        $resIncomplete->assertSee('Belum Lengkap');
+        $resIncomplete->assertSee('Lengkapi Profil Sekarang');
+        $resIncomplete->assertDontSee('100% (Lengkap)');
+
+        // 2. Profil 100% lengkap
+        $completeUser = $this->createApplicantUser(true);
+        $completeApp = $this->createDraftApplication($completeUser, $vacancy);
+
+        $resComplete = $this->actingAs($completeUser)->get(route('portal.applications.show', $completeApp));
+        $resComplete->assertOk();
+        $resComplete->assertSee('100% (Lengkap)');
+        $resComplete->assertSee('Lanjutkan Unggah Berkas');
+    }
 }

@@ -95,8 +95,8 @@
                                 <span class="w-6 h-6 rounded-full {{ $stepBadgeBg }} font-bold text-xs flex items-center justify-center shrink-0">
                                     {{ $stage['sort_order'] ?? ($index + 1) }}
                                 </span>
-                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold border {{ $stage['badge_class'] ?? 'bg-slate-100 text-slate-600 border-slate-200' }}">
-                                    {{ $stage['label'] ?? 'Belum Dimulai' }}
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold border whitespace-nowrap shrink-0 {{ $stage['badge_class'] ?? 'bg-slate-100 text-slate-600 border-slate-200' }}">
+                                    {{ $stage['label'] ?? 'Menunggu' }}
                                 </span>
                             </div>
 
@@ -105,7 +105,7 @@
                             </h3>
 
                             @if(!empty($stage['description']))
-                                <p class="text-[11px] text-slate-500 leading-relaxed line-clamp-2">
+                                <p class="text-[11px] text-slate-500 leading-relaxed">
                                     {{ $stage['description'] }}
                                 </p>
                             @endif
@@ -314,25 +314,17 @@
                             </h3>
                         </div>
 
-                        <!-- Progress Bar Kelengkapan Berkas (Full Width) -->
+                        <!-- Informasi Kelengkapan Berkas (Simple & Clean) -->
                         @if (($documentProgress['total'] ?? 0) > 0)
-                            <div class="space-y-1.5 pt-1">
-                                <div class="flex items-center justify-between text-xs">
-                                    <span class="font-semibold text-slate-700">
-                                        Kelengkapan Berkas:
-                                        <span class="text-slate-500 font-normal">
-                                            {{ $documentProgress['completed'] }} dari {{ $documentProgress['total'] }} dokumen
-                                        </span>
+                            <div class="pt-1 space-y-1">
+                                <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
+                                    <div class="flex items-center gap-1.5 text-slate-600">
+                                        <span class="font-semibold text-slate-700">Kelengkapan Berkas:</span>
+                                        <span>{{ $documentProgress['completed'] }} dari {{ $documentProgress['total'] }} dokumen</span>
+                                    </div>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold {{ $isDocumentsComplete ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-600 border border-slate-200' }}">
+                                        {{ $isDocumentsComplete ? 'Lengkap' : 'Belum Lengkap' }}
                                     </span>
-                                    <span class="font-bold {{ $isDocumentsComplete ? 'text-emerald-700' : 'text-[#0179B5]' }} font-mono">
-                                        {{ $documentProgress['percentage'] }}%
-                                    </span>
-                                </div>
-                                <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden border border-slate-200/50">
-                                    <div
-                                        class="h-2.5 rounded-full transition-all duration-500 {{ $isDocumentsComplete ? 'bg-emerald-600' : 'bg-[#0179B5]' }}"
-                                        style="width: {{ min(100, $documentProgress['percentage']) }}%"
-                                    ></div>
                                 </div>
                                 <p class="text-xs text-slate-500">
                                     @if (! $isDocumentsComplete)
@@ -347,30 +339,30 @@
                         <!-- Action Bar: Tombol Aksi Simpel & Terpadu -->
                         <div class="pt-3 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                             <div class="flex items-center gap-2 flex-wrap">
-                                <a
-                                    href="{{ route('vacancies.index') }}"
-                                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 transition-colors shadow-2xs"
-                                >
-                                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                                    </svg>
-                                    <span>Ganti Formasi</span>
-                                </a>
-
                                 <button
                                     type="button"
                                     @click="showCancelModal = true"
-                                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-rose-600 bg-white hover:bg-rose-50 border border-rose-200 hover:border-rose-300 transition-colors shadow-2xs cursor-pointer"
+                                    class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-rose-600 bg-white hover:bg-rose-50 border border-rose-200 hover:border-rose-300 transition-colors shadow-2xs cursor-pointer"
                                 >
                                     <svg class="w-3.5 h-3.5 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                     </svg>
-                                    <span>Batalkan Draft</span>
+                                    <span>Batalkan Lamaran</span>
                                 </button>
                             </div>
 
                             <div class="flex items-center sm:justify-end">
-                                @if (! $isDocumentsComplete)
+                                @if (! $isComplete)
+                                    <a
+                                        href="{{ route('profile.show') }}"
+                                        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-xl shadow-xs transition-colors"
+                                    >
+                                        <span>Lengkapi Profil</span>
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                        </svg>
+                                    </a>
+                                @elseif (! $isDocumentsComplete)
                                     <a
                                         href="{{ route('portal.applications.documents.index', $application) }}"
                                         class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#0179B5] hover:bg-[#016293] text-white text-xs font-bold rounded-xl shadow-xs transition-colors"
@@ -436,7 +428,7 @@
                                                 </svg>
                                             </div>
                                             <div>
-                                                <h3 class="text-base font-bold text-slate-900">Batalkan Draft & Hapus Akun?</h3>
+                                                <h3 class="text-base font-bold text-slate-900">Batalkan Lamaran & Hapus Akun?</h3>
                                                 <p class="text-xs text-slate-500">Formasi: {{ $application->jobVacancy->title }}</p>
                                             </div>
                                         </div>
@@ -444,7 +436,7 @@
                                             type="button"
                                             @click="showCancelModal = false"
                                             class="text-slate-400 hover:text-slate-600 focus:outline-hidden cursor-pointer"
-                                        >
+                                         >
                                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                             </svg>
@@ -459,7 +451,7 @@
                                                 </svg>
                                                 Peringatan Pembatalan Akun & Lamaran:
                                             </strong>
-                                            Sesuai kebijakan RSI Fatimah, akun pelamar wajib memiliki formasi lamaran aktif. Membatalkan draft lamaran ini akan <strong>menghapus akun dan seluruh data pendaftaran Anda</strong> dari sistem, serta sesi login Anda akan diakhiri.
+                                            Sesuai kebijakan RSI Fatimah, akun pelamar wajib memiliki formasi lamaran aktif. Membatalkan lamaran ini akan <strong>menghapus akun dan seluruh data pendaftaran Anda</strong> dari sistem, serta sesi login Anda akan diakhiri.
                                         </div>
 
                                         <div class="p-3 bg-sky-50 rounded-xl border border-sky-200 text-sky-900 leading-relaxed">
@@ -467,9 +459,9 @@
                                                 <svg class="w-4 h-4 text-sky-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                                     <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
                                                 </svg>
-                                                Hanya Ingin Mengganti Formasi?
+                                                Ingin Melamar Posisi Lain?
                                             </strong>
-                                            Jika Anda hanya ingin melamar posisi lowongan lain, <strong>jangan batalkan draft</strong>. Klik tombol Kembali dan gunakan tombol <strong>Ganti Formasi</strong> agar data profil Anda tetap tersimpan.
+                                            Formasi yang telah dipilih <strong>tidak dapat diganti</strong>. Jika ingin melamar posisi lain, batalkan lamaran ini (akun Anda akan dihapus), lalu daftar ulang dan pilih formasi baru.
                                         </div>
 
                                         <p class="text-slate-500 text-[11px] leading-relaxed">
@@ -492,7 +484,7 @@
                                                 type="submit"
                                                 class="px-4 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-lg shadow-xs transition-colors cursor-pointer"
                                             >
-                                                Ya, Batalkan Draft & Hapus Akun
+                                                Ya, Batalkan Lamaran & Hapus Akun
                                             </button>
                                         </div>
                                     </form>

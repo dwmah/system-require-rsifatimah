@@ -178,7 +178,7 @@ class SelectionTrackingService
             } elseif (! $isPublished) {
                 // History belum ada atau published_at masih NULL / masa depan
                 $publicState = 'waiting';
-                $publicLabel = 'Belum Diumumkan';
+                $publicLabel = 'Menunggu';
                 $badgeClass = 'bg-slate-100 text-slate-600 border-slate-200';
                 $applicantMessage = null;
                 $publishedAt = null;
@@ -213,7 +213,7 @@ class SelectionTrackingService
                     ],
                     default => [
                         $publicState = 'waiting',
-                        $publicLabel = 'Belum Diumumkan',
+                        $publicLabel = 'Menunggu',
                         $badgeClass = 'bg-slate-100 text-slate-600 border-slate-200',
                     ],
                 };
@@ -231,6 +231,19 @@ class SelectionTrackingService
             $isDeadlineApproaching = $endAt && $daysRemaining !== null && $daysRemaining >= 0 && $daysRemaining <= 3;
             $isPastDeadline = $endAt ? $endAt->endOfDay()->isPast() : false;
 
+            $stageNameLower = strtolower($stageName);
+            $hasActionKeyword = str_contains($stageNameLower, 'tes')
+                || str_contains($stageNameLower, 'ujian')
+                || str_contains($stageNameLower, 'wawancara')
+                || str_contains($stageNameLower, 'interview')
+                || str_contains($stageNameLower, 'konfirmasi')
+                || str_contains($stageNameLower, 'mcu')
+                || str_contains($stageNameLower, 'kesehatan')
+                || str_contains($stageNameLower, 'formulir');
+
+            $requiresAction = ($publicState === 'in_progress' && $hasActionKeyword)
+                || (!empty($applicantMessage) && in_array($publicState, ['in_progress', 'pending'], true));
+
             $stagesOutput[] = [
                 'id' => $stageId,
                 'name' => $stageName,
@@ -246,6 +259,7 @@ class SelectionTrackingService
                 'days_remaining' => $daysRemaining,
                 'is_deadline_approaching' => $isDeadlineApproaching,
                 'is_past_deadline' => $isPastDeadline,
+                'requires_action' => $requiresAction,
                 'is_current' => false,
             ];
         }

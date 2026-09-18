@@ -5,30 +5,6 @@
     back-url="{{ route('vacancies.index') }}"
     back-label="Kembali ke Daftar Lowongan"
 >
-    @if (isset($targetVacancy))
-        <div class="mb-5 p-4 rounded-xl bg-rsi-50/80 border border-rsi-200">
-            <div class="flex items-center gap-2 mb-1">
-                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-rsi-700 text-white">
-                    FORMASI YANG DILAMAR
-                </span>
-                <span class="font-mono text-xs font-semibold text-rsi-800">
-                    {{ $targetVacancy->code }}
-                </span>
-            </div>
-            <h2 class="text-sm font-bold text-slate-900">
-                {{ $targetVacancy->title }}
-            </h2>
-            <p class="text-[11px] text-slate-500 mt-0.5">
-                Unit: {{ $targetVacancy->unit }} &bull; Penempatan: {{ $targetVacancy->location }} &bull; Periode: {{ $targetVacancy->recruitmentPeriod->name }}
-            </p>
-            <div class="mt-2.5 pt-2 border-t border-rsi-100 flex items-center gap-1.5 text-[11px] text-rsi-800 font-medium">
-                <svg class="w-3.5 h-3.5 text-rsi-700 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>Setelah pendaftaran akun berhasil, draf lamaran formasi ini otomatis aktif di menu <strong>Lamaran Saya</strong>.</span>
-            </div>
-        </div>
-    @endif
 
     @if ($errors->any())
         <div class="mb-5 p-3.5 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 space-y-1">
