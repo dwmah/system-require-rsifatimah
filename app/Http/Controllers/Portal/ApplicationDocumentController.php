@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ApplicationDocument;
 use App\Models\JobApplication;
 use App\Models\VacancyDocumentRequirement;
+use App\Services\Profile\ProfileCompletenessService;
 use App\Services\Recruitment\ApplicationDocumentService;
 use DomainException;
 use Illuminate\Http\RedirectResponse;
@@ -23,9 +24,16 @@ class ApplicationDocumentController extends Controller
      */
     public function index(
         JobApplication $jobApplication,
-        ApplicationDocumentService $documentService
-    ): View {
+        ApplicationDocumentService $documentService,
+        ProfileCompletenessService $completenessService
+    ): View|RedirectResponse {
         Gate::authorize('view', $jobApplication);
+
+        // Guard: profil harus 100% lengkap sebelum bisa akses pemberkasan
+        if (! $completenessService->isComplete($jobApplication->user)) {
+            return redirect()->route('profile.show')
+                ->with('warning', 'Lengkapi profil dasar Anda terlebih dahulu sebelum mengunggah berkas lamaran.');
+        }
 
         $jobApplication->loadMissing([
             'jobVacancy.documentRequirements',
@@ -59,9 +67,16 @@ class ApplicationDocumentController extends Controller
         Request $request,
         JobApplication $jobApplication,
         ApplicationDocumentService $documentService,
+        ProfileCompletenessService $completenessService,
         ?VacancyDocumentRequirement $requirement = null
     ): RedirectResponse {
         Gate::authorize('update', $jobApplication);
+
+        // Guard: profil harus 100% lengkap
+        if (! $completenessService->isComplete($jobApplication->user)) {
+            return redirect()->route('profile.show')
+                ->with('warning', 'Lengkapi profil dasar Anda terlebih dahulu sebelum mengunggah berkas lamaran.');
+        }
 
         $targetRequirement = ($requirement && $requirement->exists)
             ? $requirement
@@ -101,9 +116,16 @@ class ApplicationDocumentController extends Controller
     public function destroy(
         JobApplication $jobApplication,
         ApplicationDocument $document,
-        ApplicationDocumentService $documentService
+        ApplicationDocumentService $documentService,
+        ProfileCompletenessService $completenessService
     ): RedirectResponse {
         Gate::authorize('update', $jobApplication);
+
+        // Guard: profil harus 100% lengkap
+        if (! $completenessService->isComplete($jobApplication->user)) {
+            return redirect()->route('profile.show')
+                ->with('warning', 'Lengkapi profil dasar Anda terlebih dahulu sebelum mengelola berkas lamaran.');
+        }
 
         // Verifikasi kepemilikan dokumen terhadap lamaran
         if ($document->job_application_id !== $jobApplication->id) {

@@ -395,8 +395,8 @@ class ApplicantDashboardUiUxTest extends TestCase
         $response->assertDontSee('CATATAN RAHASIA EVALUATOR');
         $response->assertDontSee('Pesan rahasia panitia sebelum publish.');
         $response->assertDontSee('Tidak Lolos');
-        // Label stage harus berstatus aman 'Belum Diumumkan'
-        $response->assertSee('Belum Diumumkan');
+        // Label stage harus berstatus aman 'Menunggu'
+        $response->assertSee('Menunggu');
     }
 
     public function test_dashboard_without_application_loads_cleanly(): void
@@ -605,8 +605,8 @@ class ApplicantDashboardUiUxTest extends TestCase
         $response->assertSee('Kelengkapan Berkas:');
         $response->assertSee('0 dari 2 dokumen');
         $response->assertSee('Lengkapi Berkas');
-        $response->assertSee('Ganti Formasi');
-        $response->assertSee('Batalkan Draft');
-        $response->assertSeeText('Batalkan Draft & Hapus Akun?');
+        $response->assertSee('Ingin Melamar Posisi Lain?');
+        $response->assertSee('Batalkan Lamaran');
+        $response->assertSeeText('Batalkan Lamaran & Hapus Akun?');
     }
 }

@@ -41,7 +41,7 @@ class VacancyController extends Controller
         if ($request->filled('education')) {
             $eduTerm = '%' . trim($request->input('education')) . '%';
             $query->whereHas('qualifications', function ($q) use ($eduTerm) {
-                $q->where('label', VacancyQualification::LABEL_EDUCATION)
+                $q->whereIn('label', ['Pendidikan', 'Pendidikan Formal', VacancyQualification::LABEL_EDUCATION])
                     ->where('value', 'like', $eduTerm);
             });
         }

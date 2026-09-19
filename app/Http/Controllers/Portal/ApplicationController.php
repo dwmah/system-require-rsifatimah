@@ -60,32 +60,15 @@ class ApplicationController extends Controller
                 ->with('error', 'Lowongan ini sedang tidak dibuka untuk pendaftaran.');
         }
 
-        // 3. Aturan 1 Akun = 1 Formasi per Periode
+        // 3. Aturan 1 Akun = 1 Formasi per Periode (tidak boleh ganti formasi)
         $existing = JobApplication::where('user_id', $request->user()->id)
             ->where('recruitment_period_id', $jobVacancy->recruitment_period_id)
             ->first();
 
         if ($existing) {
-            // Jika sudah dikirim / terkunci resmi: tidak boleh ganti lowongan
-            if ($existing->isLocked() || ! $existing->isDraft()) {
-                return redirect()->route('portal.applications.show', $existing)
-                    ->with('info', 'Anda sudah memiliki lamaran yang telah diajukan pada periode rekrutmen ini.');
-            }
-
-            // Jika lowongan sama dengan draft yang ada
-            if ($existing->job_vacancy_id === $jobVacancy->id) {
-                return redirect()->route('portal.applications.show', $existing)
-                    ->with('info', 'Anda sedang mengerjakan draft lamaran untuk formasi ini.');
-            }
-
-            // Jika lowongan berbeda dan masih berstatus DRAFT: pelamar boleh ganti formasi!
-            $jobVacancy->loadMissing(['qualifications', 'recruitmentPeriod']);
-
-            return view('portal.applications.start', [
-                'jobVacancy' => $jobVacancy,
-                'completenessPercentage' => 100,
-                'existingDraft' => $existing,
-            ]);
+            // Sudah ada lamaran pada periode ini (draft atau submitted), tidak boleh ganti
+            return redirect()->route('portal.applications.show', $existing)
+                ->with('info', 'Anda sudah memiliki lamaran pada periode rekrutmen ini. Formasi tidak dapat diganti.');
         }
 
         $jobVacancy->loadMissing(['qualifications', 'recruitmentPeriod']);
@@ -113,27 +96,9 @@ class ApplicationController extends Controller
             ->first();
 
         if ($existing) {
-            // Jika terdapat konfirmasi pergantian formasi dan draft belum dikunci
-            if (($request->boolean('confirm_switch') || $request->boolean('switch_draft')) && $existing->isDraft() && ! $existing->isLocked()) {
-                try {
-                    $application = $service->switchVacancy($request->user(), $existing, $targetVacancy);
-
-                    return redirect()->route('portal.applications.show', $application)
-                        ->with('success', 'Formasi lamaran berhasil diganti ke "' . $targetVacancy->title . '". Dokumen persyaratan draft sebelumnya telah dibersihkan.');
-                } catch (IncompleteProfileException $e) {
-                    return redirect()->route('profile.show')
-                        ->with('warning', 'Lengkapi profil dasar Anda sebelum mengajukan lamaran.');
-                } catch (InactiveVacancyException $e) {
-                    return redirect()->route('vacancies.index')
-                        ->with('error', 'Lowongan ini sedang tidak dibuka untuk pendaftaran.');
-                } catch (DomainException $e) {
-                    return redirect()->back()
-                        ->with('error', $e->getMessage());
-                }
-            }
-
+            // Sudah ada lamaran pada periode ini, formasi tidak dapat diganti
             return redirect()->route('portal.applications.show', $existing)
-                ->with('info', 'Anda sudah memiliki lamaran pada periode rekrutmen ini.');
+                ->with('info', 'Anda sudah memiliki lamaran pada periode rekrutmen ini. Formasi tidak dapat diganti.');
         }
 
         try {
@@ -141,7 +106,7 @@ class ApplicationController extends Controller
 
             if ($request->route('jobVacancy')) {
                 return redirect()->route('portal.applications.show', $application)
-                    ->with('success', 'Draft lamaran berhasil dibuat. Anda dapat mengganti formasi selama lamaran berstatus draft.');
+                    ->with('success', 'Draft lamaran berhasil dibuat. Lengkapi dan unggah seluruh berkas persyaratan sebelum batas akhir submit.');
             }
 
             return redirect()->route('portal.applications.index')
@@ -202,44 +167,13 @@ class ApplicationController extends Controller
     }
 
     /**
-     * Mengganti formasi lowongan pada draft lamaran pekerjaan.
-     */
-    public function switchVacancy(
-        Request $request,
-        JobApplication $jobApplication,
-        JobApplicationService $service
-    ): RedirectResponse {
-        Gate::authorize('changeVacancy', $jobApplication);
-
-        $targetVacancyId = $request->input('job_vacancy_id');
-        if (! $targetVacancyId) {
-            return redirect()->back()->with('error', 'Pilih lowongan tujuan yang ingin dilamar.');
-        }
-
-        $targetVacancy = JobVacancy::findOrFail($targetVacancyId);
-
-        try {
-            $newApplication = $service->switchVacancy($request->user(), $jobApplication, $targetVacancy);
-
-            return redirect()->route('portal.applications.show', $newApplication)
-                ->with('success', 'Formasi lamaran berhasil diganti ke "' . $targetVacancy->title . '". Dokumen persyaratan draft sebelumnya telah dibersihkan.');
-        } catch (IncompleteProfileException $e) {
-            return redirect()->route('profile.show')
-                ->with('warning', 'Lengkapi profil dasar Anda sebelum mengajukan lamaran.');
-        } catch (InactiveVacancyException $e) {
-            return redirect()->route('vacancies.index')
-                ->with('error', 'Lowongan ini sedang tidak dibuka untuk pendaftaran.');
-        } catch (DomainException $e) {
-            return redirect()->back()
-                ->with('error', $e->getMessage());
-        }
-    }
-
-    /**
      * Menampilkan detail lamaran pekerjaan pelamar (Step 1 Data & Formasi).
      */
-    public function show(JobApplication $jobApplication, SelectionTrackingService $trackingService): View
-    {
+    public function show(
+        JobApplication $jobApplication,
+        SelectionTrackingService $trackingService,
+        ProfileCompletenessService $completenessService
+    ): View {
         Gate::authorize('view', $jobApplication);
 
         $jobApplication->loadMissing([
@@ -247,25 +181,20 @@ class ApplicationController extends Controller
             'jobVacancy.documentRequirements',
             'jobVacancy.selectionStages',
             'recruitmentPeriod',
-            'user.applicantProfile',
+            'user.applicantProfile.educations',
             'documents.documentRequirement',
             'snapshot',
         ]);
 
         $publicStatus = $trackingService->publicApplicationStatus($jobApplication);
-
-        // Ambil lowongan lain yang sedang terbuka pada periode yang sama untuk opsi ganti formasi
-        $otherVacancies = $jobApplication->isDraft() && ! $jobApplication->isLocked()
-            ? JobVacancy::currentlyOpen()
-                ->where('recruitment_period_id', $jobApplication->recruitment_period_id)
-                ->where('id', '!=', $jobApplication->job_vacancy_id)
-                ->get()
-            : collect();
+        $isProfileComplete = $completenessService->isComplete($jobApplication->user);
+        $completenessPercentage = $completenessService->percentage($jobApplication->user);
 
         return view('portal.applications.show', [
-            'jobApplication' => $jobApplication,
-            'publicStatus' => $publicStatus,
-            'otherVacancies' => $otherVacancies,
+            'jobApplication'         => $jobApplication,
+            'publicStatus'           => $publicStatus,
+            'isProfileComplete'      => $isProfileComplete,
+            'completenessPercentage' => $completenessPercentage,
         ]);
     }
 }

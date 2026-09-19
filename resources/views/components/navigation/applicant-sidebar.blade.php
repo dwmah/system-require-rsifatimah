@@ -8,10 +8,6 @@
     $isApplicationsActive = $activeMenu === 'applications' || request()->routeIs('portal.applications.*') || request()->routeIs('applicant.applications.*');
     $isNotificationsActive = $activeMenu === 'notifications' || request()->routeIs('portal.notifications.*') || request()->routeIs('applicant.notifications.*');
 
-    $isLowonganActive = $activeMenu === 'lowongan'
-        || request()->routeIs('vacancies.*')
-        || request()->routeIs('recruitment.index');
-
     $isAlurActive = $activeMenu === 'alur'
         || request()->routeIs('guides.flow');
 
@@ -76,27 +72,9 @@
                         </span>
                     @endif
                 </a>
-            </nav>
-        </div>
 
-        {{-- MENU UTAMA --}}
-        <div>
-            <p class="px-3 text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
-                Menu Utama
-            </p>
-
-            <nav class="space-y-1">
-                {{-- Lowongan Pekerjaan --}}
-                <a href="{{ route('vacancies.index') }}"
-                   class="flex items-center gap-3 px-3 py-2 text-xs font-medium rounded-lg border-l-4 transition-colors {{ $isLowonganActive ? 'bg-[#E6F2F8] text-[#0179B5] font-semibold border-[#0179B5]' : 'border-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
-                    <svg class="w-4 h-4 shrink-0 {{ $isLowonganActive ? 'text-[#0179B5]' : 'text-slate-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                    <span>Lowongan Pekerjaan</span>
-                </a>
-
-                {{-- Panduan (Collapsible Tree with Alpine.js) --}}
-                <div x-data="{ open: {{ $isPanduanActive ? 'true' : 'false' }} }" class="space-y-1">
+                {{-- Panduan & Info (Collapsible Tree with Alpine.js) --}}
+                <div x-data="{ open: {{ $isPanduanActive ? 'true' : 'false' }} }" class="space-y-1 pt-1">
                     <button
                         type="button"
                         @click="open = !open"
@@ -110,7 +88,7 @@
                             <svg class="w-4 h-4 shrink-0 {{ $isPanduanActive ? 'text-[#0179B5]' : 'text-slate-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                             </svg>
-                            <span>Panduan & Info</span>
+                            <span>Panduan &amp; Info</span>
                         </div>
                         <svg class="w-3.5 h-3.5 text-slate-400 transition-transform duration-150" :class="{ 'rotate-180': open }" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />

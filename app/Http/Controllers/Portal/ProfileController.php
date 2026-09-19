@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Portal;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Profile\UpdateContactAddressRequest;
 use App\Http\Requests\Profile\UpdatePersonalDataRequest;
+use App\Http\Requests\Profile\UpdateProfileRequest;
 use App\Services\Profile\ProfileCompletenessService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -94,6 +95,40 @@ class ProfileController extends Controller
         });
 
         return redirect()->route('profile.show')->with('success', 'Informasi alamat dan kontak berhasil diperbarui.');
+    }
+
+    /**
+     * Update data pribadi dan kontak sekaligus dalam satu transaksi.
+     */
+    public function updateProfile(UpdateProfileRequest $request): RedirectResponse
+    {
+        $user = $request->user();
+        $validated = $request->validated();
+
+        $sameAsKtp = (bool) ($validated['same_as_ktp'] ?? false);
+        $addressDomicile = $sameAsKtp ? $validated['address_ktp'] : ($validated['address_domicile'] ?? null);
+
+        DB::transaction(function () use ($user, $validated, $sameAsKtp, $addressDomicile) {
+            $user->update([
+                'name'  => $validated['name'],
+                'email' => $validated['email'],
+                'phone' => $validated['phone'],
+            ]);
+
+            $user->applicantProfile()->updateOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'birth_place'      => $validated['birth_place'],
+                    'birth_date'       => $validated['birth_date'],
+                    'gender'           => $validated['gender'],
+                    'address_ktp'      => $validated['address_ktp'],
+                    'same_as_ktp'      => $sameAsKtp,
+                    'address_domicile' => $addressDomicile,
+                ]
+            );
+        });
+
+        return redirect()->route('profile.show')->with('success', 'Profil berhasil disimpan.');
     }
 
     /**

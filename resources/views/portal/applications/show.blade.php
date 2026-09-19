@@ -129,44 +129,84 @@
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                 {{-- STEP 1: Formasi & Data Dasar --}}
-                <div class="p-4 rounded-xl border border-rsi-200 bg-rsi-50/50">
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-rsi-700 text-white text-xs font-bold">
-                            1
-                        </span>
-                        <span class="inline-flex items-center gap-1 text-[11px] font-bold text-rsi-800">
-                            <svg class="w-3.5 h-3.5 text-rsi-700" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                            </svg>
-                            Selesai
-                        </span>
+                @if ($isDraft && ! $isProfileComplete)
+                    <a href="{{ route('profile.show') }}" class="p-4 rounded-xl border-2 border-amber-300 bg-amber-50/60 hover:bg-amber-100/70 transition-colors block group">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber-500 text-white text-xs font-bold shadow-2xs">
+                                1
+                            </span>
+                            <span class="inline-flex items-center gap-1 text-[11px] font-bold text-amber-700 group-hover:underline">
+                                <svg class="w-3.5 h-3.5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Belum Lengkap ({{ $completenessPercentage }}%) &rarr;
+                            </span>
+                        </div>
+                        <h3 class="text-sm font-bold text-amber-950">Formasi &amp; Profil</h3>
+                        <p class="text-[11px] text-amber-800 mt-1 leading-relaxed">
+                            Formasi tersimpan. Profil dasar Anda belum lengkap, klik untuk melengkapi.
+                        </p>
+                    </a>
+                @else
+                    <div class="p-4 rounded-xl border border-rsi-200 bg-rsi-50/50">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-rsi-700 text-white text-xs font-bold">
+                                1
+                            </span>
+                            <span class="inline-flex items-center gap-1 text-[11px] font-bold text-rsi-800">
+                                <svg class="w-3.5 h-3.5 text-rsi-700" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                </svg>
+                                Selesai
+                            </span>
+                        </div>
+                        <h3 class="text-sm font-bold text-slate-900">Formasi &amp; Profil</h3>
+                        <p class="text-[11px] text-slate-600 mt-1 leading-relaxed">
+                            @if ($isDraft)
+                                Pilihan formasi &amp; profil dasar Anda telah lengkap 100%.
+                            @else
+                                Pilihan formasi telah tersimpan dan terkunci permanen.
+                            @endif
+                        </p>
                     </div>
-                    <h3 class="text-sm font-bold text-slate-900">Formasi & Profil</h3>
-                    <p class="text-[11px] text-slate-600 mt-1 leading-relaxed">
-                        @if ($isDraft)
-                            Pilihan formasi tersimpan (dapat diganti selama berstatus draft).
-                        @else
-                            Pilihan formasi telah tersimpan dan terkunci permanen.
-                        @endif
-                    </p>
-                </div>
+                @endif
 
                 {{-- STEP 2: Unggah Berkas --}}
                 @if ($isDraft)
-                    <a href="{{ route('portal.applications.documents.index', $jobApplication) }}" class="p-4 rounded-xl border-2 border-rsi-600 bg-rsi-50/30 hover:bg-rsi-50/60 transition-colors block">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-rsi-700 text-white text-xs font-bold">
-                                2
-                            </span>
-                            <span class="text-[11px] font-bold text-rsi-800">
-                                Kelola Berkas &rarr;
-                            </span>
+                    @if ($isProfileComplete)
+                        <a href="{{ route('portal.applications.documents.index', $jobApplication) }}" class="p-4 rounded-xl border-2 border-rsi-600 bg-rsi-50/30 hover:bg-rsi-50/60 transition-colors block">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-rsi-700 text-white text-xs font-bold">
+                                    2
+                                </span>
+                                <span class="text-[11px] font-bold text-rsi-800">
+                                    Kelola Berkas &rarr;
+                                </span>
+                            </div>
+                            <h3 class="text-sm font-bold text-slate-900">Unggah Berkas Persyaratan</h3>
+                            <p class="text-[11px] text-slate-600 mt-1 leading-relaxed">
+                                {{ $jobApplication->documents->count() }} berkas terunggah saat ini.
+                            </p>
+                        </a>
+                    @else
+                        <div class="p-4 rounded-xl border-2 border-slate-200 bg-slate-50/50 opacity-60 cursor-not-allowed">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-400 text-white text-xs font-bold">
+                                    2
+                                </span>
+                                <span class="inline-flex items-center gap-1 text-[11px] font-bold text-slate-400">
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                    </svg>
+                                    Terkunci
+                                </span>
+                            </div>
+                            <h3 class="text-sm font-bold text-slate-500">Unggah Berkas Persyaratan</h3>
+                            <p class="text-[11px] text-slate-400 mt-1 leading-relaxed">
+                                Lengkapi profil Anda terlebih dahulu.
+                            </p>
                         </div>
-                        <h3 class="text-sm font-bold text-slate-900">Unggah Berkas Persyaratan</h3>
-                        <p class="text-[11px] text-slate-600 mt-1 leading-relaxed">
-                            {{ $jobApplication->documents->count() }} berkas terunggah saat ini.
-                        </p>
-                    </a>
+                    @endif
                 @else
                     <div class="p-4 rounded-xl border border-rsi-200 bg-rsi-50/50">
                         <div class="flex items-center justify-between mb-2">
@@ -227,33 +267,63 @@
 
         {{-- Next Actions Banner --}}
         @if ($isDraft)
-            <div class="p-5 rounded-2xl bg-gradient-to-r from-rsi-50 via-white to-rsi-50/40 border border-rsi-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div class="flex items-start gap-3">
-                    <div class="w-9 h-9 rounded-xl bg-rsi-700 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
+            @if (! $isProfileComplete)
+                <div class="p-5 rounded-2xl bg-gradient-to-r from-amber-50/90 via-white to-amber-50/40 border border-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-amber-600 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div class="space-y-0.5">
+                            <h3 class="text-sm font-bold text-amber-950 flex items-center gap-2">
+                                <span>Profil Dasar Belum Lengkap ({{ $completenessPercentage }}%)</span>
+                            </h3>
+                            <p class="text-xs text-amber-800 leading-relaxed">
+                                Anda wajib melengkapi data profil dasar (100%) terlebih dahulu sebelum dapat mengunggah dokumen persyaratan.
+                            </p>
+                        </div>
                     </div>
-                    <div class="space-y-0.5">
-                        <h3 class="text-sm font-bold text-rsi-900">
-                            Draft Lamaran Siap Dilengkapi
-                        </h3>
-                        <p class="text-xs text-slate-600 leading-relaxed">
-                            Lanjutkan ke tahap pengunggahan berkas persyaratan formasi untuk dapat mengirimkan lamaran.
-                        </p>
-                    </div>
-                </div>
 
-                <a
-                    href="{{ route('portal.applications.documents.index', $jobApplication) }}"
-                    class="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold bg-rsi-700 text-white hover:bg-rsi-800 transition-colors shrink-0 shadow-2xs"
-                >
-                    <span>Lanjutkan Unggah Berkas</span>
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                    </svg>
-                </a>
-            </div>
+                    <a
+                        href="{{ route('profile.show') }}"
+                        class="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold bg-amber-600 hover:bg-amber-700 text-white transition-colors shrink-0 shadow-2xs cursor-pointer"
+                    >
+                        <span>Lengkapi Profil Sekarang</span>
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                    </a>
+                </div>
+            @else
+                <div class="p-5 rounded-2xl bg-gradient-to-r from-rsi-50 via-white to-rsi-50/40 border border-rsi-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-rsi-700 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div class="space-y-0.5">
+                            <h3 class="text-sm font-bold text-rsi-900">
+                                Draft Lamaran Siap Dilengkapi
+                            </h3>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Profil lengkap! Lanjutkan ke tahap pengunggahan berkas persyaratan formasi untuk dapat mengirimkan lamaran.
+                            </p>
+                        </div>
+                    </div>
+
+                    <a
+                        href="{{ route('portal.applications.documents.index', $jobApplication) }}"
+                        class="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold bg-rsi-700 text-white hover:bg-rsi-800 transition-colors shrink-0 shadow-2xs"
+                    >
+                        <span>Lanjutkan Unggah Berkas</span>
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                    </a>
+                </div>
+            @endif
         @else
             <div class="p-5 rounded-2xl bg-gradient-to-r from-rsi-50 via-white to-rsi-50/40 border border-rsi-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div class="flex items-start gap-3">
@@ -294,7 +364,7 @@
                     <h2 class="text-sm font-bold text-slate-900">Formasi yang Dilamar</h2>
                     @if ($isDraft)
                         <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
-                            DRAFT (DAPAT DIGANTI)
+                            DRAFT
                         </span>
                     @else
                         <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
@@ -305,16 +375,6 @@
 
                 @if ($isDraft)
                     <div class="flex items-center gap-2 self-start sm:self-auto">
-                        <a
-                            href="{{ route('vacancies.index') }}"
-                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white border border-rsi-200 text-rsi-700 hover:bg-rsi-50 transition-colors shadow-2xs"
-                        >
-                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                            </svg>
-                            <span>Ganti Formasi</span>
-                        </a>
-
                         <button
                             type="button"
                             @click="showCancelModal = true"
@@ -323,7 +383,7 @@
                             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                             </svg>
-                            <span>Batalkan Draft</span>
+                            <span>Batalkan Lamaran</span>
                         </button>
                     </div>
                 @else
@@ -361,14 +421,14 @@
             </div>
 
             @if ($isDraft)
-                {{-- Informational Note on Draft Flexibility --}}
+                {{-- Informational Note on Draft --}}
                 <div class="p-3.5 bg-sky-50/70 border border-sky-200 rounded-xl text-xs text-sky-900 flex items-start gap-2.5">
                     <svg class="w-4 h-4 text-sky-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <div class="space-y-0.5 text-[11px] leading-relaxed">
                         <span class="font-bold block text-sky-950">Aturan Pemilihan Formasi:</span>
-                        <span>Selama berstatus <strong>Draft</strong>, Anda dapat mengganti posisi menggunakan tombol <strong>Ganti Formasi</strong> (data profil dan riwayat Anda tetap tersimpan aman). Namun jika Anda memilih <strong>Batalkan Draft</strong>, sesuai kebijakan bahwa akun pelamar wajib terikat pada lamaran aktif, maka draft lamaran beserta akun pendaftaran Anda akan dibatalkan/dihapus dari sistem. Pilihan formasi akan <strong>terkunci permanen</strong> setelah Anda melakukan <strong>Final Submit</strong>.</span>
+                        <span>Formasi yang telah dipilih <strong>tidak dapat diganti</strong>. Jika ingin melamar posisi lain, Anda harus <strong>Batalkan Lamaran</strong> (akun pendaftaran akan dihapus), kemudian mendaftar ulang. Pilihan formasi akan <strong>terkunci permanen</strong> setelah Anda melakukan <strong>Final Submit</strong>.</span>
                     </div>
                 </div>
 
@@ -415,7 +475,7 @@
                                             </svg>
                                         </div>
                                         <div>
-                                            <h3 class="text-base font-bold text-slate-900">Batalkan Draft & Hapus Akun?</h3>
+                                            <h3 class="text-base font-bold text-slate-900">Batalkan Lamaran & Hapus Akun?</h3>
                                             <p class="text-xs text-slate-500">Formasi: {{ $jobApplication->jobVacancy->title }}</p>
                                         </div>
                                     </div>
@@ -438,7 +498,7 @@
                                             </svg>
                                             Peringatan Pembatalan Akun & Lamaran:
                                         </strong>
-                                        Sesuai kebijakan RSI Fatimah, akun pelamar wajib memiliki formasi lamaran aktif. Membatalkan draft lamaran ini akan <strong>menghapus akun dan seluruh data pendaftaran Anda</strong> dari sistem, serta sesi login Anda akan diakhiri.
+                                        Sesuai kebijakan RSI Fatimah, akun pelamar wajib memiliki formasi lamaran aktif. Membatalkan lamaran ini akan <strong>menghapus akun dan seluruh data pendaftaran Anda</strong> dari sistem, serta sesi login Anda akan diakhiri.
                                     </div>
 
                                     <div class="p-3 bg-sky-50 rounded-xl border border-sky-200 text-sky-900 leading-relaxed">
@@ -446,9 +506,9 @@
                                             <svg class="w-4 h-4 text-sky-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
                                             </svg>
-                                            Hanya Ingin Mengganti Formasi?
+                                            Ingin Melamar Posisi Lain?
                                         </strong>
-                                        Jika Anda hanya ingin melamar posisi lowongan lain, <strong>jangan batalkan draft</strong>. Klik tombol Kembali dan gunakan tombol <strong>Ganti Formasi</strong> agar data profil Anda tetap tersimpan.
+                                        Formasi yang telah dipilih <strong>tidak dapat diganti</strong>. Jika ingin melamar posisi lain, batalkan lamaran ini (akun Anda akan dihapus), lalu daftar ulang dan pilih formasi baru.
                                     </div>
 
                                     <p class="text-slate-500 text-[11px] leading-relaxed">
@@ -471,7 +531,7 @@
                                             type="submit"
                                             class="px-4 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-lg shadow-xs transition-colors cursor-pointer"
                                         >
-                                            Ya, Batalkan Draft & Hapus Akun
+                                            Ya, Batalkan Lamaran & Hapus Akun
                                         </button>
                                     </div>
                                 </form>
@@ -667,9 +727,16 @@
             <div class="bg-white rounded-2xl border border-slate-200 shadow-2xs p-6 space-y-4">
                 <div class="flex items-center justify-between pb-3 border-b border-slate-100">
                     <h2 class="text-sm font-bold text-slate-900">Data Pelamar Terhubung</h2>
-                    <a href="{{ route('profile.show') }}" class="text-xs font-semibold text-rsi-700 hover:underline">
-                        Periksa Profil &rarr;
-                    </a>
+                    @if ($isProfileComplete)
+                        <a href="{{ route('profile.show') }}" class="text-xs font-semibold text-rsi-700 hover:underline">
+                            Periksa Profil &rarr;
+                        </a>
+                    @else
+                        <a href="{{ route('profile.show') }}" class="text-xs font-bold text-amber-700 hover:text-amber-800 hover:underline flex items-center gap-1">
+                            <span>Lengkapi Profil Sekarang</span>
+                            <span>&rarr;</span>
+                        </a>
+                    @endif
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
@@ -695,13 +762,29 @@
                     </div>
                     <div>
                         <span class="text-slate-500 block">Kelengkapan Profil:</span>
-                        <span class="font-bold text-emerald-700">100% (Lengkap)</span>
+                        @if ($isProfileComplete)
+                            <span class="font-bold text-emerald-700">100% (Lengkap)</span>
+                        @else
+                            <span class="font-bold text-amber-600 font-mono">{{ $completenessPercentage }}% (Belum Lengkap)</span>
+                        @endif
                     </div>
                 </div>
 
-                <div class="p-3 bg-blue-50/70 rounded-xl border border-blue-100 text-[11px] text-blue-800 leading-relaxed">
-                    Data profil dasar masih berstatus aktif (live) dan dapat disesuaikan pada menu Profil Saya sebelum Anda melakukan Final Submit.
-                </div>
+                @if (! $isProfileComplete)
+                    <div class="p-3.5 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-900 leading-relaxed flex items-start gap-2.5">
+                        <svg class="w-4 h-4 text-amber-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <div class="space-y-0.5 text-[11px]">
+                            <span class="font-bold block text-amber-950">Profil Dasar Anda Belum Lengkap ({{ $completenessPercentage }}%)</span>
+                            <span>Pastikan seluruh 11 poin data dasar (foto profil, biodata diri lengkap, dan minimal 1 riwayat pendidikan formal) telah terisi agar tombol pengunggahan berkas persyaratan dapat diakses.</span>
+                        </div>
+                    </div>
+                @else
+                    <div class="p-3 bg-blue-50/70 rounded-xl border border-blue-100 text-[11px] text-blue-800 leading-relaxed">
+                        Data profil dasar masih berstatus aktif (live) dan dapat disesuaikan pada menu Profil Saya sebelum Anda melakukan Final Submit.
+                    </div>
+                @endif
             </div>
         @endif
 
@@ -712,9 +795,18 @@
                     Berkas Persyaratan yang Terlampir ({{ $jobApplication->documents->count() }})
                 </h2>
                 @if ($isDraft)
-                    <a href="{{ route('portal.applications.documents.index', $jobApplication) }}" class="text-xs font-semibold text-rsi-700 hover:underline">
-                        Kelola Berkas &rarr;
-                    </a>
+                    @if ($isProfileComplete)
+                        <a href="{{ route('portal.applications.documents.index', $jobApplication) }}" class="text-xs font-semibold text-rsi-700 hover:underline">
+                            Kelola Berkas &rarr;
+                        </a>
+                    @else
+                        <span class="text-xs font-semibold text-slate-400 cursor-not-allowed flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                            Profil Belum Lengkap
+                        </span>
+                    @endif
                 @endif
             </div>
 
@@ -755,7 +847,11 @@
                     <div class="text-center py-4 text-xs text-slate-400">
                         Belum ada dokumen yang diunggah.
                         @if ($isDraft)
-                            <a href="{{ route('portal.applications.documents.index', $jobApplication) }}" class="text-rsi-700 underline font-semibold ml-1">Unggah berkas sekarang</a>
+                            @if ($isProfileComplete)
+                                <a href="{{ route('portal.applications.documents.index', $jobApplication) }}" class="text-rsi-700 underline font-semibold ml-1">Unggah berkas sekarang</a>
+                            @else
+                                <a href="{{ route('profile.show') }}" class="text-amber-700 underline font-semibold ml-1">Lengkapi profil terlebih dahulu</a>
+                            @endif
                         @endif
                     </div>
                 @endif

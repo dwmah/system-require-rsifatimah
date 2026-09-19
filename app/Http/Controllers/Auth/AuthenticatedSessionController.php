@@ -14,8 +14,12 @@ class AuthenticatedSessionController extends Controller
     /**
      * Display the login view.
      */
-    public function create(): View
+    public function create(Request $request): View
     {
+        if ($request->filled('intended')) {
+            session()->put('url.intended', $request->query('intended'));
+        }
+
         return view('auth.login');
     }
 

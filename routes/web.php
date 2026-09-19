@@ -109,9 +109,6 @@ Route::middleware('auth')->group(function () {
     Route::match(['delete', 'post'], '/portal/lamaran/{jobApplication}/batal', [\App\Http\Controllers\Portal\ApplicationController::class, 'cancelDraft'])
         ->whereNumber('jobApplication')
         ->name('portal.applications.cancel-draft');
-    Route::post('/portal/lamaran/{jobApplication}/ganti-formasi', [\App\Http\Controllers\Portal\ApplicationController::class, 'switchVacancy'])
-        ->whereNumber('jobApplication')
-        ->name('portal.applications.switch-vacancy');
 
     // Berkas Persyaratan & Final Submit (Fase 8B)
     Route::get('/portal/lamaran/{jobApplication}/berkas', [\App\Http\Controllers\Portal\ApplicationDocumentController::class, 'index'])
@@ -157,6 +154,7 @@ Route::middleware(['auth', 'applicant'])->prefix('portal')->name('portal.')->gro
     Route::delete('/profil/foto', [ProfileController::class, 'destroyPhoto'])->name('profile.photo.destroy');
     Route::patch('/profil/data-pribadi', [ProfileController::class, 'updatePersonal'])->name('profile.personal.update');
     Route::patch('/profil/alamat-kontak', [ProfileController::class, 'updateContact'])->name('profile.contact.update');
+    Route::patch('/profil', [ProfileController::class, 'updateProfile'])->name('profile.update');
 
     // Riwayat Pendidikan, Lisensi, Sertifikasi, & Pengalaman
     Route::post('/profil/pendidikan', [ApplicantEducationController::class, 'store'])->name('profile.educations.store');
@@ -188,6 +186,7 @@ Route::middleware(['auth', 'applicant'])->prefix('portal/profil')->name('profile
     Route::delete('/foto', [ProfileController::class, 'destroyPhoto'])->name('photo.destroy');
     Route::patch('/data-pribadi', [ProfileController::class, 'updatePersonal'])->name('personal.update');
     Route::patch('/alamat-kontak', [ProfileController::class, 'updateContact'])->name('contact.update');
+    Route::patch('/', [ProfileController::class, 'updateProfile'])->name('update');
     Route::post('/pendidikan', [ApplicantEducationController::class, 'store'])->name('educations.store');
     Route::patch('/pendidikan/{education}', [ApplicantEducationController::class, 'update'])->name('educations.update');
     Route::delete('/pendidikan/{education}', [ApplicantEducationController::class, 'destroy'])->name('educations.destroy');

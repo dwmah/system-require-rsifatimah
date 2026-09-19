@@ -83,7 +83,7 @@
                 <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 mb-1">
                     <h3 class="text-base font-bold text-slate-900">Pas Foto Formal</h3>
                     <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold {{ $profile?->photo_url ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200' }}">
-                        {{ $profile?->photo_url ? 'SUDAH DIUNGGAH' : 'WAJIB PROFIL LENGKAP' }}
+                        {{ $profile?->photo_url ? 'DIUNGGAH' : 'WAJIB PROFIL LENGKAP' }}
                     </span>
                 </div>
                 <p class="text-xs text-slate-500">

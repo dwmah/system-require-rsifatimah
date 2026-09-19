@@ -189,8 +189,8 @@ class ApplicantSelectionTrackingTest extends TestCase
         $response->assertDontSee('Tidak Lolos');
         $response->assertDontSee('CATATAN RAHASIA PANITIA');
         $response->assertDontSee('Anda tidak lolos berkas.');
-        // Status publik harus tetap 'Belum Diumumkan'
-        $response->assertSee('Belum Diumumkan');
+        // Status publik harus tetap 'Menunggu'
+        $response->assertSee('Menunggu');
     }
 
     public function test_unpublished_passed_stage_does_not_reveal_passed_status(): void
@@ -217,7 +217,7 @@ class ApplicantSelectionTrackingTest extends TestCase
         $response->assertDontSee('Lulus');
         $response->assertDontSee('Kandidat terbaik');
         $response->assertDontSee('Selamat Anda lolos ke tahap tes.');
-        $response->assertSee('Belum Diumumkan');
+        $response->assertSee('Menunggu');
     }
 
     public function test_future_published_at_is_treated_as_unpublished(): void
@@ -244,7 +244,7 @@ class ApplicantSelectionTrackingTest extends TestCase
         // Masa depan: TIDAK BOLEH menampilkan Lulus atau pesan
         $response->assertDontSee('Lulus');
         $response->assertDontSee('Pesan masa depan');
-        $response->assertSee('Belum Diumumkan');
+        $response->assertSee('Menunggu');
     }
 
     public function test_published_stage_reveals_status_and_applicant_message_but_never_internal_note(): void
@@ -859,7 +859,7 @@ class ApplicantSelectionTrackingTest extends TestCase
             $this->assertFalse($service->isStagePublished($history->fresh()));
             $tracking2 = $service->tracking($application);
             $this->assertEquals('waiting', $tracking2['stages'][0]['public_state']);
-            $this->assertEquals('Belum Diumumkan', $tracking2['stages'][0]['label']);
+            $this->assertEquals('Menunggu', $tracking2['stages'][0]['label']);
 
             // 3. Boundary: final_result_published_at = now() -> PUBLISHED
             $application->update([

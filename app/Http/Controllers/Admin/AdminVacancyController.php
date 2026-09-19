@@ -128,11 +128,18 @@ class AdminVacancyController extends Controller
 
             // Kualifikasi
             if (!empty($request->qualifications)) {
+                $qualLabels = (array) $request->input('qualification_labels', []);
                 foreach ($request->qualifications as $idx => $desc) {
                     if (trim($desc ?? '') !== '') {
+                        $label = VacancyQualification::resolveSemanticLabel(
+                            trim($desc),
+                            $qualLabels[$idx] ?? null,
+                            $idx
+                        );
+
                         VacancyQualification::create([
                             'job_vacancy_id' => $vacancy->id,
-                            'label' => 'Kualifikasi ' . ($idx + 1),
+                            'label' => $label,
                             'value' => trim($desc),
                             'sort_order' => $idx + 1,
                         ]);
@@ -337,11 +344,18 @@ class AdminVacancyController extends Controller
             if ($request->has('qualifications')) {
                 $vacancy->qualifications()->delete();
                 if (!empty($request->qualifications)) {
+                    $qualLabels = (array) $request->input('qualification_labels', []);
                     foreach ($request->qualifications as $idx => $desc) {
                         if (trim($desc ?? '') !== '') {
+                            $label = VacancyQualification::resolveSemanticLabel(
+                                trim($desc),
+                                $qualLabels[$idx] ?? null,
+                                $idx
+                            );
+
                             VacancyQualification::create([
                                 'job_vacancy_id' => $vacancy->id,
-                                'label' => 'Kualifikasi ' . ($idx + 1),
+                                'label' => $label,
                                 'value' => trim($desc),
                                 'sort_order' => $idx + 1,
                             ]);

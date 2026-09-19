@@ -291,7 +291,7 @@ class ApplicationDraftAndSnapshotTest extends TestCase
         // 2. Second application in same period is rejected and redirected to existing application
         $res2 = $this->actingAs($user)->post(route('portal.applications.store', $vacancy2));
         $res2->assertRedirect(route('portal.applications.show', $firstApplication));
-        $res2->assertSessionHas('info', 'Anda sudah memiliki lamaran pada periode rekrutmen ini.');
+        $res2->assertSessionHas('info', 'Anda sudah memiliki lamaran pada periode rekrutmen ini. Formasi tidak dapat diganti.');
 
         $this->assertEquals(1, JobApplication::count());
     }

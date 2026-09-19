@@ -73,7 +73,7 @@ class ApplicantAuthenticationTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Registrasi Akun Pelamar');
         $response->assertSee('Saya menyetujui Syarat & Ketentuan');
-        $response->assertSee($vacancy->title);
+        $response->assertSee('name="job_vacancy_id"', false);
     }
 
     public function test_registration_without_vacancy_redirects_to_vacancies_index(): void

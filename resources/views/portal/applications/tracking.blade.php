@@ -96,12 +96,42 @@
             </div>
         @endif
 
-        {{-- Active Stage Deadline Reminder Banner --}}
+        {{-- Active Stage Deadline Reminder / Verification Status Banner --}}
         @php
             $currentActiveStage = collect($trackingData['stages'] ?? [])->firstWhere('is_current', true);
+            $isSubmitted = $jobApplication->status === \App\Enums\JobApplicationStatus::SUBMITTED;
+            $hasApplicantAction = $currentActiveStage && (
+                !empty($currentActiveStage['requires_action']) ||
+                (!empty($currentActiveStage['applicant_message']) && in_array($currentActiveStage['public_state'], ['in_progress', 'pending'], true))
+            );
         @endphp
 
-        @if ($currentActiveStage && $currentActiveStage['end_at'])
+        @if ($isSubmitted)
+            {{-- Banner Status Lamaran Terkirim & Antrean Verifikasi Panitia --}}
+            <div class="p-5 rounded-2xl border bg-sky-50/80 border-sky-200 text-sky-950 shadow-2xs space-y-2">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div class="flex items-center gap-2.5 font-bold text-sm text-sky-900">
+                        <div class="w-7 h-7 rounded-lg bg-sky-100 text-rsi-700 flex items-center justify-center shrink-0">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <span>Lamaran Terkirim &bull; Dalam Antrean Verifikasi Panitia</span>
+                    </div>
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-sky-100 text-sky-800 border border-sky-200 self-start sm:self-auto">
+                        Antrean Verifikasi
+                    </span>
+                </div>
+                <p class="text-xs text-sky-800 leading-relaxed pl-0 sm:pl-9.5">
+                    Berkas lamaran Anda telah berhasil diterima oleh sistem dan saat ini sedang menunggu antrean verifikasi berkas oleh tim panitia rekrutmen RSI Fatimah.
+                    @if ($currentActiveStage && $currentActiveStage['end_at'])
+                        Tahapan <strong>{{ $currentActiveStage['name'] }}</strong> dijadwalkan berlangsung hingga <strong>{{ $currentActiveStage['end_at']->translatedFormat('d F Y') }}</strong>.
+                    @endif
+                    Hasil seleksi akan dipublikasikan resmi melalui portal ini. Anda tidak perlu mengunggah ulang dokumen, silakan pantau pembaruan status secara berkala.
+                </p>
+            </div>
+        @elseif ($hasApplicantAction && $currentActiveStage && $currentActiveStage['end_at'])
+            {{-- Banner Pengingat Batas Waktu Hanya Jika Ada Aksi yang Harus Dilakukan Pelamar --}}
             <div class="p-5 rounded-2xl border {{ $currentActiveStage['is_deadline_approaching'] ? 'bg-amber-50 border-amber-300 text-amber-900' : 'bg-sky-50 border-sky-200 text-sky-900' }} shadow-2xs space-y-2">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div class="flex items-center gap-2 font-bold text-sm">
@@ -119,7 +149,7 @@
                     @endif
                 </div>
                 <p class="text-xs {{ $currentActiveStage['is_deadline_approaching'] ? 'text-amber-800' : 'text-sky-800' }} leading-relaxed">
-                    Batas waktu terakhir untuk tahapan ini adalah <strong>{{ $currentActiveStage['end_at']->translatedFormat('d F Y') }}</strong>. Pastikan Anda menyelesaikan seluruh kewajiban atau memantau instruksi panitia tepat waktu.
+                    Batas waktu penyelesaian untuk tahapan ini adalah <strong>{{ $currentActiveStage['end_at']->translatedFormat('d F Y') }}</strong>. Pastikan Anda menyelesaikan instruksi dan ketentuan tahapan ini tepat waktu.
                 </p>
             </div>
         @endif
@@ -158,12 +188,13 @@
                             $isPending = $stage['public_state'] === 'pending';
                             $isNotContinued = $stage['public_state'] === 'not_continued';
                             $isWaiting = $stage['public_state'] === 'waiting';
+                            $isCurrent = !empty($stage['is_current']);
 
-                            $circleClass = match ($stage['public_state']) {
-                                'passed' => 'bg-emerald-600 text-white ring-4 ring-emerald-100',
-                                'failed' => 'bg-red-600 text-white ring-4 ring-red-100',
-                                'in_progress' => 'bg-blue-600 text-white ring-4 ring-blue-100',
-                                'pending' => 'bg-amber-500 text-white ring-4 ring-amber-100',
+                            $circleClass = match (true) {
+                                $isPassed => 'bg-emerald-600 text-white ring-4 ring-emerald-100',
+                                $isFailed => 'bg-red-600 text-white ring-4 ring-red-100',
+                                $isCurrent || $isInProgress => 'bg-rsi-700 text-white ring-4 ring-rsi-100 shadow-sm',
+                                $isPending => 'bg-amber-500 text-white ring-4 ring-amber-100',
                                 default => 'bg-slate-300 text-slate-600 ring-4 ring-slate-100',
                             };
                         @endphp
@@ -193,20 +224,20 @@
                             </span>
 
                             {{-- Step Content Card --}}
-                            <div class="bg-slate-50/70 hover:bg-slate-50 rounded-xl border border-slate-200 p-4 sm:p-5 transition-colors space-y-2.5">
+                            <div class="{{ $isCurrent ? 'bg-white rounded-xl border border-sky-300 ring-1 ring-sky-200/60 shadow-2xs' : 'bg-slate-50/70 hover:bg-slate-50 rounded-xl border border-slate-200' }} p-4 sm:p-5 transition-colors space-y-2.5">
                                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                                     <div class="flex items-center gap-2 flex-wrap">
                                         <h3 class="text-sm font-bold text-slate-900">
                                             {{ $stage['name'] }}
                                         </h3>
                                         @if ($stage['is_current'])
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-sky-50 text-[#0179B5] border border-sky-200">
                                                 Tahap Aktif
                                             </span>
                                         @endif
                                     </div>
 
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-bold border {{ $stage['badge_class'] }} self-start sm:self-auto">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-bold border whitespace-nowrap shrink-0 {{ $stage['badge_class'] }} self-start sm:self-auto">
                                         {{ $stage['label'] }}
                                     </span>
                                 </div>
@@ -233,7 +264,7 @@
                                             </span>
                                         </div>
 
-                                        @if ($stage['is_current'] && $stage['end_at'] && ! $stage['is_past_deadline'] && $stage['days_remaining'] !== null)
+                                        @if ($stage['is_current'] && $stage['end_at'] && ! $stage['is_past_deadline'] && $stage['days_remaining'] !== null && !empty($stage['requires_action']))
                                             <span class="px-2 py-0.5 text-[10px] font-bold rounded {{ $stage['is_deadline_approaching'] ? 'bg-amber-100 text-amber-800 border border-amber-200' : 'bg-blue-100 text-blue-800 border border-blue-200' }}">
                                                 {{ $stage['days_remaining'] === 0 ? 'Hari Terakhir!' : 'Sisa ' . $stage['days_remaining'] . ' Hari' }}
                                             </span>
@@ -262,21 +293,5 @@
             @endif
         </div>
 
-        {{-- Bottom Actions --}}
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 bg-white rounded-2xl border border-slate-200 shadow-2xs">
-            <a
-                href="{{ route('portal.applications.show', $jobApplication) }}"
-                class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 transition-colors"
-            >
-                &larr; Kembali ke Detail Lamaran
-            </a>
-
-            <a
-                href="{{ route('portal.applications.index') }}"
-                class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold text-rsi-700 bg-rsi-50 hover:bg-rsi-100 transition-colors"
-            >
-                Lihat Seluruh Lamaran Saya &rarr;
-            </a>
-        </div>
     </div>
 </x-layouts.applicant>
