@@ -149,8 +149,8 @@
                                                     ✕ Berkas Tidak Valid
                                                 </span>
                                             @else
-                                                <span class="inline-block px-2.5 py-0.5 text-[10px] font-semibold bg-slate-100 text-slate-600 rounded-full">
-                                                    Tersimpan
+                                                <span class="inline-block px-2.5 py-0.5 text-[10px] font-semibold bg-amber-100 text-amber-800 rounded-full">
+                                                    ⏳ Menunggu Review
                                                 </span>
                                             @endif
                                         @else

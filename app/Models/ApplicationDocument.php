@@ -10,6 +10,10 @@ class ApplicationDocument extends Model
 {
     use HasFactory;
 
+    protected $attributes = [
+        'verification_status' => 'pending',
+    ];
+
     /**
      * The attributes that are mass assignable.
      *

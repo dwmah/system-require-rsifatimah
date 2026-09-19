@@ -165,6 +165,62 @@ class ApplicantDashboardService
                 $currentStage = $this->trackingService->currentStage($primaryApp);
                 $finalResult = $this->trackingService->finalResult($primaryApp);
 
+                // Fallback timeline stages from live jobVacancy if snapshot is missing / empty
+                if (empty($timelineStages) && $primaryApp->jobVacancy?->selectionStages) {
+                    $stagesCollection = $primaryApp->jobVacancy->selectionStages->sortBy('sort_order')->values();
+                    $histories = $primaryApp->stageHistories ? $primaryApp->stageHistories->keyBy('vacancy_selection_stage_id') : collect();
+
+                    $timelineStages = $stagesCollection->map(function ($stage, $index) use ($histories, $primaryApp) {
+                        $history = $histories->get($stage->id);
+                        $isPublished = $history && $history->published_at && ($history->published_at->isPast() || $history->published_at->isCurrentSecond());
+
+                        $publicState = 'waiting';
+                        $publicLabel = 'Belum Dimulai';
+                        $badgeClass = 'bg-slate-100 text-slate-600 border-slate-200';
+                        $applicantMessage = null;
+                        $publishedAt = null;
+
+                        if ($isPublished && $history->status) {
+                            $stVal = $history->status instanceof \App\Enums\ApplicationStageStatus ? $history->status->value : (string) $history->status;
+                            match ($stVal) {
+                                'passed' => [
+                                    $publicState = 'passed',
+                                    $publicLabel = 'Lulus',
+                                    $badgeClass = 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                                ],
+                                'failed', 'rejected' => [
+                                    $publicState = 'failed',
+                                    $publicLabel = 'Tidak Lolos',
+                                    $badgeClass = 'bg-red-50 text-red-700 border-red-200',
+                                ],
+                                'in_progress' => [
+                                    $publicState = 'in_progress',
+                                    $publicLabel = 'Sedang Berlangsung',
+                                    $badgeClass = 'bg-blue-50 text-blue-700 border-blue-200',
+                                ],
+                                default => null,
+                            };
+                            $applicantMessage = $history->applicant_message;
+                            $publishedAt = $history->published_at;
+                        }
+
+                        return [
+                            'id' => (int) $stage->id,
+                            'name' => (string) ($stage->name ?? $stage->stage_name ?? 'Tahapan Seleksi'),
+                            'description' => $stage->description,
+                            'sort_order' => (int) ($stage->sort_order ?? ($index + 1)),
+                            'public_state' => $publicState,
+                            'label' => $publicLabel,
+                            'badge_class' => $badgeClass,
+                            'applicant_message' => $applicantMessage,
+                            'published_at' => $publishedAt,
+                            'start_at' => $stage->start_at,
+                            'end_at' => $stage->end_at,
+                            'is_current' => ($primaryApp->current_stage_id === $stage->id),
+                        ];
+                    })->all();
+                }
+
                 if ($finalResult !== null) {
                     $quickAction = [
                         'label' => 'Lihat Hasil Seleksi',
