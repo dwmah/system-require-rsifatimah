@@ -1,7 +1,6 @@
 <x-layouts.auth
     title="Masuk ke Portal Pelamar"
     card-title="Masuk Portal Pelamar"
-    card-subtitle="Silakan masukkan kredensial akun pelamar Anda untuk mengakses portal rekrutmen"
     back-url="{{ route('vacancies.index') }}"
     back-label="Kembali ke Beranda"
 >
@@ -42,13 +41,13 @@
                 name="login"
                 id="login"
                 value="{{ old('login') }}"
-                placeholder="nama@email.com atau PLM-2026-000001"
+                placeholder="nama@email.com"
                 required
                 autofocus
                 autocomplete="username"
                 class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $errors->has('login') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100' }} focus:outline-hidden focus:ring-2"
             >
-            <p class="text-[11px] text-slate-400 mt-1">Gunakan alamat email aktif atau nomor registrasi yang didapatkan saat pendaftaran.</p>
+            <p class="text-[11px] text-slate-400 mt-1">Gunakan alamat email yg terdaftar.</p>
         </div>
 
         {{-- Password dengan Show/Hide Alpine.js --}}

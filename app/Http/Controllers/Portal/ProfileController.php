@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Portal;
 
+use App\Enums\JobApplicationStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Profile\UpdateContactAddressRequest;
 use App\Http\Requests\Profile\UpdatePersonalDataRequest;
@@ -31,6 +32,15 @@ class ProfileController extends Controller
         $missingItems = $completenessService->missingItems($user);
         $details = $completenessService->details($user);
 
+        $activeDraft = $user->jobApplications()
+            ->where('status', JobApplicationStatus::DRAFT)
+            ->latest()
+            ->first();
+
+        $pemberkasanUrl = $activeDraft
+            ? route('portal.applications.documents.index', $activeDraft)
+            : route('portal.applications.index');
+
         return view('portal.profile.show', [
             'user' => $user,
             'profile' => $user->applicantProfile,
@@ -38,6 +48,8 @@ class ProfileController extends Controller
             'isComplete' => $isComplete,
             'missingItems' => $missingItems,
             'details' => $details,
+            'activeDraft' => $activeDraft,
+            'pemberkasanUrl' => $pemberkasanUrl,
         ]);
     }
 

@@ -36,34 +36,39 @@
 
     {{-- Body Shell: Sidebar + Main Content --}}
     <div class="pt-16 flex-1 flex w-full">
-        {{-- Desktop Left Sidebar --}}
-        <div class="hidden lg:block shrink-0 sticky top-16 h-[calc(100vh-4rem)]">
-            @if ($isApplicant)
-                <x-navigation.applicant-sidebar :active-menu="$activeMenu" class="h-full" />
-            @else
-                <x-navigation.public-sidebar :active-menu="$activeMenu" class="h-full" />
-            @endif
-        </div>
-
-        {{-- Main Page Content --}}
-        <main class="flex-1 min-w-0 max-w-7xl px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
-            {{ $slot }}
-        </main>
-    </div>
-
-    {{-- Footer --}}
-    <footer class="bg-white border-t border-slate-200 mt-auto">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div class="flex items-center gap-2 text-center sm:text-left">
-                <span class="font-semibold text-slate-700">RSI Fatimah Banyuwangi</span>
-                <span>&bull;</span>
-                <span>Jl. Jember No. 56, Banyuwangi, Jawa Timur</span>
+        {{-- Desktop Left Sidebar (Fixed with reserved space) --}}
+        <div class="hidden lg:block w-64 shrink-0">
+            <div class="fixed top-16 left-0 bottom-0 w-64 z-30">
+                @if ($isApplicant)
+                    <x-navigation.applicant-sidebar :active-menu="$activeMenu" class="h-full" />
+                @else
+                    <x-navigation.public-sidebar :active-menu="$activeMenu" class="h-full" />
+                @endif
             </div>
-            <p class="text-slate-400 text-center sm:text-right">
-                &copy; {{ date('Y') }} Sistem Rekrutmen SDM. Hak cipta dilindungi undang-undang.
-            </p>
         </div>
-    </footer>
+
+        {{-- Main Page Content Wrapper --}}
+        <div class="flex-1 flex flex-col min-w-0">
+            {{-- Main Page Content --}}
+            <main class="flex-1 min-w-0 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+                {{ $slot }}
+            </main>
+
+            {{-- Footer --}}
+            <footer class="bg-white border-t border-slate-200 mt-auto">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <div class="flex items-center gap-2 text-center sm:text-left">
+                        <span class="font-semibold text-slate-700">RSI Fatimah Banyuwangi</span>
+                        <span>&bull;</span>
+                        <span>Jl. Jember No. 56, Banyuwangi, Jawa Timur</span>
+                    </div>
+                    <p class="text-slate-400 text-center sm:text-right">
+                        &copy; {{ date('Y') }} Sistem Rekrutmen SDM. Hak cipta dilindungi undang-undang.
+                    </p>
+                </div>
+            </footer>
+        </div>
+    </div>
 
 </body>
 </html>

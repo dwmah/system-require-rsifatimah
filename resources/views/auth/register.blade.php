@@ -1,7 +1,6 @@
 <x-layouts.auth
     title="Pendaftaran Akun & Lamaran Formasi"
     card-title="Registrasi Akun Pelamar"
-    card-subtitle="Buat akun untuk melamar formasi pekerjaan di RSI Fatimah Banyuwangi"
     back-url="{{ route('vacancies.index') }}"
     back-label="Kembali ke Daftar Lowongan"
 >

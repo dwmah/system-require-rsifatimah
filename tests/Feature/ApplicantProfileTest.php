@@ -534,4 +534,43 @@ class ApplicantProfileTest extends TestCase
         $response->assertSee('36% Selesai');
         $response->assertSee('Lengkapi Profil Sekarang');
     }
+
+    public function test_pemberkasan_cta_is_disabled_when_profile_is_incomplete(): void
+    {
+        $user = $this->createApplicantUser(); // Incomplete (~36%)
+
+        $response = $this->actingAs($user)->get(route('profile.show'));
+
+        $response->assertStatus(200);
+        $response->assertSee('Menuju ke Pemberkasan');
+        $response->assertSee('disabled', false);
+        $response->assertSee('id="btn-cta-pemberkasan"', false);
+    }
+
+    public function test_pemberkasan_cta_is_enabled_when_profile_is_100_percent_complete(): void
+    {
+        $user = $this->createApplicantUser([], [
+            'birth_place' => 'Banyuwangi',
+            'birth_date' => '1995-05-15',
+            'gender' => 'Laki-laki',
+            'address_ktp' => 'Jl. Ahmad Yani No. 10',
+            'address_domicile' => 'Jl. Ahmad Yani No. 10',
+            'same_as_ktp' => true,
+            'photo_path' => 'profile-photos/sample.jpg',
+        ]);
+
+        \App\Models\ApplicantEducation::create([
+            'applicant_profile_id' => $user->applicantProfile->id,
+            'education_level' => 'S1',
+            'institution_name' => 'Universitas Airlangga',
+            'study_program' => 'Ilmu Keperawatan',
+        ]);
+
+        $response = $this->actingAs($user)->get(route('profile.show'));
+
+        $response->assertStatus(200);
+        $response->assertSee('Menuju ke Pemberkasan');
+        $response->assertSee('id="btn-cta-pemberkasan"', false);
+        $response->assertSee(route('portal.applications.index'));
+    }
 }
