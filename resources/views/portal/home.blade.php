@@ -314,17 +314,25 @@
                             </h3>
                         </div>
 
-                        <!-- Informasi Kelengkapan Berkas (Simple & Clean) -->
+                        <!-- Progress Bar Kelengkapan Berkas (Full Width) -->
                         @if (($documentProgress['total'] ?? 0) > 0)
-                            <div class="pt-1 space-y-1">
-                                <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
-                                    <div class="flex items-center gap-1.5 text-slate-600">
-                                        <span class="font-semibold text-slate-700">Kelengkapan Berkas:</span>
-                                        <span>{{ $documentProgress['completed'] }} dari {{ $documentProgress['total'] }} dokumen</span>
-                                    </div>
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold {{ $isDocumentsComplete ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-600 border border-slate-200' }}">
-                                        {{ $isDocumentsComplete ? 'Lengkap' : 'Belum Lengkap' }}
+                            <div class="space-y-1.5 pt-1">
+                                <div class="flex items-center justify-between text-xs">
+                                    <span class="font-semibold text-slate-700">
+                                        Kelengkapan Berkas:
+                                        <span class="text-slate-500 font-normal">
+                                            {{ $documentProgress['completed'] }} dari {{ $documentProgress['total'] }} dokumen
+                                        </span>
                                     </span>
+                                    <span class="font-bold {{ $isDocumentsComplete ? 'text-emerald-700' : 'text-[#0179B5]' }} font-mono">
+                                        {{ $documentProgress['percentage'] }}%
+                                    </span>
+                                </div>
+                                <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden border border-slate-200/50">
+                                    <div
+                                        class="h-2.5 rounded-full transition-all duration-500 {{ $isDocumentsComplete ? 'bg-emerald-600' : 'bg-[#0179B5]' }}"
+                                        style="width: {{ min(100, $documentProgress['percentage']) }}%"
+                                    ></div>
                                 </div>
                                 <p class="text-xs text-slate-500">
                                     @if (! $isDocumentsComplete)
@@ -353,15 +361,20 @@
 
                             <div class="flex items-center sm:justify-end">
                                 @if (! $isComplete)
-                                    <a
-                                        href="{{ route('profile.show') }}"
-                                        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-xl shadow-xs transition-colors"
-                                    >
-                                        <span>Lengkapi Profil</span>
-                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                        </svg>
-                                    </a>
+                                    <div class="flex flex-col items-center sm:items-end gap-1.5 w-full sm:w-auto">
+                                        <span class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-slate-200 text-slate-400 text-xs font-bold rounded-xl cursor-not-allowed select-none">
+                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                            </svg>
+                                            <span>Lengkapi Berkas</span>
+                                        </span>
+                                        <a href="{{ route('profile.show') }}" class="text-[11px] text-amber-700 font-semibold hover:underline flex items-center gap-1">
+                                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            Profil belum lengkap &rarr; Lengkapi Sekarang
+                                        </a>
+                                    </div>
                                 @elseif (! $isDocumentsComplete)
                                     <a
                                         href="{{ route('portal.applications.documents.index', $application) }}"
