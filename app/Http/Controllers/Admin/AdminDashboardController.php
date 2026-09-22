@@ -8,6 +8,7 @@ use App\Models\JobApplication;
 use App\Models\JobVacancy;
 use App\Models\RecruitmentPeriod;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class AdminDashboardController extends Controller
@@ -15,7 +16,7 @@ class AdminDashboardController extends Controller
     /**
      * Tampilkan halaman Dashboard Utama Admin HRD/SDI.
      */
-    public function index(): View
+    public function index(Request $request): View
     {
         $activePeriod = RecruitmentPeriod::currentlyOpen()->first()
             ?? RecruitmentPeriod::where('status', \App\Enums\RecruitmentPeriodStatus::OPEN)->first()
@@ -53,9 +54,25 @@ class AdminDashboardController extends Controller
             },
         ])->latest()->take(6)->get();
 
-        // Lamaran Terbaru yang Masuk
-        $recentApplications = JobApplication::with(['user.applicantProfile', 'jobVacancy'])
-            ->latest('submitted_at')
+        // Filter Formasi jika dipilih
+        $selectedVacancyId = $request->query('vacancy_id');
+        $selectedVacancy = null;
+        if ($selectedVacancyId) {
+            $selectedVacancy = JobVacancy::find($selectedVacancyId);
+            if (!$selectedVacancy) {
+                $selectedVacancyId = null;
+            }
+        }
+
+        // Lamaran Terbaru yang Masuk (difilter jika formasi dipilih)
+        $recentApplicationsQuery = JobApplication::with(['user.applicantProfile', 'jobVacancy'])
+            ->latest('submitted_at');
+
+        if ($selectedVacancyId) {
+            $recentApplicationsQuery->where('job_vacancy_id', $selectedVacancyId);
+        }
+
+        $recentApplications = $recentApplicationsQuery
             ->take(8)
             ->get();
 
@@ -74,6 +91,8 @@ class AdminDashboardController extends Controller
             'draftCount' => $draftCount,
             'vacanciesWithStats' => $vacanciesWithStats,
             'recentApplications' => $recentApplications,
+            'selectedVacancyId' => $selectedVacancyId,
+            'selectedVacancy' => $selectedVacancy,
         ]);
     }
 }
