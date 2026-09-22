@@ -25,7 +25,7 @@ class JobVacancySeeder extends Seeder
                 'vacancy' => [
                     'recruitment_period_id' => $period->id,
                     'code' => 'POS-2026-IGD-01',
-                    'title' => 'Perawat Instalasi Gawat Darurat (IGD)',
+                    'title' => 'Perawat',
                     'unit' => 'Instalasi Gawat Darurat',
                     'employment_type' => 'PKWT',
                     'quota' => 5,
@@ -113,7 +113,7 @@ class JobVacancySeeder extends Seeder
                 'vacancy' => [
                     'recruitment_period_id' => $period->id,
                     'code' => 'POS-2026-RAD-01',
-                    'title' => 'Radiografer Madya',
+                    'title' => 'Radiografer',
                     'unit' => 'Instalasi Radiologi',
                     'employment_type' => 'PKWT',
                     'quota' => 2,
@@ -153,7 +153,7 @@ class JobVacancySeeder extends Seeder
                 'vacancy' => [
                     'recruitment_period_id' => $period->id,
                     'code' => 'POS-2026-FAR-01',
-                    'title' => 'Apoteker Pendamping Farmasi',
+                    'title' => 'Apoteker',
                     'unit' => 'Instalasi Farmasi',
                     'employment_type' => 'PKWT',
                     'quota' => 2,
@@ -193,7 +193,7 @@ class JobVacancySeeder extends Seeder
                 'vacancy' => [
                     'recruitment_period_id' => $period->id,
                     'code' => 'POS-2026-LAB-01',
-                    'title' => 'Pranata Laboratorium / Analis Medis',
+                    'title' => 'Laboratorium',
                     'unit' => 'Instalasi Laboratorium Patologi Klinik',
                     'employment_type' => 'PKWT',
                     'quota' => 2,
@@ -233,7 +233,7 @@ class JobVacancySeeder extends Seeder
                 'vacancy' => [
                     'recruitment_period_id' => $period->id,
                     'code' => 'POS-2026-IT-01',
-                    'title' => 'Staff IT & Administrator SIMRS',
+                    'title' => 'Staff IT',
                     'unit' => 'Instalasi Teknologi Informasi',
                     'employment_type' => 'PKWT',
                     'quota' => 1,
@@ -276,17 +276,14 @@ class JobVacancySeeder extends Seeder
             );
 
             // Kualifikasi dinamis
+            $vacancy->qualifications()->delete();
             foreach ($item['qualifications'] as $qualification) {
-                VacancyQualification::updateOrCreate(
-                    [
-                        'job_vacancy_id' => $vacancy->id,
-                        'label' => $qualification['label'],
-                    ],
-                    [
-                        'value' => $qualification['value'],
-                        'sort_order' => $qualification['sort_order'],
-                    ]
-                );
+                VacancyQualification::create([
+                    'job_vacancy_id' => $vacancy->id,
+                    'label' => $qualification['label'],
+                    'value' => $qualification['value'],
+                    'sort_order' => $qualification['sort_order'],
+                ]);
             }
 
             // Persyaratan berkas dokumen

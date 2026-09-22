@@ -77,7 +77,7 @@ class ApplicantDocumentController extends Controller
                 'stored_path' => $storedPath,
                 'mime_type' => $mimeType,
                 'file_size' => $fileSize,
-                'verification_status' => null,
+                'verification_status' => 'pending',
                 'verification_note' => null,
             ]
         );

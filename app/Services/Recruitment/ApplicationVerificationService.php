@@ -21,19 +21,189 @@ class ApplicationVerificationService
 
     /**
      * Update status verifikasi dan catatan untuk satu item dokumen.
+     * Jika seluruh berkas persyaratan telah berstatus valid, tahap berkas / administrasi otomatis lolos.
      */
-    public function verifyDocument(ApplicationDocument $document, string $status, ?string $note = null): ApplicationDocument
+    public function verifyDocument(ApplicationDocument $document, string $status, ?string $note = null, ?User $adminUser = null): ApplicationDocument
     {
         $document->update([
             'verification_status' => $status,
             'verification_note' => $note,
         ]);
 
+        if ($status === 'valid') {
+            $this->checkAndAutoApproveIfAllDocumentsValid($document->jobApplication, $adminUser);
+        }
+
         return $document;
     }
 
     /**
-     * Menyetujui (Approve) kelengkapan berkas administrasi pelamar.
+     * Periksa apakah seluruh berkas persyaratan telah berstatus valid.
+     * Jika ya, otomatis loloskan tahapan verifikasi berkas / seleksi administrasi.
+     */
+    public function checkAndAutoApproveIfAllDocumentsValid(JobApplication $application, ?User $adminUser = null): bool
+    {
+        if (!$application || $application->isRejected() || $application->isPassedAdministration()) {
+            return false;
+        }
+
+        $requirements = $application->jobVacancy->documentRequirements;
+        if ($requirements->isEmpty()) {
+            return false;
+        }
+
+        $mandatoryReqs = $requirements->where('is_required', true);
+        $reqsToCheck = $mandatoryReqs->isNotEmpty() ? $mandatoryReqs : $requirements;
+
+        foreach ($reqsToCheck as $req) {
+            $doc = $application->documents()->where('vacancy_document_requirement_id', $req->id)->first();
+            if (!$doc || $doc->verification_status !== 'valid') {
+                return false;
+            }
+        }
+
+        // Pastikan tidak ada dokumen terunggah yang berstatus invalid atau pending
+        if ($application->documents()->where('verification_status', 'invalid')->exists()) {
+            return false;
+        }
+        if ($application->documents()->where('verification_status', 'pending')->exists()) {
+            return false;
+        }
+
+        $admin = $adminUser ?? \Illuminate\Support\Facades\Auth::user() ?? User::where('role', User::ROLE_ADMIN)->first();
+
+        // Temukan tahapan seleksi administrasi / berkas
+        $adminStage = $application->jobVacancy->selectionStages()
+            ->where(function ($q) {
+                $q->where('name', 'like', '%Administrasi%')
+                  ->orWhere('name', 'like', '%Berkas%')
+                  ->orWhere('name', 'like', '%Dokumen%');
+            })
+            ->orderBy('sort_order', 'asc')
+            ->first() ?? $application->jobVacancy->selectionStages()->orderBy('sort_order', 'asc')->first();
+
+        if ($adminStage) {
+            ApplicationStageHistory::updateOrCreate(
+                [
+                    'job_application_id' => $application->id,
+                    'vacancy_selection_stage_id' => $adminStage->id,
+                ],
+                [
+                    'status' => ApplicationStageStatus::PASSED,
+                    'decided_at' => now(),
+                    'note' => 'Seluruh berkas persyaratan telah diverifikasi valid.',
+                    'published_at' => now(),
+                    'applicant_message' => 'Selamat, seluruh berkas persyaratan Anda telah terverifikasi Valid dan Lolos Seleksi Berkas/Administrasi.',
+                ]
+            );
+
+            // Update status lamaran
+            $application->update([
+                'status' => JobApplicationStatus::PASSED_ADMINISTRATION,
+                'verified_at' => now(),
+                'verified_by' => $admin?->id,
+            ]);
+
+            // Set tahapan berikutnya jika ada
+            $nextStage = $application->jobVacancy->selectionStages()
+                ->where('sort_order', '>', $adminStage->sort_order)
+                ->orderBy('sort_order', 'asc')
+                ->first();
+
+            if ($nextStage) {
+                $application->update(['current_stage_id' => $nextStage->id]);
+
+                ApplicationStageHistory::updateOrCreate(
+                    [
+                        'job_application_id' => $application->id,
+                        'vacancy_selection_stage_id' => $nextStage->id,
+                    ],
+                    [
+                        'status' => ApplicationStageStatus::PENDING,
+                        'started_at' => now(),
+                        'published_at' => now(),
+                    ]
+                );
+            }
+
+            // Kirim notifikasi lolos berkas administrasi
+            $this->notificationService->notifyVerificationResult($application, true);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Menyetujui (Approve) verifikasi biodata & portofolio pelamar dari panel biodata.
+     */
+    public function approveBiodata(JobApplication $application, User $adminUser, ?string $adminNote = null): JobApplication
+    {
+        return DB::transaction(function () use ($application, $adminUser, $adminNote) {
+            // Temukan tahapan pendaftaran online / biodata / portofolio
+            $biodataStage = $application->jobVacancy->selectionStages()
+                ->where(function ($q) {
+                    $q->where('name', 'like', '%Pendaftaran%')
+                      ->orWhere('name', 'like', '%Biodata%')
+                      ->orWhere('name', 'like', '%Portofolio%');
+                })
+                ->orderBy('sort_order', 'asc')
+                ->first() ?? $application->jobVacancy->selectionStages()->orderBy('sort_order', 'asc')->first();
+
+            if ($biodataStage) {
+                ApplicationStageHistory::updateOrCreate(
+                    [
+                        'job_application_id' => $application->id,
+                        'vacancy_selection_stage_id' => $biodataStage->id,
+                    ],
+                    [
+                        'status' => ApplicationStageStatus::PASSED,
+                        'decided_at' => now(),
+                        'note' => $adminNote ?? 'Biodata dan riwayat pelamar telah diverifikasi sesuai.',
+                        'published_at' => now(),
+                        'applicant_message' => $adminNote ?? 'Selamat, biodata dan data pendaftaran Anda telah diverifikasi dan dinyatakan Lolos.',
+                    ]
+                );
+
+                // Jika tahapan saat ini adalah tahap biodata, alihkan ke tahap berikutnya (misal berkas)
+                $nextStage = $application->jobVacancy->selectionStages()
+                    ->where('sort_order', '>', $biodataStage->sort_order)
+                    ->orderBy('sort_order', 'asc')
+                    ->first();
+
+                if ($nextStage && $application->current_stage_id === $biodataStage->id) {
+                    $application->update(['current_stage_id' => $nextStage->id]);
+
+                    ApplicationStageHistory::firstOrCreate(
+                        [
+                            'job_application_id' => $application->id,
+                            'vacancy_selection_stage_id' => $nextStage->id,
+                        ],
+                        [
+                            'status' => ApplicationStageStatus::PENDING,
+                            'started_at' => now(),
+                            'published_at' => now(),
+                        ]
+                    );
+                }
+
+                $this->notificationService->notifyStageUpdate($application, $biodataStage->stage_name, $adminNote);
+            }
+
+            return $application->fresh();
+        });
+    }
+
+    /**
+     * Menolak (Reject) biodata pelamar.
+     */
+    public function rejectBiodata(JobApplication $application, User $adminUser, string $rejectionReason): JobApplication
+    {
+        return $this->rejectAdministration($application, $adminUser, $rejectionReason);
+    }
+
+    /**
+     * Menyetujui (Approve) kelengkapan administrasi/biodata pelamar secara keseluruhan.
      */
     public function approveAdministration(JobApplication $application, User $adminUser, ?string $adminNote = null): JobApplication
     {
@@ -41,39 +211,49 @@ class ApplicationVerificationService
             // Update status lamaran
             $application->update([
                 'status' => JobApplicationStatus::PASSED_ADMINISTRATION,
-                'accepted_at' => null, // accepted_at hanya untuk kelulusan seleksi final
+                'accepted_at' => null,
                 'rejected_at' => null,
                 'rejection_reason' => null,
                 'verified_at' => now(),
                 'verified_by' => $adminUser->id,
             ]);
 
-            // Tandai seluruh dokumen yang belum ditolak menjadi valid
-            foreach ($application->documents as $doc) {
-                if ($doc->verification_status !== 'invalid') {
-                    $doc->update(['verification_status' => 'valid']);
-                }
-            }
-
-            // Catat riwayat tahap seleksi administrasi
+            // Temukan tahapan seleksi administrasi / verifikasi berkas dokumen
             $adminStage = $application->jobVacancy->selectionStages()
-                ->where('name', 'like', '%Administrasi%')
-                ->first();
+                ->where(function ($q) {
+                    $q->where('name', 'like', '%Administrasi%')
+                      ->orWhere('name', 'like', '%Berkas%')
+                      ->orWhere('name', 'like', '%Dokumen%');
+                })
+                ->orderBy('sort_order', 'asc')
+                ->first() ?? $application->jobVacancy->selectionStages()->orderBy('sort_order', 'asc')->first();
 
             if ($adminStage) {
-                ApplicationStageHistory::updateOrCreate(
-                    [
-                        'job_application_id' => $application->id,
-                        'vacancy_selection_stage_id' => $adminStage->id,
-                    ],
-                    [
-                        'status' => ApplicationStageStatus::PASSED,
-                        'decided_at' => now(),
-                        'note' => $adminNote ?? 'Berkas lengkap dan sesuai kualifikasi.',
-                        'published_at' => now(),
-                        'applicant_message' => $adminNote ?? 'Selamat, berkas administrasi Anda telah diverifikasi dan dinyatakan Lolos.',
-                    ]
-                );
+                // Loloskan semua tahapan pendaftaran online, review berkas/portofolio, hingga seleksi administrasi (sort_order <= adminStage)
+                $priorAndAdminStages = $application->jobVacancy->selectionStages()
+                    ->where('sort_order', '<=', $adminStage->sort_order)
+                    ->orderBy('sort_order', 'asc')
+                    ->get();
+
+                foreach ($priorAndAdminStages as $stg) {
+                    $defaultMsg = $stg->id === $adminStage->id
+                        ? ($adminNote ?? 'Selamat, berkas administrasi Anda telah diverifikasi dan dinyatakan Lolos.')
+                        : 'Pendaftaran online dan kelengkapan berkas/portofolio telah diverifikasi dan dinyatakan Lolos.';
+
+                    ApplicationStageHistory::updateOrCreate(
+                        [
+                            'job_application_id' => $application->id,
+                            'vacancy_selection_stage_id' => $stg->id,
+                        ],
+                        [
+                            'status' => ApplicationStageStatus::PASSED,
+                            'decided_at' => now(),
+                            'note' => $adminNote ?? 'Lolos verifikasi.',
+                            'published_at' => now(),
+                            'applicant_message' => $defaultMsg,
+                        ]
+                    );
+                }
 
                 // Set tahapan berikutnya jika ada
                 $nextStage = $application->jobVacancy->selectionStages()
@@ -84,7 +264,7 @@ class ApplicationVerificationService
                 if ($nextStage) {
                     $application->update(['current_stage_id' => $nextStage->id]);
                     
-                    ApplicationStageHistory::firstOrCreate(
+                    ApplicationStageHistory::updateOrCreate(
                         [
                             'job_application_id' => $application->id,
                             'vacancy_selection_stage_id' => $nextStage->id,
@@ -230,6 +410,44 @@ class ApplicationVerificationService
                 ]);
 
                 $this->notificationService->notifyVerificationResult($application, false);
+            } elseif ($stageStatus === ApplicationStageStatus::IN_PROGRESS || $stageStatus === ApplicationStageStatus::PENDING) {
+                // Kembalikan status lamaran agar tombol verifikasi muncul kembali di panel biodata
+                $application->update([
+                    'status' => JobApplicationStatus::SUBMITTED,
+                    'verified_at' => null,
+                    'verified_by' => null,
+                    'accepted_at' => null,
+                    'rejected_at' => null,
+                    'rejection_reason' => null,
+                    'final_result_published_at' => null,
+                    'final_result_message' => null,
+                    'current_stage_id' => $stage->id,
+                ]);
+
+                // Reset seluruh dokumen menjadi 'pending' (Menunggu Review)
+                foreach ($application->documents as $doc) {
+                    $doc->update([
+                        'verification_status' => 'pending',
+                        'verification_note' => null,
+                    ]);
+                }
+
+                // Reset tahapan-tahapan setelahnya agar tidak menggantung
+                $subsequentStages = $application->jobVacancy->selectionStages()
+                    ->where('sort_order', '>', $stage->sort_order)
+                    ->get();
+
+                foreach ($subsequentStages as $subStage) {
+                    ApplicationStageHistory::where('job_application_id', $application->id)
+                        ->where('vacancy_selection_stage_id', $subStage->id)
+                        ->update([
+                            'status' => ApplicationStageStatus::PENDING,
+                            'decided_at' => null,
+                            'published_at' => null,
+                            'applicant_message' => null,
+                            'note' => null,
+                        ]);
+                }
             }
 
             return $application->fresh();

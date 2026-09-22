@@ -87,6 +87,7 @@ class AdminApplicationController extends Controller
             'user.applicantProfile',
             'jobVacancy.documentRequirements',
             'jobVacancy.selectionStages',
+            'jobVacancy.qualifications',
             'documents.documentRequirement',
             'stageHistories.selectionStage',
             'verifier',
@@ -137,13 +138,13 @@ class AdminApplicationController extends Controller
         ]);
 
         if ($request->action === 'approve') {
-            $this->verificationService->approveAdministration($application, $admin, $request->admin_note);
+            $this->verificationService->approveBiodata($application, $admin, $request->admin_note);
             return redirect()->route('admin.applications.show', $application)
-                ->with('success', "Lamaran atas nama {$application->user->name} berhasil DISETUJUI (Lolos Administrasi). Notifikasi telah dikirim ke pelamar.");
+                ->with('success', "Verifikasi Biodata atas nama {$application->user->name} berhasil DISETUJUI (Lolos Biodata & Portofolio).");
         } else {
-            $this->verificationService->rejectAdministration($application, $admin, $request->rejection_reason);
+            $this->verificationService->rejectBiodata($application, $admin, $request->rejection_reason);
             return redirect()->route('admin.applications.show', $application)
-                ->with('info', "Lamaran atas nama {$application->user->name} telah DITOLAK dengan alasan: {$request->rejection_reason}. Notifikasi telah dikirim ke pelamar.");
+                ->with('info', "Verifikasi Biodata atas nama {$application->user->name} telah DITOLAK dengan alasan: {$request->rejection_reason}.");
         }
     }
 
@@ -160,11 +161,14 @@ class AdminApplicationController extends Controller
         $this->verificationService->verifyDocument(
             $document,
             $request->verification_status,
-            $request->verification_note
+            $request->verification_note,
+            Auth::user()
         );
 
+        $document->jobApplication->refresh();
+
         return redirect()->route('admin.applications.show', $document->jobApplication)
-            ->with('success', "Status dokumen '{$document->documentRequirement->document_name}' berhasil diperbarui.");
+            ->with('success', "Status dokumen '{$document->documentRequirement->document_name}' berhasil diperbarui ({$request->verification_status}).");
     }
 
     /**

@@ -150,6 +150,7 @@ class SelectionTrackingService
         }
 
         $stages = $snapshot->vacancy_data['selection_stages'];
+
         usort($stages, fn ($a, $b) => ($a['sort_order'] ?? 0) <=> ($b['sort_order'] ?? 0));
 
         $application->load('stageHistories');

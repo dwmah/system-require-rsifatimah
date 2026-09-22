@@ -1,5 +1,5 @@
 <x-layouts.admin title="Verifikasi: {{ $user->name }}">
-    <div class="space-y-6" x-data="{ rejectModalOpen: false, stageModalOpen: false, activeTab: 'berkas' }">
+    <div class="space-y-6" x-data="{ rejectModalOpen: false, approveModalOpen: false, stageModalOpen: false, activeTab: 'profil' }">
         <!-- Breadcrumb & Top Bar -->
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div class="flex items-center gap-2 text-sm text-slate-500">
@@ -82,16 +82,16 @@
                 </div>
             @endif
 
-            <!-- Navigation Tabs -->
+            <!-- Navigation Tabs (Urutan: Biodata -> Berkas -> Tahapan) -->
             <div class="flex items-center gap-6 mt-6 border-b border-slate-200 text-sm font-semibold">
-                <button @click="activeTab = 'berkas'" :class="activeTab === 'berkas' ? 'border-[#0179B5] text-[#0179B5] border-b-2' : 'text-slate-500 hover:text-slate-800'" class="pb-3 px-1 transition-colors flex items-center gap-1.5 cursor-pointer">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    <span>Verifikasi Berkas Dokumen ({{ $uploadedDocuments->count() }}/{{ $requirements->count() }})</span>
-                </button>
-
                 <button @click="activeTab = 'profil'" :class="activeTab === 'profil' ? 'border-[#0179B5] text-[#0179B5] border-b-2' : 'text-slate-500 hover:text-slate-800'" class="pb-3 px-1 transition-colors flex items-center gap-1.5 cursor-pointer">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                     <span>Biodata & Riwayat Pelamar</span>
+                </button>
+
+                <button @click="activeTab = 'berkas'" :class="activeTab === 'berkas' ? 'border-[#0179B5] text-[#0179B5] border-b-2' : 'text-slate-500 hover:text-slate-800'" class="pb-3 px-1 transition-colors flex items-center gap-1.5 cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    <span>Verifikasi Berkas Dokumen ({{ $uploadedDocuments->count() }}/{{ $requirements->count() }})</span>
                 </button>
 
                 <button @click="activeTab = 'tahapan'" :class="activeTab === 'tahapan' ? 'border-[#0179B5] text-[#0179B5] border-b-2' : 'text-slate-500 hover:text-slate-800'" class="pb-3 px-1 transition-colors flex items-center gap-1.5 cursor-pointer">
@@ -101,31 +101,331 @@
             </div>
         </div>
 
-        <!-- TAB 1: VERIFIKASI BERKAS DOKUMEN -->
-        <div x-show="activeTab === 'berkas'" class="space-y-6">
-            <!-- Action Verification Panel -->
-            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div>
-                    <h2 class="text-base font-bold text-slate-900">Panel Keputusan Verifikasi Administrasi</h2>
-                    <p class="text-sm text-slate-500 mt-0.5">Periksa seluruh dokumen sebelum memberikan persetujuan kelulusan berkas</p>
+        <!-- TAB 1: BIODATA & RIWAYAT PELAMAR (SISI KIRI SENDIRI) -->
+        <div x-show="activeTab === 'profil'" class="space-y-6">
+            @php
+                $latestEdu = $educations->first();
+                $firstLic = $licenses->first();
+                $isNikValid = strlen(preg_replace('/[^0-9]/', '', $profile->nik ?? '')) === 16;
+                $applicantAge = $profile && $profile->birth_date ? \Carbon\Carbon::parse($profile->birth_date)->age : null;
+                $isStrActive = $firstLic && (!$firstLic->expires_at || \Carbon\Carbon::parse($firstLic->expires_at)->isFuture());
+
+                $genderRaw = strtolower(trim((string)($profile->gender ?? '')));
+                $genderLabel = match(true) {
+                    in_array($genderRaw, ['laki-laki', 'male', 'l', 'pria'], true) => 'Laki-laki',
+                    in_array($genderRaw, ['perempuan', 'female', 'p', 'wanita'], true) => 'Perempuan',
+                    !empty($profile->gender) => (string)$profile->gender,
+                    default => '-',
+                };
+            @endphp
+
+            <!-- PANEL VERIFIKASI BIODATA -->
+            <div class="bg-white p-5 sm:p-6 rounded-xl border border-slate-200 shadow-sm space-y-5">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-200">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="p-1.5 bg-[#0179B5]/10 text-[#0179B5] rounded-lg">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                            </span>
+                            <h2 class="text-base font-bold text-slate-900">Panel Verifikasi Kelayakan Biodata Pelamar</h2>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-1">Pemeriksaan instan kesesuaian data identitas, jenjang pendidikan, lisensi profesi, dan pengalaman kerja pelamar</p>
+                    </div>
+
+                    <div class="flex items-center gap-3 flex-wrap sm:flex-nowrap">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-sky-50 text-[#0179B5] border border-sky-200 rounded-lg text-xs font-semibold">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            Formasi: {{ $application->jobVacancy->title }}
+                        </span>
+
+                        <!-- Action Buttons: Tolak & Lolos Biodata -->
+                        @php
+                            $biodataStage = $selectionStages->first(fn($s) => stripos($s->name, 'Pendaftaran') !== false || stripos($s->name, 'Biodata') !== false || stripos($s->name, 'Portofolio') !== false) ?? $selectionStages->first();
+                            $biodataHistory = $application->stageHistories->firstWhere('vacancy_selection_stage_id', $biodataStage?->id);
+                            $isBiodataPassed = $biodataHistory && $biodataHistory->status === \App\Enums\ApplicationStageStatus::PASSED;
+                        @endphp
+
+                        @if(!$application->isRejected() && !$isBiodataPassed)
+                            <div class="flex items-center gap-2">
+                                <button type="button" @click="rejectModalOpen = true" class="px-3.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs" title="Buka form konfirmasi penolakan biodata">
+                                    <svg class="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                    <span>Tolak Biodata</span>
+                                </button>
+
+                                <button type="button" @click="approveModalOpen = true" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow-sm transition-colors flex items-center gap-1.5 cursor-pointer" title="Buka form konfirmasi kelulusan biodata">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    <span>Lolos Verifikasi Biodata</span>
+                                </button>
+                            </div>
+                        @else
+                            @if($isBiodataPassed)
+                                <span class="px-3 py-1.5 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-lg border border-emerald-300 flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    Biodata Terverifikasi Sesuai
+                                </span>
+                            @elseif($application->isRejected())
+                                <span class="px-3 py-1.5 bg-rose-100 text-rose-800 text-xs font-bold rounded-lg border border-rose-300 flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                    Lamaran Ditolak
+                                </span>
+                            @endif
+                        @endif
+                    </div>
                 </div>
 
-                <div class="flex items-center gap-3">
-                    <!-- Reject Button Trigger -->
-                    <button type="button" @click="rejectModalOpen = true" class="px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                        <span>Tolak Berkas (Reject)</span>
-                    </button>
+                <!-- 4 Key Checklist Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- 1. Identitas & NIK -->
+                    <div class="p-4 rounded-xl border {{ $isNikValid ? 'bg-emerald-50/40 border-emerald-200' : 'bg-amber-50/40 border-amber-200' }} space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-600 uppercase tracking-wider">Identitas & NIK</span>
+                            <span class="px-2 py-0.5 text-[11px] font-bold rounded {{ $isNikValid ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800' }}">
+                                {{ $isNikValid ? '✓ NIK 16 Digit' : 'Perlu Cek' }}
+                            </span>
+                        </div>
+                        <div>
+                            <div class="text-sm font-mono font-bold text-slate-900">{{ $profile->nik ?? 'Belum Diisi' }}</div>
+                            <div class="text-xs text-slate-600 mt-0.5 font-medium">
+                                {{ $genderLabel }} 
+                                @if($applicantAge) &bull; {{ $applicantAge }} Tahun @endif
+                            </div>
+                        </div>
+                    </div>
 
-                    <!-- Approve Form -->
-                    <form method="POST" action="{{ route('admin.applications.verify', $application) }}" onsubmit="return confirm('Apakah Anda yakin seluruh berkas dokumen telah lengkap dan memenuhi syarat?')">
-                        @csrf
-                        <input type="hidden" name="action" value="approve">
-                        <button type="submit" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-lg shadow-sm transition-colors flex items-center gap-1.5 cursor-pointer">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                            <span>Setujui (Lolos Administrasi)</span>
-                        </button>
-                    </form>
+                    <!-- 2. Pendidikan Terakhir -->
+                    <div class="p-4 rounded-xl border {{ $latestEdu ? 'bg-emerald-50/40 border-emerald-200' : 'bg-amber-50/40 border-amber-200' }} space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-600 uppercase tracking-wider">Pendidikan</span>
+                            <span class="px-2 py-0.5 text-[11px] font-bold rounded {{ $latestEdu ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800' }}">
+                                {{ $latestEdu ? ($latestEdu->education_level ?? $latestEdu->degree_level ?? 'Tercatat') : 'Belum Diisi' }}
+                            </span>
+                        </div>
+                        <div>
+                            <div class="text-sm font-bold text-slate-900 truncate" title="{{ $latestEdu?->institution_name }}">
+                                {{ $latestEdu ? ($latestEdu->study_program ?? $latestEdu->major ?? $latestEdu->institution_name) : 'Belum ada data' }}
+                            </div>
+                            <div class="text-xs text-slate-500 mt-0.5 truncate">
+                                @if($latestEdu)
+                                    IPK: <strong>{{ $latestEdu->gpa ?? '-' }}</strong> &bull; Lulus: {{ $latestEdu->graduation_year ?? '-' }}
+                                @else
+                                    -
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. STR / Lisensi Medis -->
+                    <div class="p-4 rounded-xl border {{ $firstLic ? ($isStrActive ? 'bg-emerald-50/40 border-emerald-200' : 'bg-rose-50/40 border-rose-200') : 'bg-slate-50 border-slate-200' }} space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-600 uppercase tracking-wider">STR / Lisensi</span>
+                            @if($firstLic)
+                                <span class="px-2 py-0.5 text-[11px] font-bold rounded {{ $isStrActive ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800' }}">
+                                    {{ $isStrActive ? '✓ STR Aktif' : '✕ Kedaluwarsa' }}
+                                </span>
+                            @else
+                                <span class="px-2 py-0.5 text-[11px] font-semibold bg-slate-100 text-slate-600 rounded">
+                                    Tanpa STR
+                                </span>
+                            @endif
+                        </div>
+                        <div>
+                            <div class="text-sm font-bold text-slate-900 truncate">
+                                {{ $firstLic ? $firstLic->license_type : 'Tidak dilampirkan' }}
+                            </div>
+                            <div class="text-xs text-slate-500 mt-0.5 font-mono truncate">
+                                @if($firstLic)
+                                    No: {{ $firstLic->license_number }}
+                                @else
+                                    -
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. Pengalaman & Sertifikat -->
+                    <div class="p-4 rounded-xl border {{ ($workExperiences->count() + $certifications->count()) > 0 ? 'bg-emerald-50/40 border-emerald-200' : 'bg-slate-50 border-slate-200' }} space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-600 uppercase tracking-wider">Portofolio</span>
+                            <span class="px-2 py-0.5 text-[11px] font-bold rounded {{ $workExperiences->count() > 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600' }}">
+                                {{ $workExperiences->count() > 0 ? $workExperiences->count() . ' Pengalaman' : 'Fresh Graduate' }}
+                            </span>
+                        </div>
+                        <div>
+                            <div class="text-sm font-bold text-slate-900">
+                                {{ $certifications->count() }} Sertifikasi
+                            </div>
+                            <div class="text-xs text-slate-500 mt-0.5">
+                                {{ $workExperiences->count() > 0 ? 'Memiliki riwayat kerja relevan' : 'Siap penempatan pemula' }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kualifikasi Lowongan Cross-Check -->
+                @if($application->jobVacancy->qualifications && $application->jobVacancy->qualifications->isNotEmpty())
+                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2.5">
+                        <div class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                            <svg class="w-4 h-4 text-[#0179B5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                            <span>Standar Kualifikasi Formasi {{ $application->jobVacancy->title }}</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+                            @foreach($application->jobVacancy->qualifications as $qual)
+                                <div class="bg-white p-2.5 rounded-lg border border-slate-200 text-xs">
+                                    <span class="font-bold text-[#0179B5] block mb-0.5">{{ $qual->label ?? 'Kualifikasi' }}</span>
+                                    <span class="text-slate-700">{{ $qual->value ?? $qual->description ?? '-' }}</span>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+            </div>
+
+            <!-- RINCIAN BIODATA LENGKAP -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Data Pribadi -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                    <h2 class="text-sm font-bold uppercase tracking-wider text-[#0179B5] flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                        <span>Data Pribadi & Identitas</span>
+                    </h2>
+                    <div class="space-y-2 text-sm divide-y divide-slate-100">
+                        <div class="flex justify-between py-2"><span class="text-slate-500">Nama Lengkap:</span> <strong class="text-slate-900">{{ $user->name }}</strong></div>
+                        <div class="flex justify-between py-2"><span class="text-slate-500">NIK (KTP):</span> <strong class="text-slate-900 font-mono">{{ $profile->nik ?? '-' }}</strong></div>
+                        <div class="flex justify-between py-2"><span class="text-slate-500">Jenis Kelamin:</span> <strong class="text-slate-900">{{ $genderLabel }}</strong></div>
+                        <div class="flex justify-between py-2"><span class="text-slate-500">Tempat, Tanggal Lahir:</span> <strong class="text-slate-900">{{ $profile->birth_place ?? '-' }}, {{ $profile->birth_date ? \Carbon\Carbon::parse($profile->birth_date)->locale('id')->translatedFormat('d F Y') : '-' }}</strong></div>
+                        <div class="flex justify-between py-2"><span class="text-slate-500">Usia:</span> <strong class="text-slate-900">{{ $applicantAge ? $applicantAge . ' Tahun' : '-' }}</strong></div>
+                        <div class="flex justify-between py-2"><span class="text-slate-500">No. Registrasi:</span> <strong class="text-slate-900 font-mono">{{ $user->registration_number ?? '-' }}</strong></div>
+                    </div>
+                </div>
+
+                <!-- Kontak & Alamat -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                    <h2 class="text-sm font-bold uppercase tracking-wider text-[#0179B5] flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        <span>Alamat & Kontak</span>
+                    </h2>
+                    <div class="space-y-2 text-sm divide-y divide-slate-100">
+                        <div class="flex justify-between py-2"><span class="text-slate-500">Email Utama:</span> <strong class="text-slate-900">{{ $user->email }}</strong></div>
+                        <div class="flex justify-between py-2"><span class="text-slate-500">No. WhatsApp / HP:</span> <strong class="text-slate-900">{{ $user->phone ?? '-' }}</strong></div>
+                        <div class="flex justify-between py-2"><span class="text-slate-500">Alamat KTP:</span> <strong class="text-slate-900 text-right max-w-[280px]">{{ $profile->address_ktp ?? '-' }}</strong></div>
+                        <div class="flex justify-between py-2"><span class="text-slate-500">Alamat Domisili:</span> <strong class="text-slate-900 text-right max-w-[280px]">{{ $profile->same_as_ktp ? 'Sama dengan KTP' : ($profile->address_domicile ?? '-') }}</strong></div>
+                        <div class="flex justify-between py-2"><span class="text-slate-500">Status Domisili:</span> <strong class="text-slate-900">{{ $profile->same_as_ktp ? 'Sesuai KTP' : 'Domisili Berbeda' }}</strong></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Riwayat Pendidikan & STR / Lisensi -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Pendidikan -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                    <h2 class="text-sm font-bold uppercase tracking-wider text-[#0179B5] flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"></path></svg>
+                        <span>Riwayat Pendidikan</span>
+                    </h2>
+                    <div class="space-y-3 text-sm">
+                        @forelse ($educations as $edu)
+                            <div class="p-3.5 bg-slate-50 rounded-lg border border-slate-200">
+                                <div class="font-bold text-slate-900">{{ $edu->institution_name }}</div>
+                                <div class="text-slate-700 mt-0.5 text-xs">{{ $edu->education_level ?? $edu->degree_level }} {{ $edu->study_program ?? $edu->major }} (Lulus {{ $edu->graduation_year }})</div>
+                                <div class="text-slate-500 text-xs mt-1">IPK / Nilai: <strong>{{ $edu->gpa ?? '-' }}</strong> @if($edu->accreditation) &bull; Akreditasi: <strong>{{ $edu->accreditation }}</strong> @endif</div>
+                            </div>
+                        @empty
+                            <p class="text-slate-400 italic text-sm">Belum ada riwayat pendidikan diisi.</p>
+                        @endforelse
+                    </div>
+                </div>
+
+                <!-- Lisensi / STR -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                    <h2 class="text-sm font-bold uppercase tracking-wider text-[#0179B5] flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        <span>Surat Tanda Registrasi (STR) / Lisensi</span>
+                    </h2>
+                    <div class="space-y-3 text-sm">
+                        @forelse ($licenses as $lic)
+                            <div class="p-3.5 bg-slate-50 rounded-lg border border-slate-200">
+                                <div class="flex items-center justify-between">
+                                    <div class="font-bold text-slate-900">{{ $lic->license_type }}</div>
+                                    @php
+                                        $licExpires = $lic->expires_at ?? $lic->valid_until;
+                                        $licActive = !$licExpires || \Carbon\Carbon::parse($licExpires)->isFuture();
+                                    @endphp
+                                    <span class="px-2 py-0.5 text-[10px] font-bold rounded {{ $licActive ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800' }}">
+                                        {{ $licActive ? 'Aktif' : 'Kedaluwarsa' }}
+                                    </span>
+                                </div>
+                                <div class="text-slate-700 font-mono text-xs mt-0.5">No: {{ $lic->license_number }}</div>
+                                <div class="text-slate-500 text-xs mt-1">Berlaku s/d: <strong>{{ $licExpires ? \Carbon\Carbon::parse($licExpires)->format('d M Y') : 'Seumur Hidup' }}</strong></div>
+                            </div>
+                        @empty
+                            <p class="text-slate-400 italic text-sm">Belum ada lisensi/STR dicatat.</p>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pengalaman Kerja & Sertifikasi -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Pengalaman Kerja -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                    <h2 class="text-sm font-bold uppercase tracking-wider text-[#0179B5] flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                        <span>Pengalaman Kerja</span>
+                    </h2>
+                    <div class="space-y-3 text-sm">
+                        @forelse ($workExperiences as $exp)
+                            <div class="p-3.5 bg-slate-50 rounded-lg border border-slate-200">
+                                <div class="font-bold text-slate-900">{{ $exp->position }} &bull; {{ $exp->company_name }}</div>
+                                <div class="text-xs text-slate-500 mt-0.5">
+                                    {{ $exp->start_date ? \Carbon\Carbon::parse($exp->start_date)->format('M Y') : '-' }} - {{ ($exp->is_current ?? false) ? 'Sekarang' : ($exp->end_date ? \Carbon\Carbon::parse($exp->end_date)->format('M Y') : '-') }}
+                                </div>
+                                @if($exp->description ?? $exp->job_description)
+                                    <p class="text-slate-700 mt-1.5 text-xs">{{ $exp->description ?? $exp->job_description }}</p>
+                                @endif
+                            </div>
+                        @empty
+                            <p class="text-slate-400 italic text-sm">Belum ada pengalaman kerja diisi.</p>
+                        @endforelse
+                    </div>
+                </div>
+
+                <!-- Sertifikasi & Pelatihan -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                    <h2 class="text-sm font-bold uppercase tracking-wider text-[#0179B5] flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg>
+                        <span>Sertifikasi & Pelatihan Medis</span>
+                    </h2>
+                    <div class="space-y-3 text-sm">
+                        @forelse ($certifications as $cert)
+                            <div class="p-3.5 bg-slate-50 rounded-lg border border-slate-200">
+                                <div class="font-bold text-slate-900">{{ $cert->name }}</div>
+                                <div class="text-slate-600 text-xs mt-0.5">Lembaga: {{ $cert->issuer ?? '-' }} @if($cert->issued_at) (Tahun {{ \Carbon\Carbon::parse($cert->issued_at)->format('Y') }}) @elseif($cert->issue_year) (Tahun {{ $cert->issue_year }}) @endif</div>
+                                @if($cert->certificate_number)
+                                    <div class="text-slate-400 font-mono text-[11px] mt-0.5">No: {{ $cert->certificate_number }}</div>
+                                @endif
+                            </div>
+                        @empty
+                            <p class="text-slate-400 italic text-sm">Belum ada data sertifikasi diisi.</p>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: VERIFIKASI BERKAS DOKUMEN -->
+        <div x-show="activeTab === 'berkas'" class="space-y-6">
+            <!-- Header Ringkasan Verifikasi Dokumen -->
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <h2 class="text-base font-bold text-slate-900">Daftar Dokumen Persyaratan Pelamar</h2>
+                    <p class="text-xs text-slate-500 mt-0.5">
+                        Klik <strong>Lihat Berkas</strong> untuk memeriksa preview dan validasi dokumen. Jika <strong>seluruh berkas telah valid</strong>, sistem otomatis meloloskan pelamar ke tahap berikutnya.
+                    </p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="px-3 py-1.5 bg-slate-100 text-slate-700 text-xs font-semibold rounded-lg">
+                        Terunggah: <strong>{{ $uploadedDocuments->count() }}</strong> dari <strong>{{ $requirements->count() }}</strong> Berkas
+                    </span>
                 </div>
             </div>
 
@@ -384,110 +684,6 @@
             </div>
         </div>
 
-        <!-- TAB 2: BIODATA LENGKAP PELAMAR -->
-        <div x-show="activeTab === 'profil'" class="space-y-6">
-            <!-- Data Pribadi & Kontak -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Data Pribadi -->
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                    <h2 class="text-sm font-bold uppercase tracking-wider text-[#0179B5]">Data Pribadi & Identitas</h2>
-                    <div class="space-y-2 text-sm divide-y divide-slate-100">
-                        <div class="flex justify-between py-2"><span class="text-slate-500">Nama Lengkap:</span> <strong class="text-slate-900">{{ $user->name }}</strong></div>
-                        <div class="flex justify-between py-2"><span class="text-slate-500">NIK (KTP):</span> <strong class="text-slate-900 font-mono">{{ $profile->nik ?? '-' }}</strong></div>
-                        <div class="flex justify-between py-2"><span class="text-slate-500">Jenis Kelamin:</span> <strong class="text-slate-900">{{ $profile->gender === 'male' ? 'Laki-laki' : ($profile->gender === 'female' ? 'Perempuan' : '-') }}</strong></div>
-                        <div class="flex justify-between py-2"><span class="text-slate-500">Tempat, Tanggal Lahir:</span> <strong class="text-slate-900">{{ $profile->birth_place ?? '-' }}, {{ $profile->birth_date ? \Carbon\Carbon::parse($profile->birth_date)->format('d F Y') : '-' }}</strong></div>
-                        <div class="flex justify-between py-2"><span class="text-slate-500">Agama:</span> <strong class="text-slate-900">{{ $profile->religion ?? '-' }}</strong></div>
-                        <div class="flex justify-between py-2"><span class="text-slate-500">Status Pernikahan:</span> <strong class="text-slate-900">{{ $profile->marital_status ?? '-' }}</strong></div>
-                    </div>
-                </div>
-
-                <!-- Kontak & Alamat -->
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                    <h2 class="text-sm font-bold uppercase tracking-wider text-[#0179B5]">Alamat & Kontak Darurat</h2>
-                    <div class="space-y-2 text-sm divide-y divide-slate-100">
-                        <div class="flex justify-between py-2"><span class="text-slate-500">Email Utama:</span> <strong class="text-slate-900">{{ $user->email }}</strong></div>
-                        <div class="flex justify-between py-2"><span class="text-slate-500">No. WhatsApp / HP:</span> <strong class="text-slate-900">{{ $user->phone ?? '-' }}</strong></div>
-                        <div class="flex justify-between py-2"><span class="text-slate-500">Alamat KTP:</span> <strong class="text-slate-900 text-right">{{ $profile->address ?? '-' }}</strong></div>
-                        <div class="flex justify-between py-2"><span class="text-slate-500">Kota / Kabupaten:</span> <strong class="text-slate-900">{{ $profile->city ?? '-' }} ({{ $profile->province ?? '-' }})</strong></div>
-                        <div class="flex justify-between py-2"><span class="text-slate-500">Kontak Darurat:</span> <strong class="text-slate-900">{{ $profile->emergency_contact_name ?? '-' }} ({{ $profile->emergency_contact_phone ?? '-' }})</strong></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Riwayat Pendidikan & STR / Lisensi -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Pendidikan -->
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                    <h2 class="text-sm font-bold uppercase tracking-wider text-[#0179B5]">Riwayat Pendidikan</h2>
-                    <div class="space-y-3 text-sm">
-                        @forelse ($educations as $edu)
-                            <div class="p-3.5 bg-slate-50 rounded-lg border border-slate-200">
-                                <div class="font-bold text-slate-900">{{ $edu->institution_name }}</div>
-                                <div class="text-slate-700 mt-0.5 text-xs">{{ $edu->degree_level }} {{ $edu->major }} (Lulus {{ $edu->graduation_year }})</div>
-                                <div class="text-slate-500 text-xs mt-1">IPK / Nilai: <strong>{{ $edu->gpa ?? '-' }}</strong></div>
-                            </div>
-                        @empty
-                            <p class="text-slate-400 italic text-sm">Belum ada riwayat pendidikan diisi.</p>
-                        @endforelse
-                    </div>
-                </div>
-
-                <!-- Lisensi / STR -->
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                    <h2 class="text-sm font-bold uppercase tracking-wider text-[#0179B5]">Surat Tanda Registrasi (STR) / Lisensi</h2>
-                    <div class="space-y-3 text-sm">
-                        @forelse ($licenses as $lic)
-                            <div class="p-3.5 bg-slate-50 rounded-lg border border-slate-200">
-                                <div class="font-bold text-slate-900">{{ $lic->license_type }}</div>
-                                <div class="text-slate-700 font-mono text-xs mt-0.5">No: {{ $lic->license_number }}</div>
-                                <div class="text-slate-500 text-xs mt-1">Berlaku s/d: <strong>{{ $lic->valid_until ? \Carbon\Carbon::parse($lic->valid_until)->format('d M Y') : 'Seumur Hidup' }}</strong></div>
-                            </div>
-                        @empty
-                            <p class="text-slate-400 italic text-sm">Belum ada lisensi/STR dicatat.</p>
-                        @endforelse
-                    </div>
-                </div>
-            </div>
-
-            <!-- Pengalaman Kerja & Sertifikasi -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Pengalaman Kerja -->
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                    <h2 class="text-sm font-bold uppercase tracking-wider text-[#0179B5]">Pengalaman Kerja</h2>
-                    <div class="space-y-3 text-sm">
-                        @forelse ($workExperiences as $exp)
-                            <div class="p-3.5 bg-slate-50 rounded-lg border border-slate-200">
-                                <div class="font-bold text-slate-900">{{ $exp->position }} &bull; {{ $exp->company_name }}</div>
-                                <div class="text-xs text-slate-500 mt-0.5">
-                                    {{ \Carbon\Carbon::parse($exp->start_date)->format('M Y') }} - {{ $exp->is_current ? 'Sekarang' : ($exp->end_date ? \Carbon\Carbon::parse($exp->end_date)->format('M Y') : '-') }}
-                                </div>
-                                @if($exp->job_description)
-                                    <p class="text-slate-700 mt-1.5 text-xs">{{ $exp->job_description }}</p>
-                                @endif
-                            </div>
-                        @empty
-                            <p class="text-slate-400 italic text-sm">Belum ada pengalaman kerja diisi.</p>
-                        @endforelse
-                    </div>
-                </div>
-
-                <!-- Sertifikasi & Pelatihan -->
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                    <h2 class="text-sm font-bold uppercase tracking-wider text-[#0179B5]">Sertifikasi & Pelatihan Medis</h2>
-                    <div class="space-y-3 text-sm">
-                        @forelse ($certifications as $cert)
-                            <div class="p-3.5 bg-slate-50 rounded-lg border border-slate-200">
-                                <div class="font-bold text-slate-900">{{ $cert->name }}</div>
-                                <div class="text-slate-600 text-xs mt-0.5">Lembaga: {{ $cert->issuer }} (Tahun {{ $cert->issue_year }})</div>
-                            </div>
-                        @empty
-                            <p class="text-slate-400 italic text-sm">Belum ada data sertifikasi diisi.</p>
-                        @endforelse
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- TAB 3: TAHAPAN SELEKSI & LOG -->
         <div x-show="activeTab === 'tahapan'" class="space-y-6">
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
@@ -547,18 +743,101 @@
             </div>
         </div>
 
-        <!-- REJECT MODAL WITH MANDATORY REASON -->
-        <div x-show="rejectModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm" @click="rejectModalOpen = false"></div>
-            <div class="relative bg-white rounded-2xl shadow-2xl border border-slate-200 p-6 max-w-lg w-full text-left">
-                <div class="flex items-center gap-3 pb-3 border-b border-slate-200 mb-4">
-                    <div class="w-10 h-10 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+        <!-- APPROVE CONFIRMATION MODAL (POPUP PERINGATAN LOLOS BIODATA) -->
+        <div x-show="approveModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4" @keydown.escape.window="approveModalOpen = false">
+            <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" @click="approveModalOpen = false"></div>
+            <div class="relative bg-white rounded-2xl shadow-2xl border border-slate-200 p-6 max-w-lg w-full text-left z-10">
+                <div class="flex items-start gap-3.5 pb-4 border-b border-slate-200">
+                    <div class="w-11 h-11 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
                     </div>
                     <div>
-                        <h3 class="text-base font-bold text-slate-900">Tolak Berkas Lamaran</h3>
-                        <p class="text-xs text-slate-500">Wajib memberikan rincian alasan penolakan berkas kepada pelamar</p>
+                        <h3 class="text-base font-bold text-slate-900">Konfirmasi Kelulusan Verifikasi Biodata</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">Pemeriksaan kelayakan data identitas, pendidikan, STR, dan riwayat pelamar.</p>
                     </div>
+                </div>
+
+                <!-- Candidate & Vacancy Summary -->
+                <div class="my-4 p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-xs space-y-1.5">
+                    <div class="flex justify-between">
+                        <span class="text-slate-500">Nama Pelamar:</span>
+                        <strong class="text-slate-900">{{ $user->name }}</strong>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-500">Formasi Dilamar:</span>
+                        <strong class="text-[#0179B5]">{{ $application->jobVacancy->title }}</strong>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-500">No. Registrasi / Lamaran:</span>
+                        <span class="font-mono text-slate-700 font-semibold">{{ $user->registration_number ?? '-' }} / {{ $application->application_number ?? '-' }}</span>
+                    </div>
+                </div>
+
+                <!-- Warning Notice -->
+                <div class="p-3 bg-emerald-50/80 border border-emerald-200 rounded-xl text-xs text-emerald-900 flex items-start gap-2 mb-4">
+                    <svg class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span>Setelah disetujui, pelamar akan dinyatakan <strong>Lolos Verifikasi Biodata & Portofolio</strong>. (Verifikasi berkas persyaratan diproses tersendiri pada tab Verifikasi Berkas Dokumen).</span>
+                </div>
+
+                <form method="POST" action="{{ route('admin.applications.verify', $application) }}" class="space-y-4">
+                    @csrf
+                    <input type="hidden" name="action" value="approve">
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">
+                            Catatan Verifikator Biodata (Opsional)
+                        </label>
+                        <textarea name="admin_note" rows="2" placeholder="Contoh: Kualifikasi pendidikan dan STR aktif sesuai formasi..."
+                                  class="w-full p-2.5 text-xs bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-emerald-500 focus:bg-white"></textarea>
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-200 flex items-center justify-end gap-2">
+                        <button type="button" @click="approveModalOpen = false" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition-colors cursor-pointer">
+                            Batal
+                        </button>
+                        <button type="submit" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow-sm transition-colors flex items-center gap-1.5 cursor-pointer">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            <span>Ya, Loloskan Biodata</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- REJECT CONFIRMATION MODAL (POPUP PERINGATAN TOLAK BIODATA) -->
+        <div x-show="rejectModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4" @keydown.escape.window="rejectModalOpen = false">
+            <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" @click="rejectModalOpen = false"></div>
+            <div class="relative bg-white rounded-2xl shadow-2xl border border-slate-200 p-6 max-w-lg w-full text-left z-10">
+                <div class="flex items-start gap-3.5 pb-4 border-b border-slate-200">
+                    <div class="w-11 h-11 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900">Peringatan: Konfirmasi Penolakan Biodata</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">Lamaran akan dinyatakan tidak memenuhi syarat pada verifikasi biodata/portofolio.</p>
+                    </div>
+                </div>
+
+                <!-- Candidate & Vacancy Summary -->
+                <div class="my-4 p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-xs space-y-1.5">
+                    <div class="flex justify-between">
+                        <span class="text-slate-500">Nama Pelamar:</span>
+                        <strong class="text-slate-900">{{ $user->name }}</strong>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-500">Formasi Dilamar:</span>
+                        <strong class="text-rose-600">{{ $application->jobVacancy->title }}</strong>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-500">No. Registrasi / Lamaran:</span>
+                        <span class="font-mono text-slate-700 font-semibold">{{ $user->registration_number ?? '-' }} / {{ $application->application_number ?? '-' }}</span>
+                    </div>
+                </div>
+
+                <!-- Warning Notice -->
+                <div class="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-900 flex items-start gap-2 mb-4">
+                    <svg class="w-4 h-4 text-rose-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    <span>Peringatan: Pelamar akan dinyatakan <strong>Tidak Lolos</strong> dan menerima email notifikasi resmi beserta rincian alasan penolakan di bawah.</span>
                 </div>
 
                 <form method="POST" action="{{ route('admin.applications.verify', $application) }}" class="space-y-4">
@@ -567,19 +846,19 @@
 
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">
-                            Alasan Penolakan Berkas <span class="text-rose-500">*</span>
+                            Alasan Penolakan Biodata <span class="text-rose-500">*</span>
                         </label>
-                        <textarea name="rejection_reason" rows="4" required placeholder="Tuliskan alasan penolakan secara jelas (contoh: STR telah habis masa berlaku / Ijazah belum terlegalisir asli)..."
-                                  class="w-full p-3 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:border-rose-500 focus:bg-white"></textarea>
-                        <p class="text-xs text-slate-400 mt-1">Alasan ini akan ditampilkan langsung di banner penolakan dashboard pelamar dan dikirim via email.</p>
+                        <textarea name="rejection_reason" rows="3" required placeholder="Tuliskan alasan penolakan secara jelas (contoh: Kualifikasi pendidikan tidak sesuai / STR kedaluwarsa)..."
+                                  class="w-full p-2.5 text-xs bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-rose-500 focus:bg-white"></textarea>
                     </div>
 
                     <div class="pt-3 border-t border-slate-200 flex items-center justify-end gap-2">
-                        <button type="button" @click="rejectModalOpen = false" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-lg cursor-pointer">
+                        <button type="button" @click="rejectModalOpen = false" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition-colors cursor-pointer">
                             Batal
                         </button>
-                        <button type="submit" class="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold rounded-lg shadow-sm cursor-pointer">
-                            Konfirmasi Tolak Berkas
+                        <button type="submit" class="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-lg shadow-sm transition-colors flex items-center gap-1.5 cursor-pointer">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            <span>Konfirmasi Tolak Biodata</span>
                         </button>
                     </div>
                 </form>
@@ -608,7 +887,7 @@
                         <select name="stage_id" required class="w-full h-11 px-3 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:border-[#0179B5]">
                             @foreach ($selectionStages as $stg)
                                 <option value="{{ $stg->id }}" {{ $application->current_stage_id === $stg->id ? 'selected' : '' }}>
-                                    Tahap {{ $stg->sequence_order }}: {{ $stg->stage_name }}
+                                    Tahap {{ $stg->sequence_order ?? $stg->sort_order }}: {{ $stg->stage_name }}
                                 </option>
                             @endforeach
                         </select>
