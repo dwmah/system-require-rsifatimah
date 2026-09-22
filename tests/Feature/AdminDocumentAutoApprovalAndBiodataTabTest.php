@@ -192,7 +192,7 @@ class AdminDocumentAutoApprovalAndBiodataTabTest extends TestCase
         $this->assertTrue($posBerkasTab < $posTahapanTab, 'Berkas tab should be before Tahapan tab');
 
         // Check activeTab default is profil/biodata
-        $this->assertStringContainsString("activeTab: 'profil'", $content);
+        $this->assertStringContainsString("activeTab: (new URLSearchParams(window.location.search).get('tab')) || 'profil'", $content);
 
         // Check Biodata verification panel is present
         $this->assertStringContainsString('Panel Verifikasi Kelayakan Biodata Pelamar', $content);
@@ -229,13 +229,13 @@ class AdminDocumentAutoApprovalAndBiodataTabTest extends TestCase
 
         $this->assertEquals(JobApplicationStatus::SUBMITTED, $this->application->status);
 
-        // 2. Admin verifies first document (KTP) as valid
+        // 2. Admin verifies first document (KTP) as valid (redirects back with tab=berkas and anchor to doc row)
         $response1 = $this->actingAs($this->admin)->post(route('admin.applications.documents.verify', $docKtp), [
             'verification_status' => 'valid',
             'verification_note' => 'KTP jelas dan terbaca.',
         ]);
 
-        $response1->assertRedirect(route('admin.applications.show', $this->application));
+        $response1->assertRedirect(route('admin.applications.show', ['application' => $this->application, 'tab' => 'berkas']) . '#doc-row-' . $docKtp->id);
         $docKtp->refresh();
         $this->assertEquals('valid', $docKtp->verification_status);
         $this->application->refresh();
@@ -248,7 +248,7 @@ class AdminDocumentAutoApprovalAndBiodataTabTest extends TestCase
             'verification_note' => 'Ijazah terlegalisir.',
         ]);
 
-        $response2->assertRedirect(route('admin.applications.show', $this->application));
+        $response2->assertRedirect(route('admin.applications.show', ['application' => $this->application, 'tab' => 'berkas']) . '#doc-row-' . $docIjazah->id);
         $docIjazah->refresh();
         $this->assertEquals('valid', $docIjazah->verification_status);
         $this->application->refresh();
@@ -310,13 +310,13 @@ class AdminDocumentAutoApprovalAndBiodataTabTest extends TestCase
             'verification_status' => 'pending',
         ]);
 
-        // Admin approves biodata from the biodata panel
+        // Admin approves biodata from the biodata panel (redirects back with tab=profil and #biodata-panel)
         $response = $this->actingAs($this->admin)->post(route('admin.applications.verify', $this->application), [
             'action' => 'approve',
             'admin_note' => 'Biodata sangat sesuai persyaratan.',
         ]);
 
-        $response->assertRedirect(route('admin.applications.show', $this->application));
+        $response->assertRedirect(route('admin.applications.show', ['application' => $this->application, 'tab' => 'profil']) . '#biodata-panel');
         $this->application->refresh();
 
         // Check Stage 1 history is PASSED
@@ -362,14 +362,14 @@ class AdminDocumentAutoApprovalAndBiodataTabTest extends TestCase
 
         $this->assertTrue($this->application->isPassedAdministration());
 
-        // 2. Admin updates the stage to 'in_progress'
+        // 2. Admin updates the stage to 'in_progress' (redirects back with tab=tahapan and #stage-item-)
         $response = $this->actingAs($this->admin)->post(route('admin.applications.update-stage', $this->application), [
             'stage_id' => $stage->id,
             'status' => 'in_progress',
             'stage_note' => 'Pemeriksaan ulang berkas dan biodata pelamar.',
         ]);
 
-        $response->assertRedirect(route('admin.applications.show', $this->application));
+        $response->assertRedirect(route('admin.applications.show', ['application' => $this->application, 'tab' => 'tahapan']) . '#stage-item-' . $stage->id);
         $this->application->refresh();
 
         // 3. Application returns to SUBMITTED status (so Tolak & Lolos buttons appear again in UI)
@@ -388,5 +388,24 @@ class AdminDocumentAutoApprovalAndBiodataTabTest extends TestCase
         $showResponse->assertSee('Tolak Biodata');
         $showResponse->assertSee('Lolos Verifikasi Biodata');
         $showResponse->assertSee('Menunggu Review');
+    }
+
+    public function test_application_detail_respects_tab_query_parameter(): void
+    {
+        // Request with tab=berkas
+        $resBerkas = $this->actingAs($this->admin)->get(route('admin.applications.show', [
+            'application' => $this->application,
+            'tab' => 'berkas',
+        ]));
+        $resBerkas->assertStatus(200);
+        $this->assertStringContainsString("|| 'berkas'", $resBerkas->getContent());
+
+        // Request with tab=tahapan
+        $resTahapan = $this->actingAs($this->admin)->get(route('admin.applications.show', [
+            'application' => $this->application,
+            'tab' => 'tahapan',
+        ]));
+        $resTahapan->assertStatus(200);
+        $this->assertStringContainsString("|| 'tahapan'", $resTahapan->getContent());
     }
 }

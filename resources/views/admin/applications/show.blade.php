@@ -1,5 +1,34 @@
 <x-layouts.admin title="Verifikasi: {{ $user->name }}">
-    <div class="space-y-6" x-data="{ rejectModalOpen: false, approveModalOpen: false, stageModalOpen: false, activeTab: 'profil' }">
+    <div class="space-y-6" x-data="{
+        rejectModalOpen: false,
+        approveModalOpen: false,
+        stageModalOpen: false,
+        activeTab: (new URLSearchParams(window.location.search).get('tab')) || '{{ request('tab', 'profil') }}',
+        setTab(tab) {
+            this.activeTab = tab;
+            const url = new URL(window.location);
+            url.searchParams.set('tab', tab);
+            window.history.replaceState({}, '', url);
+        },
+        scrollToTarget() {
+            if (window.location.hash) {
+                const el = document.querySelector(window.location.hash);
+                if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    el.classList.add('ring-2', 'ring-[#0179B5]', 'ring-offset-2', 'transition-all', 'duration-500');
+                    setTimeout(() => {
+                        el.classList.remove('ring-2', 'ring-[#0179B5]', 'ring-offset-2');
+                    }, 2500);
+                }
+            }
+        }
+    }"
+    x-init="
+        $nextTick(() => {
+            setTimeout(() => scrollToTarget(), 80);
+        });
+        window.addEventListener('hashchange', () => scrollToTarget());
+    ">
         <!-- Breadcrumb & Top Bar -->
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div class="flex items-center gap-2 text-sm text-slate-500">
@@ -83,21 +112,68 @@
             @endif
 
             <!-- Navigation Tabs (Urutan: Biodata -> Berkas -> Tahapan) -->
-            <div class="flex items-center gap-6 mt-6 border-b border-slate-200 text-sm font-semibold">
-                <button @click="activeTab = 'profil'" :class="activeTab === 'profil' ? 'border-[#0179B5] text-[#0179B5] border-b-2' : 'text-slate-500 hover:text-slate-800'" class="pb-3 px-1 transition-colors flex items-center gap-1.5 cursor-pointer">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                    <span>Biodata & Riwayat Pelamar</span>
-                </button>
+            <div class="mt-6 pt-5 border-t border-slate-200">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 p-1.5 bg-slate-100/80 border border-slate-200 rounded-2xl">
+                    <!-- Tab 1: Biodata & Riwayat Pelamar -->
+                    <button type="button" @click="setTab('profil')"
+                        :class="activeTab === 'profil'
+                            ? 'bg-[#0179B5] text-white shadow-md border-[#0179B5] ring-2 ring-[#0179B5]/20'
+                            : 'bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border-slate-200 hover:border-slate-300 shadow-2xs'"
+                        class="p-3 sm:p-3.5 rounded-xl border transition-all duration-150 flex items-center justify-between gap-3 text-left cursor-pointer group">
+                        <div class="flex items-center gap-3">
+                            <div :class="activeTab === 'profil' ? 'bg-white/20 text-white' : 'bg-[#0179B5]/10 text-[#0179B5] group-hover:bg-[#0179B5]/20'" class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                            </div>
+                            <div>
+                                <span class="block font-bold text-sm leading-tight">Biodata &amp; Riwayat Pelamar</span>
+                                <span :class="activeTab === 'profil' ? 'text-sky-100' : 'text-slate-500'" class="text-xs block mt-0.5">Identitas, STR &amp; Pengalaman</span>
+                            </div>
+                        </div>
+                        <span :class="activeTab === 'profil' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'" class="px-2 py-0.5 rounded-md text-[11px] font-bold shrink-0">
+                            Tab 1
+                        </span>
+                    </button>
 
-                <button @click="activeTab = 'berkas'" :class="activeTab === 'berkas' ? 'border-[#0179B5] text-[#0179B5] border-b-2' : 'text-slate-500 hover:text-slate-800'" class="pb-3 px-1 transition-colors flex items-center gap-1.5 cursor-pointer">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    <span>Verifikasi Berkas Dokumen ({{ $uploadedDocuments->count() }}/{{ $requirements->count() }})</span>
-                </button>
+                    <!-- Tab 2: Verifikasi Berkas Dokumen -->
+                    <button type="button" @click="setTab('berkas')"
+                        :class="activeTab === 'berkas'
+                            ? 'bg-[#0179B5] text-white shadow-md border-[#0179B5] ring-2 ring-[#0179B5]/20'
+                            : 'bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border-slate-200 hover:border-slate-300 shadow-2xs'"
+                        class="p-3 sm:p-3.5 rounded-xl border transition-all duration-150 flex items-center justify-between gap-3 text-left cursor-pointer group">
+                        <div class="flex items-center gap-3">
+                            <div :class="activeTab === 'berkas' ? 'bg-white/20 text-white' : 'bg-[#0179B5]/10 text-[#0179B5] group-hover:bg-[#0179B5]/20'" class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            </div>
+                            <div>
+                                <span class="block font-bold text-sm leading-tight">Verifikasi Berkas Dokumen ({{ $uploadedDocuments->count() }}/{{ $requirements->count() }})</span>
+                                <span :class="activeTab === 'berkas' ? 'text-sky-100' : 'text-slate-500'" class="text-xs block mt-0.5">Validasi Dokumen Syarat</span>
+                            </div>
+                        </div>
+                        <span :class="activeTab === 'berkas' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'" class="px-2 py-0.5 rounded-md text-[11px] font-bold shrink-0">
+                            Tab 2
+                        </span>
+                    </button>
 
-                <button @click="activeTab = 'tahapan'" :class="activeTab === 'tahapan' ? 'border-[#0179B5] text-[#0179B5] border-b-2' : 'text-slate-500 hover:text-slate-800'" class="pb-3 px-1 transition-colors flex items-center gap-1.5 cursor-pointer">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
-                    <span>Tahapan Seleksi & Timeline</span>
-                </button>
+                    <!-- Tab 3: Tahapan Seleksi & Timeline -->
+                    <button type="button" @click="setTab('tahapan')"
+                        :class="activeTab === 'tahapan'
+                            ? 'bg-[#0179B5] text-white shadow-md border-[#0179B5] ring-2 ring-[#0179B5]/20'
+                            : 'bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border-slate-200 hover:border-slate-300 shadow-2xs'"
+                        class="p-3 sm:p-3.5 rounded-xl border transition-all duration-150 flex items-center justify-between gap-3 text-left cursor-pointer group">
+                        <div class="flex items-center gap-3">
+                            <div :class="activeTab === 'tahapan' ? 'bg-white/20 text-white' : 'bg-[#0179B5]/10 text-[#0179B5] group-hover:bg-[#0179B5]/20'" class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                            </div>
+                            <div>
+                                <span class="block font-bold text-sm leading-tight">Tahapan Seleksi &amp; Timeline</span>
+                                <span :class="activeTab === 'tahapan' ? 'text-sky-100' : 'text-slate-500'" class="text-xs block mt-0.5">Jadwal &amp; Hasil Seleksi</span>
+                            </div>
+                        </div>
+                        <span :class="activeTab === 'tahapan' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'" class="px-2 py-0.5 rounded-md text-[11px] font-bold shrink-0">
+                            Tab 3
+                        </span>
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -120,7 +196,7 @@
             @endphp
 
             <!-- PANEL VERIFIKASI BIODATA -->
-            <div class="bg-white p-5 sm:p-6 rounded-xl border border-slate-200 shadow-sm space-y-5">
+            <div id="biodata-panel" class="scroll-mt-24 bg-white p-5 sm:p-6 rounded-xl border border-slate-200 shadow-sm space-y-5">
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-200">
                     <div>
                         <div class="flex items-center gap-2">
@@ -430,7 +506,7 @@
             </div>
 
             <!-- Documents Table -->
-            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div id="berkas-table" class="scroll-mt-24 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-sm">
                         <thead class="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
@@ -448,7 +524,7 @@
                                 @php
                                     $doc = $uploadedDocuments->get($req->id);
                                 @endphp
-                                <tr class="hover:bg-slate-50 transition-colors">
+                                <tr id="doc-row-{{ $doc ? $doc->id : ('req-'.$req->id) }}" class="hover:bg-slate-50 transition-colors scroll-mt-24">
                                     <td class="py-4 px-4 font-semibold text-slate-900">
                                         {{ $req->document_name }}
                                     </td>
@@ -686,7 +762,7 @@
 
         <!-- TAB 3: TAHAPAN SELEKSI & LOG -->
         <div x-show="activeTab === 'tahapan'" class="space-y-6">
-            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+            <div id="tahapan-timeline" class="scroll-mt-24 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                 <div class="flex items-center justify-between pb-4 border-b border-slate-200 mb-6">
                     <div>
                         <h2 class="text-base font-bold text-slate-900">Progres Tahapan Seleksi</h2>
@@ -706,7 +782,7 @@
                             $hist = $stageHistories->get($stg->id);
                             $histStatus = $hist ? ($hist->status instanceof \App\Enums\ApplicationStageStatus ? $hist->status->value : (string)$hist->status) : null;
                         @endphp
-                        <div class="p-4 rounded-xl border {{ $histStatus === 'passed' ? 'bg-emerald-50/50 border-emerald-200' : (in_array($histStatus, ['failed', 'rejected']) ? 'bg-rose-50/50 border-rose-200' : ($histStatus === 'in_progress' ? 'bg-blue-50/50 border-blue-200' : 'bg-slate-50 border-slate-200')) }} flex items-start justify-between gap-4">
+                        <div id="stage-item-{{ $stg->id }}" class="scroll-mt-24 p-4 rounded-xl border {{ $histStatus === 'passed' ? 'bg-emerald-50/50 border-emerald-200' : (in_array($histStatus, ['failed', 'rejected']) ? 'bg-rose-50/50 border-rose-200' : ($histStatus === 'in_progress' ? 'bg-blue-50/50 border-blue-200' : 'bg-slate-50 border-slate-200')) }} flex items-start justify-between gap-4">
                             <div class="flex items-start gap-3">
                                 <div class="w-8 h-8 rounded-full {{ $histStatus === 'passed' ? 'bg-emerald-600 text-white' : (in_array($histStatus, ['failed', 'rejected']) ? 'bg-rose-600 text-white' : ($histStatus === 'in_progress' ? 'bg-blue-600 text-white' : 'bg-slate-300 text-slate-700')) }} font-bold text-sm flex items-center justify-center flex-shrink-0">
                                     {{ $stg->sequence_order ?? $stg->sort_order }}

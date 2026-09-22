@@ -139,11 +139,11 @@ class AdminApplicationController extends Controller
 
         if ($request->action === 'approve') {
             $this->verificationService->approveBiodata($application, $admin, $request->admin_note);
-            return redirect()->route('admin.applications.show', $application)
+            return redirect()->to(route('admin.applications.show', ['application' => $application, 'tab' => 'profil']) . '#biodata-panel')
                 ->with('success', "Verifikasi Biodata atas nama {$application->user->name} berhasil DISETUJUI (Lolos Biodata & Portofolio).");
         } else {
             $this->verificationService->rejectBiodata($application, $admin, $request->rejection_reason);
-            return redirect()->route('admin.applications.show', $application)
+            return redirect()->to(route('admin.applications.show', ['application' => $application, 'tab' => 'profil']) . '#biodata-panel')
                 ->with('info', "Verifikasi Biodata atas nama {$application->user->name} telah DITOLAK dengan alasan: {$request->rejection_reason}.");
         }
     }
@@ -167,7 +167,7 @@ class AdminApplicationController extends Controller
 
         $document->jobApplication->refresh();
 
-        return redirect()->route('admin.applications.show', $document->jobApplication)
+        return redirect()->to(route('admin.applications.show', ['application' => $document->jobApplication, 'tab' => 'berkas']) . '#doc-row-' . $document->id)
             ->with('success', "Status dokumen '{$document->documentRequirement->document_name}' berhasil diperbarui ({$request->verification_status}).");
     }
 
@@ -185,7 +185,7 @@ class AdminApplicationController extends Controller
         $stage = VacancySelectionStage::findOrFail($request->stage_id);
 
         if ($stage->job_vacancy_id !== $application->job_vacancy_id) {
-            return redirect()->route('admin.applications.show', $application)
+            return redirect()->to(route('admin.applications.show', ['application' => $application, 'tab' => 'tahapan']) . '#tahapan-timeline')
                 ->with('error', 'Tahapan seleksi tidak valid untuk formasi ini.');
         }
 
@@ -196,7 +196,7 @@ class AdminApplicationController extends Controller
             $request->stage_note
         );
 
-        return redirect()->route('admin.applications.show', $application)
+        return redirect()->to(route('admin.applications.show', ['application' => $application, 'tab' => 'tahapan']) . '#stage-item-' . $stage->id)
             ->with('success', "Tahapan seleksi '{$stage->stage_name}' berhasil diperbarui.");
     }
 }
