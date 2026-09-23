@@ -327,4 +327,62 @@ class RecruitmentBusinessLogicTest extends TestCase
             ]
         );
     }
+
+    /**
+     * 8. Kelulusan tahap akhir mematuhi batas kuota formasi.
+     */
+    public function test_update_stage_to_final_passed_respects_quota_limit(): void
+    {
+        $period = RecruitmentPeriod::create([
+            'name' => 'Periode Kuota Test',
+            'code' => 'PER-Q1',
+            'registration_start_at' => now()->subDays(2),
+            'registration_end_at' => now()->addDays(10),
+            'status' => RecruitmentPeriodStatus::OPEN,
+        ]);
+
+        $vacancy = JobVacancy::create([
+            'recruitment_period_id' => $period->id,
+            'code' => 'VAC-Q1',
+            'title' => 'Staff IT',
+            'unit' => 'IT',
+            'employment_type' => 'PKWT',
+            'quota' => 1,
+            'location' => 'Banyuwangi',
+            'open_at' => now()->subDays(2),
+            'close_at' => now()->addDays(5),
+            'status' => JobVacancyStatus::OPEN,
+        ]);
+
+        $stageFinal = VacancySelectionStage::create([
+            'job_vacancy_id' => $vacancy->id,
+            'name' => 'Wawancara Akhir & Penetapan',
+            'sort_order' => 1,
+        ]);
+
+        $user1 = User::create([
+            'name' => 'Kandidat Pertama',
+            'email' => 'kandidat1@example.com',
+            'password' => bcrypt('password'),
+        ]);
+
+        $user2 = User::create([
+            'name' => 'Kandidat Kedua',
+            'email' => 'kandidat2@example.com',
+            'password' => bcrypt('password'),
+        ]);
+
+        $app1 = $this->applicationService->createApplication(user: $user1, vacancy: $vacancy);
+        $app2 = $this->applicationService->createApplication(user: $user2, vacancy: $vacancy);
+
+        $verificationService = app(\App\Services\Recruitment\ApplicationVerificationService::class);
+
+        // Kandidat 1 diloloskan pada tahapan akhir (diterima) -> sukses karena kuota 1
+        $verificationService->updateSelectionStage($app1, $stageFinal, 'passed', 'Lolos diterima');
+        $this->assertEquals(\App\Enums\JobApplicationStatus::ACCEPTED, $app1->fresh()->status);
+
+        // Kandidat 2 mencoba diloloskan pada tahapan akhir -> gagal validasi karena kuota 1 sudah penuh
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        $verificationService->updateSelectionStage($app2, $stageFinal, 'passed', 'Lolos diterima kedua');
+    }
 }

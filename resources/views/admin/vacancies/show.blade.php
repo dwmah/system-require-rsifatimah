@@ -39,12 +39,22 @@
                     </div>
                 </div>
 
-                <div class="flex items-center gap-4">
-                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-center min-w-[100px]">
+                @php
+                    $acceptedApplicantsCount = $vacancy->jobApplications->where('status', \App\Enums\JobApplicationStatus::ACCEPTED)->count();
+                    $isQuotaReached = $acceptedApplicantsCount >= $vacancy->quota;
+                @endphp
+                <div class="flex items-center gap-3">
+                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-center min-w-[90px]">
                         <span class="text-xs uppercase font-bold text-slate-400">Kuota</span>
                         <div class="text-2xl font-extrabold text-slate-900">{{ $vacancy->quota }}</div>
                     </div>
-                    <div class="p-3 bg-sky-50 border border-sky-100 rounded-xl text-center min-w-[100px]">
+                    <div class="p-3 {{ $isQuotaReached ? 'bg-emerald-50 border border-emerald-200 text-emerald-800' : 'bg-teal-50 border border-teal-200 text-teal-800' }} rounded-xl text-center min-w-[100px]">
+                        <span class="text-xs uppercase font-bold {{ $isQuotaReached ? 'text-emerald-700' : 'text-teal-700' }}">Diterima</span>
+                        <div class="text-2xl font-extrabold {{ $isQuotaReached ? 'text-emerald-800' : 'text-teal-900' }}">
+                            {{ $acceptedApplicantsCount }} <span class="text-xs font-semibold text-slate-400">/ {{ $vacancy->quota }}</span>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-sky-50 border border-sky-100 rounded-xl text-center min-w-[90px]">
                         <span class="text-xs uppercase font-bold text-sky-700">Pelamar</span>
                         <div class="text-2xl font-extrabold text-[#0179B5]">{{ $vacancy->jobApplications->count() }}</div>
                     </div>

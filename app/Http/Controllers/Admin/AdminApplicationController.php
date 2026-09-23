@@ -12,6 +12,7 @@ use App\Services\Recruitment\ApplicationVerificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class AdminApplicationController extends Controller
@@ -189,12 +190,18 @@ class AdminApplicationController extends Controller
                 ->with('error', 'Tahapan seleksi tidak valid untuk formasi ini.');
         }
 
-        $this->verificationService->updateSelectionStage(
-            $application,
-            $stage,
-            $request->status,
-            $request->stage_note
-        );
+        try {
+            $this->verificationService->updateSelectionStage(
+                $application,
+                $stage,
+                $request->status,
+                $request->stage_note
+            );
+        } catch (ValidationException $e) {
+            $errorMessage = $e->errors()['quota'][0] ?? $e->getMessage();
+            return redirect()->to(route('admin.applications.show', ['application' => $application, 'tab' => 'tahapan']) . '#tahapan-timeline')
+                ->with('error', $errorMessage);
+        }
 
         return redirect()->to(route('admin.applications.show', ['application' => $application, 'tab' => 'tahapan']) . '#stage-item-' . $stage->id)
             ->with('success', "Tahapan seleksi '{$stage->stage_name}' berhasil diperbarui.");

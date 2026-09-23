@@ -41,17 +41,20 @@
             </a>
         </div>
 
-        <!-- Filter Form -->
+        <!-- Filter Form (Auto-Filter on Change) -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-            <form method="GET" action="{{ route('admin.applications.index') }}" class="grid grid-cols-1 sm:grid-cols-4 gap-3">
-                <div>
+            <form method="GET" action="{{ route('admin.applications.index') }}" class="flex flex-col sm:flex-row gap-3 items-center">
+                <div class="flex-1 w-full relative">
+                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </span>
                     <input type="text" name="search" value="{{ request('search') }}"
-                           placeholder="Cari nama, email, No. Reg..."
-                           class="w-full h-11 px-3 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:border-[#0179B5] focus:bg-white">
+                           placeholder="Cari nama, email, No. Reg... (Tekan Enter)"
+                           class="w-full h-11 pl-10 pr-3 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:border-[#0179B5] focus:bg-white transition-colors">
                 </div>
 
-                <div>
-                    <select name="vacancy_id" class="w-full h-11 px-3 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:border-[#0179B5]">
+                <div class="w-full sm:w-64">
+                    <select name="vacancy_id" onchange="this.form.submit()" class="w-full h-11 px-3 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:border-[#0179B5] cursor-pointer">
                         <option value="">Semua Posisi Formasi</option>
                         @foreach ($vacancies as $vac)
                             <option value="{{ $vac->id }}" {{ request('vacancy_id') == $vac->id ? 'selected' : '' }}>
@@ -61,8 +64,8 @@
                     </select>
                 </div>
 
-                <div>
-                    <select name="status" class="w-full h-11 px-3 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:border-[#0179B5]">
+                <div class="w-full sm:w-56">
+                    <select name="status" onchange="this.form.submit()" class="w-full h-11 px-3 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:border-[#0179B5] cursor-pointer">
                         <option value="">Semua Status</option>
                         <option value="draft" {{ request('status') === 'draft' ? 'selected' : '' }}>Draft</option>
                         <option value="submitted" {{ request('status') === 'submitted' ? 'selected' : '' }}>Menunggu Verifikasi</option>
@@ -73,16 +76,12 @@
                     </select>
                 </div>
 
-                <div class="flex gap-2">
-                    <button type="submit" class="flex-1 h-11 bg-[#0179B5] hover:bg-[#016293] text-white text-sm font-semibold rounded-lg transition-colors cursor-pointer">
-                        Filter
-                    </button>
-                    @if(request()->hasAny(['search', 'vacancy_id', 'status']))
-                        <a href="{{ route('admin.applications.index') }}" class="h-11 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-lg flex items-center justify-center transition-colors">
-                            Reset
-                        </a>
-                    @endif
-                </div>
+                @if(request()->hasAny(['search', 'vacancy_id', 'status']))
+                    <a href="{{ route('admin.applications.index') }}" title="Reset Semua Filter" class="h-11 px-3.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold rounded-lg flex items-center justify-center gap-1.5 transition-colors shrink-0">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        <span>Reset</span>
+                    </a>
+                @endif
             </form>
         </div>
 

@@ -1,6 +1,6 @@
 @props(['active' => 'dashboard'])
 
-<aside class="w-64 bg-white border-r border-slate-200 flex-shrink-0 hidden md:flex flex-col justify-between py-6">
+<aside class="w-64 bg-white border-r border-slate-200 flex-shrink-0 hidden md:flex flex-col justify-between py-6 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto z-30">
     <div class="space-y-6">
         <!-- Section Menu Utama -->
         <div>

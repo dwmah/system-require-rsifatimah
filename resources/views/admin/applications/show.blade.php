@@ -762,6 +762,43 @@
 
         <!-- TAB 3: TAHAPAN SELEKSI & LOG -->
         <div x-show="activeTab === 'tahapan'" class="space-y-6">
+            @php
+                $vacQuota = $application->jobVacancy->quota;
+                $vacAcceptedCount = \App\Models\JobApplication::where('job_vacancy_id', $application->job_vacancy_id)
+                    ->where('status', \App\Enums\JobApplicationStatus::ACCEPTED)
+                    ->count();
+                $isVacQuotaFull = $vacAcceptedCount >= $vacQuota;
+                $isCurrentAppAccepted = $application->status === \App\Enums\JobApplicationStatus::ACCEPTED;
+            @endphp
+
+            <!-- Quota Status Banner -->
+            <div class="p-4 rounded-xl border {{ $isVacQuotaFull ? 'bg-amber-50/70 border-amber-200 text-amber-900' : 'bg-sky-50/70 border-sky-200 text-sky-950' }} flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-2xs">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl {{ $isVacQuotaFull ? 'bg-amber-100 text-amber-700' : 'bg-sky-100 text-[#0179B5]' }} flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-bold uppercase tracking-wider {{ $isVacQuotaFull ? 'text-amber-800' : 'text-[#0179B5]' }}">Kapasitas Kuota Formasi</span>
+                            @if($isVacQuotaFull)
+                                <span class="px-2 py-0.5 text-[10px] font-extrabold bg-amber-200 text-amber-900 rounded-md">KUOTA PENUH</span>
+                            @else
+                                <span class="px-2 py-0.5 text-[10px] font-extrabold bg-emerald-100 text-emerald-800 rounded-md">TERSEDIA</span>
+                            @endif
+                        </div>
+                        <p class="text-xs mt-0.5 {{ $isVacQuotaFull ? 'text-amber-800' : 'text-slate-600' }}">
+                            Kuota Dibutuhkan: <strong>{{ $vacQuota }} Orang</strong> &bull; Kandidat Diterima: <strong>{{ $vacAcceptedCount }} Orang</strong> &bull; Sisa Kuota: <strong>{{ max(0, $vacQuota - $vacAcceptedCount) }} Orang</strong>
+                        </p>
+                    </div>
+                </div>
+
+                @if($isVacQuotaFull && !$isCurrentAppAccepted)
+                    <div class="text-xs font-medium text-amber-800 bg-amber-100/80 px-3 py-1.5 rounded-lg border border-amber-300/60">
+                        ⚠️ Auto-Validation Aktif: Kelulusan akhir pelamar ini dicegah otomatis sampai kuota ditambah.
+                    </div>
+                @endif
+            </div>
+
             <div id="tahapan-timeline" class="scroll-mt-24 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                 <div class="flex items-center justify-between pb-4 border-b border-slate-200 mb-6">
                     <div>
@@ -952,6 +989,17 @@
                     <div>
                         <h3 class="text-base font-bold text-slate-900">Pembaruan Tahapan Seleksi</h3>
                         <p class="text-xs text-slate-500">Update hasil kelulusan tahapan pelamar</p>
+                    </div>
+                </div>
+
+                <div class="p-3 mb-4 rounded-lg bg-slate-50 border border-slate-200 text-xs flex items-center justify-between">
+                    <div>
+                        <span class="text-slate-500">Kuota Formasi:</span>
+                        <strong class="text-slate-800">{{ $vacQuota }} Orang</strong>
+                    </div>
+                    <div>
+                        <span class="text-slate-500">Telah Diterima:</span>
+                        <strong class="{{ $isVacQuotaFull ? 'text-amber-700' : 'text-emerald-700' }}">{{ $vacAcceptedCount }} Orang</strong>
                     </div>
                 </div>
 

@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Models\VacancySelectionStage;
 use App\Services\Notification\RecruitmentNotificationService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class ApplicationVerificationService
 {
@@ -387,6 +388,19 @@ class ApplicationVerificationService
                     $this->notificationService->notifyStageUpdate($application, $nextStage->stage_name, $note);
                 } else {
                     // Tahapan terakhir selesai -> Lolos Final / Diterima
+                    // Validasi Kuota Formasi
+                    $vacancy = $application->jobVacancy;
+                    $acceptedCount = JobApplication::where('job_vacancy_id', $vacancy->id)
+                        ->where('status', JobApplicationStatus::ACCEPTED)
+                        ->where('id', '!=', $application->id)
+                        ->count();
+
+                    if ($acceptedCount >= $vacancy->quota) {
+                        throw ValidationException::withMessages([
+                            'quota' => "Kuota kelulusan untuk formasi '{$vacancy->title}' telah terpenuhi (Kuota: {$vacancy->quota}, Sudah Diterima: {$acceptedCount}). Silakan tambah kuota formasi lowongan atau ubah status kelulusan kandidat lain terlebih dahulu.",
+                        ]);
+                    }
+
                     $application->update([
                         'status' => JobApplicationStatus::ACCEPTED,
                         'accepted_at' => now(),
