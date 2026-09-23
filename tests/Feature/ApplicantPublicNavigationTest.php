@@ -15,7 +15,9 @@ class ApplicantPublicNavigationTest extends TestCase
     use RefreshDatabase;
 
     protected User $applicant;
+
     protected RecruitmentPeriod $period;
+
     protected JobVacancy $vacancy;
 
     protected function setUp(): void
@@ -101,5 +103,15 @@ class ApplicantPublicNavigationTest extends TestCase
         $response->assertDontSee('Pelamar SDM Aktif');
         $response->assertSee('Pusat Informasi SDM');
         $response->assertSee('Masuk');
+    }
+
+    public function test_guest_sees_already_have_application_continue_link_on_vacancy_detail_page(): void
+    {
+        $response = $this->get(route('vacancies.show', $this->vacancy));
+
+        $response->assertStatus(200);
+        $response->assertSee('Sudah punya lamaran?');
+        $response->assertSee('Lanjutkan');
+        $response->assertDontSee('Sudah punya akun?');
     }
 }

@@ -268,7 +268,7 @@
 
                         <button type="button" @click="addDoc()" class="w-full py-3 border-2 border-dashed border-slate-300 hover:border-[#0179B5] text-slate-600 hover:text-[#0179B5] font-semibold text-sm rounded-xl transition-colors flex items-center justify-center gap-1.5">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                            <span>+ Tambah Opsi Dokumen Berkas</span>
+                            <span>Tambah Opsi Dokumen Berkas</span>
                         </button>
                     </div>
                 </div>

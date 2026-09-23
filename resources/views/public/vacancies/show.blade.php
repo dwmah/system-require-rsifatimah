@@ -323,7 +323,7 @@
                                     </svg>
                                 </a>
                                 <p class="text-[11px] text-center text-slate-500">
-                                    Sudah punya akun? <a href="{{ route('login', ['intended' => route('vacancies.show', $jobVacancy)]) }}" class="text-rsi-700 font-semibold hover:underline">Masuk untuk Melanjutkan</a>
+                                    Sudah punya lamaran? <a href="{{ route('login', ['intended' => route('vacancies.show', $jobVacancy)]) }}" class="text-rsi-700 font-semibold hover:underline">Lanjutkan</a>
                                 </p>
                             @else
                                 <button
