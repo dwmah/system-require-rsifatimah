@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Enums\JobApplicationStatus;
 use App\Http\Controllers\Controller;
 use App\Models\JobApplication;
+use App\Models\JobVacancy;
 use App\Models\User;
 use App\Services\Lifecycle\UserLifecycleService;
 use Illuminate\Http\RedirectResponse;
@@ -19,25 +20,64 @@ class AdminLifecycleController extends Controller
     }
 
     /**
-     * Tampilkan halaman pengelolaan siklus akun pengguna pasca-seleksi.
+     * Tampilkan halaman pengelolaan siklus akun pengguna pasca-seleksi dengan filter interaktif.
      */
-    public function index(): View
+    public function index(Request $request): View
     {
+        $vacancies = JobVacancy::latest()->get(['id', 'title']);
+
+        // Helper filter closure
+        $applyFilters = function ($query) use ($request) {
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->whereHas('user', function ($uq) use ($search) {
+                        $uq->where('name', 'like', "%{$search}%")
+                           ->orWhere('email', 'like', "%{$search}%")
+                           ->orWhere('phone', 'like', "%{$search}%")
+                           ->orWhere('registration_number', 'like', "%{$search}%");
+                    })->orWhere('application_number', 'like', "%{$search}%");
+                });
+            }
+
+            if ($request->filled('vacancy_id')) {
+                $query->where('job_vacancy_id', $request->vacancy_id);
+            }
+
+            if ($request->filled('status')) {
+                $query->where('status', $request->status);
+            }
+
+            if ($request->filled('account_status')) {
+                if ($request->account_status === 'active') {
+                    $query->whereHas('user', fn($uq) => $uq->where('is_active', true));
+                } elseif ($request->account_status === 'inactive') {
+                    $query->whereHas('user', fn($uq) => $uq->where('is_active', false));
+                }
+            }
+        };
+
         // 1. Pelamar Lolos / Calon Karyawan Baru (Arsip Data Kepegawaian)
-        $passedApplications = JobApplication::whereIn('status', [
+        $passedQuery = JobApplication::whereIn('status', [
             JobApplicationStatus::PASSED_ADMINISTRATION,
             JobApplicationStatus::IN_SELECTION,
             JobApplicationStatus::ACCEPTED,
         ])
-        ->with(['user.applicantProfile', 'jobVacancy', 'documents'])
-        ->latest('accepted_at')
-        ->paginate(10, ['*'], 'passed_page');
+        ->with(['user.applicantProfile', 'jobVacancy', 'documents']);
+
+        $applyFilters($passedQuery);
+        $passedApplications = $passedQuery->latest('accepted_at')
+            ->paginate(10, ['*'], 'passed_page')
+            ->withQueryString();
 
         // 2. Pelamar Tidak Lolos (Antrean Pembersihan Data)
-        $rejectedApplications = JobApplication::where('status', JobApplicationStatus::REJECTED)
-            ->with(['user.applicantProfile', 'jobVacancy', 'documents'])
-            ->latest('rejected_at')
-            ->paginate(10, ['*'], 'rejected_page');
+        $rejectedQuery = JobApplication::where('status', JobApplicationStatus::REJECTED)
+            ->with(['user.applicantProfile', 'jobVacancy', 'documents']);
+
+        $applyFilters($rejectedQuery);
+        $rejectedApplications = $rejectedQuery->latest('rejected_at')
+            ->paginate(10, ['*'], 'rejected_page')
+            ->withQueryString();
 
         $seenCount = JobApplication::where('status', JobApplicationStatus::REJECTED)
             ->whereNotNull('announcement_seen_at')
@@ -47,6 +87,7 @@ class AdminLifecycleController extends Controller
             'passedApplications' => $passedApplications,
             'rejectedApplications' => $rejectedApplications,
             'seenCount' => $seenCount,
+            'vacancies' => $vacancies,
         ]);
     }
 
