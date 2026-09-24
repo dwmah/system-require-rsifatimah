@@ -126,7 +126,7 @@
                             </div>
                             <div>
                                 <span class="block font-bold text-sm leading-tight">Biodata &amp; Riwayat Pelamar</span>
-                                <span :class="activeTab === 'profil' ? 'text-sky-100' : 'text-slate-500'" class="text-xs block mt-0.5">Identitas, STR &amp; Pengalaman</span>
+                                <span :class="activeTab === 'profil' ? 'text-sky-100' : 'text-slate-500'" class="text-xs block mt-0.5">Identitas &amp; Pendidikan</span>
                             </div>
                         </div>
                         <span :class="activeTab === 'profil' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'" class="px-2 py-0.5 rounded-md text-[11px] font-bold shrink-0">
@@ -181,10 +181,8 @@
         <div x-show="activeTab === 'profil'" class="space-y-6">
             @php
                 $latestEdu = $educations->first();
-                $firstLic = $licenses->first();
                 $isNikValid = strlen(preg_replace('/[^0-9]/', '', $profile->nik ?? '')) === 16;
                 $applicantAge = $profile && $profile->birth_date ? \Carbon\Carbon::parse($profile->birth_date)->age : null;
-                $isStrActive = $firstLic && (!$firstLic->expires_at || \Carbon\Carbon::parse($firstLic->expires_at)->isFuture());
 
                 $genderRaw = strtolower(trim((string)($profile->gender ?? '')));
                 $genderLabel = match(true) {
@@ -205,7 +203,7 @@
                             </span>
                             <h2 class="text-base font-bold text-slate-900">Panel Verifikasi Kelayakan Biodata Pelamar</h2>
                         </div>
-                        <p class="text-xs text-slate-500 mt-1">Pemeriksaan instan kesesuaian data identitas, jenjang pendidikan, lisensi profesi, dan pengalaman kerja pelamar</p>
+                        <p class="text-xs text-slate-500 mt-1">Pemeriksaan instan kesesuaian data identitas dan jenjang pendidikan pelamar</p>
                     </div>
 
                     <div class="flex items-center gap-3 flex-wrap sm:flex-nowrap">
@@ -249,8 +247,8 @@
                     </div>
                 </div>
 
-                <!-- 4 Key Checklist Cards -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- 2 Key Checklist Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <!-- 1. Identitas & NIK -->
                     <div class="p-4 rounded-xl border {{ $isNikValid ? 'bg-emerald-50/40 border-emerald-200' : 'bg-amber-50/40 border-amber-200' }} space-y-2">
                         <div class="flex items-center justify-between">
@@ -286,52 +284,6 @@
                                 @else
                                     -
                                 @endif
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 3. STR / Lisensi Medis -->
-                    <div class="p-4 rounded-xl border {{ $firstLic ? ($isStrActive ? 'bg-emerald-50/40 border-emerald-200' : 'bg-rose-50/40 border-rose-200') : 'bg-slate-50 border-slate-200' }} space-y-2">
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold text-slate-600 uppercase tracking-wider">STR / Lisensi</span>
-                            @if($firstLic)
-                                <span class="px-2 py-0.5 text-[11px] font-bold rounded {{ $isStrActive ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800' }}">
-                                    {{ $isStrActive ? '✓ STR Aktif' : '✕ Kedaluwarsa' }}
-                                </span>
-                            @else
-                                <span class="px-2 py-0.5 text-[11px] font-semibold bg-slate-100 text-slate-600 rounded">
-                                    Tanpa STR
-                                </span>
-                            @endif
-                        </div>
-                        <div>
-                            <div class="text-sm font-bold text-slate-900 truncate">
-                                {{ $firstLic ? $firstLic->license_type : 'Tidak dilampirkan' }}
-                            </div>
-                            <div class="text-xs text-slate-500 mt-0.5 font-mono truncate">
-                                @if($firstLic)
-                                    No: {{ $firstLic->license_number }}
-                                @else
-                                    -
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 4. Pengalaman & Sertifikat -->
-                    <div class="p-4 rounded-xl border {{ ($workExperiences->count() + $certifications->count()) > 0 ? 'bg-emerald-50/40 border-emerald-200' : 'bg-slate-50 border-slate-200' }} space-y-2">
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold text-slate-600 uppercase tracking-wider">Portofolio</span>
-                            <span class="px-2 py-0.5 text-[11px] font-bold rounded {{ $workExperiences->count() > 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600' }}">
-                                {{ $workExperiences->count() > 0 ? $workExperiences->count() . ' Pengalaman' : 'Fresh Graduate' }}
-                            </span>
-                        </div>
-                        <div>
-                            <div class="text-sm font-bold text-slate-900">
-                                {{ $certifications->count() }} Sertifikasi
-                            </div>
-                            <div class="text-xs text-slate-500 mt-0.5">
-                                {{ $workExperiences->count() > 0 ? 'Memiliki riwayat kerja relevan' : 'Siap penempatan pemula' }}
                             </div>
                         </div>
                     </div>
@@ -390,100 +342,22 @@
                 </div>
             </div>
 
-            <!-- Riwayat Pendidikan & STR / Lisensi -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Pendidikan -->
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                    <h2 class="text-sm font-bold uppercase tracking-wider text-[#0179B5] flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"></path></svg>
-                        <span>Riwayat Pendidikan</span>
-                    </h2>
-                    <div class="space-y-3 text-sm">
-                        @forelse ($educations as $edu)
-                            <div class="p-3.5 bg-slate-50 rounded-lg border border-slate-200">
-                                <div class="font-bold text-slate-900">{{ $edu->institution_name }}</div>
-                                <div class="text-slate-700 mt-0.5 text-xs">{{ $edu->education_level ?? $edu->degree_level }} {{ $edu->study_program ?? $edu->major }} (Lulus {{ $edu->graduation_year }})</div>
-                                <div class="text-slate-500 text-xs mt-1">IPK / Nilai: <strong>{{ $edu->gpa ?? '-' }}</strong> @if($edu->accreditation) &bull; Akreditasi: <strong>{{ $edu->accreditation }}</strong> @endif</div>
-                            </div>
-                        @empty
-                            <p class="text-slate-400 italic text-sm">Belum ada riwayat pendidikan diisi.</p>
-                        @endforelse
-                    </div>
-                </div>
-
-                <!-- Lisensi / STR -->
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                    <h2 class="text-sm font-bold uppercase tracking-wider text-[#0179B5] flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                        <span>Surat Tanda Registrasi (STR) / Lisensi</span>
-                    </h2>
-                    <div class="space-y-3 text-sm">
-                        @forelse ($licenses as $lic)
-                            <div class="p-3.5 bg-slate-50 rounded-lg border border-slate-200">
-                                <div class="flex items-center justify-between">
-                                    <div class="font-bold text-slate-900">{{ $lic->license_type }}</div>
-                                    @php
-                                        $licExpires = $lic->expires_at ?? $lic->valid_until;
-                                        $licActive = !$licExpires || \Carbon\Carbon::parse($licExpires)->isFuture();
-                                    @endphp
-                                    <span class="px-2 py-0.5 text-[10px] font-bold rounded {{ $licActive ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800' }}">
-                                        {{ $licActive ? 'Aktif' : 'Kedaluwarsa' }}
-                                    </span>
-                                </div>
-                                <div class="text-slate-700 font-mono text-xs mt-0.5">No: {{ $lic->license_number }}</div>
-                                <div class="text-slate-500 text-xs mt-1">Berlaku s/d: <strong>{{ $licExpires ? \Carbon\Carbon::parse($licExpires)->format('d M Y') : 'Seumur Hidup' }}</strong></div>
-                            </div>
-                        @empty
-                            <p class="text-slate-400 italic text-sm">Belum ada lisensi/STR dicatat.</p>
-                        @endforelse
-                    </div>
-                </div>
-            </div>
-
-            <!-- Pengalaman Kerja & Sertifikasi -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Pengalaman Kerja -->
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                    <h2 class="text-sm font-bold uppercase tracking-wider text-[#0179B5] flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                        <span>Pengalaman Kerja</span>
-                    </h2>
-                    <div class="space-y-3 text-sm">
-                        @forelse ($workExperiences as $exp)
-                            <div class="p-3.5 bg-slate-50 rounded-lg border border-slate-200">
-                                <div class="font-bold text-slate-900">{{ $exp->position }} &bull; {{ $exp->company_name }}</div>
-                                <div class="text-xs text-slate-500 mt-0.5">
-                                    {{ $exp->start_date ? \Carbon\Carbon::parse($exp->start_date)->format('M Y') : '-' }} - {{ ($exp->is_current ?? false) ? 'Sekarang' : ($exp->end_date ? \Carbon\Carbon::parse($exp->end_date)->format('M Y') : '-') }}
-                                </div>
-                                @if($exp->description ?? $exp->job_description)
-                                    <p class="text-slate-700 mt-1.5 text-xs">{{ $exp->description ?? $exp->job_description }}</p>
-                                @endif
-                            </div>
-                        @empty
-                            <p class="text-slate-400 italic text-sm">Belum ada pengalaman kerja diisi.</p>
-                        @endforelse
-                    </div>
-                </div>
-
-                <!-- Sertifikasi & Pelatihan -->
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                    <h2 class="text-sm font-bold uppercase tracking-wider text-[#0179B5] flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg>
-                        <span>Sertifikasi & Pelatihan Medis</span>
-                    </h2>
-                    <div class="space-y-3 text-sm">
-                        @forelse ($certifications as $cert)
-                            <div class="p-3.5 bg-slate-50 rounded-lg border border-slate-200">
-                                <div class="font-bold text-slate-900">{{ $cert->name }}</div>
-                                <div class="text-slate-600 text-xs mt-0.5">Lembaga: {{ $cert->issuer ?? '-' }} @if($cert->issued_at) (Tahun {{ \Carbon\Carbon::parse($cert->issued_at)->format('Y') }}) @elseif($cert->issue_year) (Tahun {{ $cert->issue_year }}) @endif</div>
-                                @if($cert->certificate_number)
-                                    <div class="text-slate-400 font-mono text-[11px] mt-0.5">No: {{ $cert->certificate_number }}</div>
-                                @endif
-                            </div>
-                        @empty
-                            <p class="text-slate-400 italic text-sm">Belum ada data sertifikasi diisi.</p>
-                        @endforelse
-                    </div>
+            <!-- Riwayat Pendidikan -->
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                <h2 class="text-sm font-bold uppercase tracking-wider text-[#0179B5] flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"></path></svg>
+                    <span>Riwayat Pendidikan</span>
+                </h2>
+                <div class="space-y-3 text-sm">
+                    @forelse ($educations as $edu)
+                        <div class="p-3.5 bg-slate-50 rounded-lg border border-slate-200">
+                            <div class="font-bold text-slate-900">{{ $edu->institution_name }}</div>
+                            <div class="text-slate-700 mt-0.5 text-xs">{{ $edu->education_level ?? $edu->degree_level }} {{ $edu->study_program ?? $edu->major }} (Lulus {{ $edu->graduation_year }})</div>
+                            <div class="text-slate-500 text-xs mt-1">IPK / Nilai: <strong>{{ $edu->gpa ?? '-' }}</strong> @if($edu->accreditation) &bull; Akreditasi: <strong>{{ $edu->accreditation }}</strong> @endif</div>
+                        </div>
+                    @empty
+                        <p class="text-slate-400 italic text-sm">Belum ada riwayat pendidikan diisi.</p>
+                    @endforelse
                 </div>
             </div>
         </div>
