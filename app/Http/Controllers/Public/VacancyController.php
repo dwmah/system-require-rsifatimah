@@ -19,7 +19,7 @@ class VacancyController extends Controller
 
         // 1. Server-side Search: title, unit, code
         if ($request->filled('q')) {
-            $searchTerm = '%' . trim($request->input('q')) . '%';
+            $searchTerm = '%'.trim($request->input('q')).'%';
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('title', 'like', $searchTerm)
                     ->orWhere('unit', 'like', $searchTerm)
@@ -39,7 +39,7 @@ class VacancyController extends Controller
 
         // 4. Filter Kualifikasi Pendidikan Formal
         if ($request->filled('education')) {
-            $eduTerm = '%' . trim($request->input('education')) . '%';
+            $eduTerm = '%'.trim($request->input('education')).'%';
             $query->whereHas('qualifications', function ($q) use ($eduTerm) {
                 $q->whereIn('label', ['Pendidikan', 'Pendidikan Formal', VacancyQualification::LABEL_EDUCATION])
                     ->where('value', 'like', $eduTerm);

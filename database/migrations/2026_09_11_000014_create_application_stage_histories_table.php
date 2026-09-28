@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('application_stage_histories', function (Blueprint $table) {
             $table->id();
             $table->foreignId('job_application_id')->constrained('job_applications')->cascadeOnDelete();
-            
+
             // Invariant: vacancy_selection_stage_id harus milik job_vacancy yang dilamar oleh job_application
             $table->foreignId('vacancy_selection_stage_id')->constrained('vacancy_selection_stages')->restrictOnDelete();
-            
+
             $table->string('status')->default('pending');
             $table->dateTime('started_at')->nullable();
             $table->dateTime('decided_at')->nullable();

@@ -15,7 +15,7 @@ class EnsureUserIsApplicant
     {
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
             return redirect()->route('login');
         }
 
@@ -23,7 +23,7 @@ class EnsureUserIsApplicant
             return redirect()->route('admin.dashboard');
         }
 
-        if (!$user->is_active) {
+        if (! $user->is_active) {
             auth()->logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();

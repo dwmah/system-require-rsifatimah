@@ -16,10 +16,15 @@ use App\Http\Controllers\Portal\ApplicantEducationController;
 use App\Http\Controllers\Portal\ApplicantLicenseController;
 use App\Http\Controllers\Portal\ApplicantNotificationController;
 use App\Http\Controllers\Portal\ApplicantWorkExperienceController;
+use App\Http\Controllers\Portal\ApplicationController;
+use App\Http\Controllers\Portal\ApplicationDocumentController;
+use App\Http\Controllers\Portal\ApplicationSubmissionController;
+use App\Http\Controllers\Portal\ApplicationTrackingController;
 use App\Http\Controllers\Portal\PortalHomeController;
 use App\Http\Controllers\Portal\ProfileController;
 use App\Http\Controllers\Public\GuideController;
 use App\Http\Controllers\Public\VacancyController;
+use App\Models\JobApplication;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -72,69 +77,42 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/portal', [PortalHomeController::class, 'index'])->name('portal.home');
 
-    // Profil Pelamar
-    Route::get('/portal/profil', [\App\Http\Controllers\Portal\ProfileController::class, 'show'])->name('profile.show');
-    Route::post('/portal/profil/foto', [\App\Http\Controllers\Portal\ProfileController::class, 'updatePhoto'])->name('profile.photo.update');
-    Route::delete('/portal/profil/foto', [\App\Http\Controllers\Portal\ProfileController::class, 'destroyPhoto'])->name('profile.photo.destroy');
-    Route::patch('/portal/profil/data-pribadi', [\App\Http\Controllers\Portal\ProfileController::class, 'updatePersonal'])->name('profile.personal.update');
-    Route::patch('/portal/profil/alamat-kontak', [\App\Http\Controllers\Portal\ProfileController::class, 'updateContact'])->name('profile.contact.update');
-
-    // Riwayat Pendidikan
-    Route::post('/portal/profil/pendidikan', [\App\Http\Controllers\Portal\ApplicantEducationController::class, 'store'])->name('profile.educations.store');
-    Route::patch('/portal/profil/pendidikan/{education}', [\App\Http\Controllers\Portal\ApplicantEducationController::class, 'update'])->name('profile.educations.update');
-    Route::delete('/portal/profil/pendidikan/{education}', [\App\Http\Controllers\Portal\ApplicantEducationController::class, 'destroy'])->name('profile.educations.destroy');
-
-    // Lisensi / STR
-    Route::post('/portal/profil/lisensi', [\App\Http\Controllers\Portal\ApplicantLicenseController::class, 'store'])->name('profile.licenses.store');
-    Route::patch('/portal/profil/lisensi/{license}', [\App\Http\Controllers\Portal\ApplicantLicenseController::class, 'update'])->name('profile.licenses.update');
-    Route::delete('/portal/profil/lisensi/{license}', [\App\Http\Controllers\Portal\ApplicantLicenseController::class, 'destroy'])->name('profile.licenses.destroy');
-
-    // Sertifikasi
-    Route::post('/portal/profil/sertifikasi', [\App\Http\Controllers\Portal\ApplicantCertificationController::class, 'store'])->name('profile.certifications.store');
-    Route::patch('/portal/profil/sertifikasi/{certification}', [\App\Http\Controllers\Portal\ApplicantCertificationController::class, 'update'])->name('profile.certifications.update');
-    Route::delete('/portal/profil/sertifikasi/{certification}', [\App\Http\Controllers\Portal\ApplicantCertificationController::class, 'destroy'])->name('profile.certifications.destroy');
-
-    // Pengalaman Kerja
-    Route::post('/portal/profil/pengalaman', [\App\Http\Controllers\Portal\ApplicantWorkExperienceController::class, 'store'])->name('profile.work-experiences.store');
-    Route::patch('/portal/profil/pengalaman/{workExperience}', [\App\Http\Controllers\Portal\ApplicantWorkExperienceController::class, 'update'])->name('profile.work-experiences.update');
-    Route::delete('/portal/profil/pengalaman/{workExperience}', [\App\Http\Controllers\Portal\ApplicantWorkExperienceController::class, 'destroy'])->name('profile.work-experiences.destroy');
-
     // Alur Lamaran Pekerjaan (Fase 8A & 8B)
-    Route::get('/portal/lamaran', [\App\Http\Controllers\Portal\ApplicationController::class, 'index'])->name('portal.applications.index');
-    Route::get('/portal/lamaran/mulai/{jobVacancy}', [\App\Http\Controllers\Portal\ApplicationController::class, 'start'])->name('portal.applications.start');
-    Route::post('/portal/lamaran/mulai/{jobVacancy?}', [\App\Http\Controllers\Portal\ApplicationController::class, 'store'])->name('portal.applications.store');
-    Route::get('/portal/lamaran/{jobApplication}', [\App\Http\Controllers\Portal\ApplicationController::class, 'show'])
+    Route::get('/portal/lamaran', [ApplicationController::class, 'index'])->name('portal.applications.index');
+    Route::get('/portal/lamaran/mulai/{jobVacancy}', [ApplicationController::class, 'start'])->name('portal.applications.start');
+    Route::post('/portal/lamaran/mulai/{jobVacancy?}', [ApplicationController::class, 'store'])->name('portal.applications.store');
+    Route::get('/portal/lamaran/{jobApplication}', [ApplicationController::class, 'show'])
         ->whereNumber('jobApplication')
         ->name('portal.applications.show');
-    Route::match(['delete', 'post'], '/portal/lamaran/{jobApplication}/batal', [\App\Http\Controllers\Portal\ApplicationController::class, 'cancelDraft'])
+    Route::match(['delete', 'post'], '/portal/lamaran/{jobApplication}/batal', [ApplicationController::class, 'cancelDraft'])
         ->whereNumber('jobApplication')
         ->name('portal.applications.cancel-draft');
 
     // Berkas Persyaratan & Final Submit (Fase 8B)
-    Route::get('/portal/lamaran/{jobApplication}/berkas', [\App\Http\Controllers\Portal\ApplicationDocumentController::class, 'index'])
+    Route::get('/portal/lamaran/{jobApplication}/berkas', [ApplicationDocumentController::class, 'index'])
         ->whereNumber('jobApplication')
         ->name('portal.applications.documents.index');
-    Route::post('/portal/lamaran/{jobApplication}/berkas/{requirement?}', [\App\Http\Controllers\Portal\ApplicationDocumentController::class, 'store'])
+    Route::post('/portal/lamaran/{jobApplication}/berkas/{requirement?}', [ApplicationDocumentController::class, 'store'])
         ->whereNumber('jobApplication')
         ->name('portal.applications.documents.store');
-    Route::delete('/portal/lamaran/{jobApplication}/berkas/{document}', [\App\Http\Controllers\Portal\ApplicationDocumentController::class, 'destroy'])
+    Route::delete('/portal/lamaran/{jobApplication}/berkas/{document}', [ApplicationDocumentController::class, 'destroy'])
         ->whereNumber('jobApplication')
         ->whereNumber('document')
         ->name('portal.applications.documents.destroy');
-    Route::get('/portal/lamaran/{jobApplication}/berkas/{document}/download', [\App\Http\Controllers\Portal\ApplicationDocumentController::class, 'download'])
+    Route::get('/portal/lamaran/{jobApplication}/berkas/{document}/download', [ApplicationDocumentController::class, 'download'])
         ->whereNumber('jobApplication')
         ->whereNumber('document')
         ->name('portal.applications.documents.download');
 
-    Route::get('/portal/lamaran/{jobApplication}/review', [\App\Http\Controllers\Portal\ApplicationSubmissionController::class, 'review'])
+    Route::get('/portal/lamaran/{jobApplication}/review', [ApplicationSubmissionController::class, 'review'])
         ->whereNumber('jobApplication')
         ->name('portal.applications.review');
-    Route::post('/portal/lamaran/{jobApplication}/submit', [\App\Http\Controllers\Portal\ApplicationSubmissionController::class, 'submit'])
+    Route::post('/portal/lamaran/{jobApplication}/submit', [ApplicationSubmissionController::class, 'submit'])
         ->whereNumber('jobApplication')
         ->name('portal.applications.submit');
 
     // Tracking Proses Seleksi Pelamar (Fase 9)
-    Route::get('/portal/lamaran/{jobApplication}/tracking', [\App\Http\Controllers\Portal\ApplicationTrackingController::class, 'show'])
+    Route::get('/portal/lamaran/{jobApplication}/tracking', [ApplicationTrackingController::class, 'show'])
         ->whereNumber('jobApplication')
         ->name('portal.applications.tracking');
 });
@@ -221,11 +199,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Manajemen Seluruh Lamaran & Verifikasi Berkas
     Route::get('/applications', [AdminApplicationController::class, 'index'])->name('applications.index');
     Route::get('/applications/{application}', [AdminApplicationController::class, 'show'])->name('applications.show');
+    Route::get('/applications/{application}/documents/download-all', [AdminApplicationController::class, 'downloadAllDocuments'])->name('applications.documents.download-all');
     Route::post('/applications/{application}/verify', [AdminApplicationController::class, 'verify'])->name('applications.verify');
-    Route::get('/applications/{application}/verify', fn (\App\Models\JobApplication $application) => redirect()->route('admin.applications.show', $application));
+    Route::get('/applications/{application}/verify', fn (JobApplication $application) => redirect()->route('admin.applications.show', $application));
     Route::post('/applications/documents/{document}/verify', [AdminApplicationController::class, 'verifyDocument'])->name('applications.documents.verify');
     Route::post('/applications/{application}/update-stage', [AdminApplicationController::class, 'updateStage'])->name('applications.update-stage');
-    Route::get('/applications/{application}/update-stage', fn (\App\Models\JobApplication $application) => redirect()->route('admin.applications.show', $application));
+    Route::get('/applications/{application}/update-stage', fn (JobApplication $application) => redirect()->route('admin.applications.show', $application));
 
     // Manajemen Timeline & Kalender Seleksi
     Route::get('/timelines', [AdminTimelineController::class, 'index'])->name('timelines.index');
@@ -234,6 +213,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // Manajemen Siklus Akun (User Lifecycle)
     Route::get('/lifecycle', [AdminLifecycleController::class, 'index'])->name('lifecycle.index');
+    Route::get('/lifecycle/export-accepted-biodata', [AdminLifecycleController::class, 'exportAcceptedBiodata'])->name('lifecycle.export-accepted-biodata');
     Route::post('/lifecycle/{user}/deactivate', [AdminLifecycleController::class, 'deactivate'])->name('lifecycle.deactivate');
     Route::post('/lifecycle/{user}/reactivate', [AdminLifecycleController::class, 'reactivate'])->name('lifecycle.reactivate');
     Route::delete('/lifecycle/{user}/cleanup', [AdminLifecycleController::class, 'cleanup'])->name('lifecycle.cleanup');

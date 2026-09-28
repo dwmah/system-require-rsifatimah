@@ -55,11 +55,11 @@ class JobApplicationService
         }
 
         if (! $this->completenessService->isComplete($user)) {
-            throw new IncompleteProfileException();
+            throw new IncompleteProfileException;
         }
 
         if (! $vacancy->isCurrentlyOpen()) {
-            throw new InactiveVacancyException();
+            throw new InactiveVacancyException;
         }
 
         $this->validatePeriodMatch($vacancy->recruitment_period_id, $vacancy);
@@ -71,7 +71,7 @@ class JobApplicationService
                 ->first();
 
             if ($existing) {
-                throw new DuplicateApplicationException();
+                throw new DuplicateApplicationException;
             }
 
             try {
@@ -104,6 +104,7 @@ class JobApplicationService
             }
         });
     }
+
     /**
      * Memvalidasi invariant:
      * recruitment_period_id pada JobApplication HARUS sama dengan

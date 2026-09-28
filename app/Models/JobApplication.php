@@ -151,7 +151,7 @@ class JobApplication extends Model
 
     public function isLocked(): bool
     {
-        return !is_null($this->locked_at) || !$this->isDraft();
+        return ! is_null($this->locked_at) || ! $this->isDraft();
     }
 
     /**

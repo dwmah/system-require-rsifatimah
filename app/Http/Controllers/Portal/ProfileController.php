@@ -11,6 +11,7 @@ use App\Services\Profile\ProfileCompletenessService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
@@ -122,7 +123,7 @@ class ProfileController extends Controller
 
         DB::transaction(function () use ($user, $validated, $sameAsKtp, $addressDomicile) {
             $user->update([
-                'name'  => $validated['name'],
+                'name' => $validated['name'],
                 'email' => $validated['email'],
                 'phone' => $validated['phone'],
             ]);
@@ -130,11 +131,11 @@ class ProfileController extends Controller
             $user->applicantProfile()->updateOrCreate(
                 ['user_id' => $user->id],
                 [
-                    'birth_place'      => $validated['birth_place'],
-                    'birth_date'       => $validated['birth_date'],
-                    'gender'           => $validated['gender'],
-                    'address_ktp'      => $validated['address_ktp'],
-                    'same_as_ktp'      => $sameAsKtp,
+                    'birth_place' => $validated['birth_place'],
+                    'birth_date' => $validated['birth_date'],
+                    'gender' => $validated['gender'],
+                    'address_ktp' => $validated['address_ktp'],
+                    'same_as_ktp' => $sameAsKtp,
                     'address_domicile' => $addressDomicile,
                 ]
             );
@@ -186,7 +187,7 @@ class ProfileController extends Controller
 
             return redirect()->route('profile.show')->with('success', 'Pas foto profil berhasil diperbarui.');
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('Profile photo upload error: ' . $e->getMessage());
+            Log::error('Profile photo upload error: '.$e->getMessage());
 
             return redirect()->route('profile.show')->withErrors(['photo' => 'Terjadi kendala saat menyimpan foto. Silakan coba lagi.']);
         }

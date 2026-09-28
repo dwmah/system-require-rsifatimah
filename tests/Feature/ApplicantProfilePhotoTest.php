@@ -19,7 +19,7 @@ class ApplicantProfilePhotoTest extends TestCase
         $seq = $sequence++;
 
         $user = User::create(array_merge([
-            'name' => 'Pelamar Foto ' . $seq,
+            'name' => 'Pelamar Foto '.$seq,
             'email' => "pelamar.foto{$seq}@example.com",
             'phone' => sprintf('62812345%05d', $seq),
             'registration_number' => sprintf('PLM-2026-%06d', $seq),

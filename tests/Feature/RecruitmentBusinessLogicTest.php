@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Enums\JobApplicationStatus;
 use App\Enums\JobVacancyStatus;
 use App\Enums\RecruitmentPeriodStatus;
 use App\Exceptions\Recruitment\InvalidDocumentRequirementException;
@@ -13,9 +14,11 @@ use App\Models\RecruitmentPeriod;
 use App\Models\User;
 use App\Models\VacancyDocumentRequirement;
 use App\Models\VacancySelectionStage;
+use App\Services\Recruitment\ApplicationVerificationService;
 use App\Services\Recruitment\JobApplicationService;
 use App\Services\Recruitment\RecruitmentService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
 
 class RecruitmentBusinessLogicTest extends TestCase
@@ -23,13 +26,14 @@ class RecruitmentBusinessLogicTest extends TestCase
     use RefreshDatabase;
 
     private JobApplicationService $applicationService;
+
     private RecruitmentService $recruitmentService;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->applicationService = new JobApplicationService();
-        $this->recruitmentService = new RecruitmentService();
+        $this->applicationService = new JobApplicationService;
+        $this->recruitmentService = new RecruitmentService;
     }
 
     /**
@@ -375,14 +379,14 @@ class RecruitmentBusinessLogicTest extends TestCase
         $app1 = $this->applicationService->createApplication(user: $user1, vacancy: $vacancy);
         $app2 = $this->applicationService->createApplication(user: $user2, vacancy: $vacancy);
 
-        $verificationService = app(\App\Services\Recruitment\ApplicationVerificationService::class);
+        $verificationService = app(ApplicationVerificationService::class);
 
         // Kandidat 1 diloloskan pada tahapan akhir (diterima) -> sukses karena kuota 1
         $verificationService->updateSelectionStage($app1, $stageFinal, 'passed', 'Lolos diterima');
-        $this->assertEquals(\App\Enums\JobApplicationStatus::ACCEPTED, $app1->fresh()->status);
+        $this->assertEquals(JobApplicationStatus::ACCEPTED, $app1->fresh()->status);
 
         // Kandidat 2 mencoba diloloskan pada tahapan akhir -> gagal validasi karena kuota 1 sudah penuh
-        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        $this->expectException(ValidationException::class);
         $verificationService->updateSelectionStage($app2, $stageFinal, 'passed', 'Lolos diterima kedua');
     }
 }

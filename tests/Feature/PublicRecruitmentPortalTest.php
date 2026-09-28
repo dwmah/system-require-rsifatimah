@@ -35,7 +35,7 @@ class PublicRecruitmentPortalTest extends TestCase
     {
         return JobVacancy::create(array_merge([
             'recruitment_period_id' => $this->period->id,
-            'code' => 'POS-' . uniqid(),
+            'code' => 'POS-'.uniqid(),
             'title' => 'Perawat IGD',
             'unit' => 'Instalasi Gawat Darurat',
             'employment_type' => 'PKWT',
@@ -144,7 +144,7 @@ class PublicRecruitmentPortalTest extends TestCase
         $this->createActiveVacancy(['unit' => 'Instalasi Radiologi', 'title' => 'Petugas X-Ray']);
         $this->createActiveVacancy(['unit' => 'Instalasi Farmasi', 'title' => 'Staff Apotek']);
 
-        $response = $this->get('/lowongan?unit=' . urlencode('Instalasi Radiologi'));
+        $response = $this->get('/lowongan?unit='.urlencode('Instalasi Radiologi'));
 
         $response->assertStatus(200);
         $response->assertSee('Petugas X-Ray');

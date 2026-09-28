@@ -16,6 +16,8 @@ use App\Models\JobVacancy;
 use App\Models\RecruitmentPeriod;
 use App\Models\User;
 use App\Models\VacancyDocumentRequirement;
+use App\Models\VacancyQualification;
+use App\Models\VacancySelectionStage;
 use App\Services\Recruitment\ApplicationDocumentService;
 use App\Services\Recruitment\ApplicationSubmissionService;
 use DomainException;
@@ -40,7 +42,7 @@ class ApplicationDocumentAndSubmissionTest extends TestCase
         $seq = $sequence++;
 
         $user = User::create(array_merge([
-            'name' => 'Pelamar Dokumen ' . $seq,
+            'name' => 'Pelamar Dokumen '.$seq,
             'email' => "pelamar.doc{$seq}@example.com",
             'phone' => sprintf('62812399%05d', $seq),
             'registration_number' => sprintf('PLM-2026-%06d', $seq),
@@ -82,8 +84,8 @@ class ApplicationDocumentAndSubmissionTest extends TestCase
         $seq = $vacSeq++;
 
         $period = RecruitmentPeriod::create([
-            'name' => 'Rekrutmen Medis RS Fatimah ' . $seq,
-            'code' => 'PR-MED-2026-' . sprintf('%03d', $seq),
+            'name' => 'Rekrutmen Medis RS Fatimah '.$seq,
+            'code' => 'PR-MED-2026-'.sprintf('%03d', $seq),
             'status' => RecruitmentPeriodStatus::OPEN,
             'registration_start_at' => now()->subDays(5),
             'registration_end_at' => now()->addDays(20),
@@ -91,8 +93,8 @@ class ApplicationDocumentAndSubmissionTest extends TestCase
 
         $vacancy = JobVacancy::create([
             'recruitment_period_id' => $period->id,
-            'code' => 'MED-IGD-' . sprintf('%03d', $seq),
-            'title' => 'Perawat Gawat Darurat ' . $seq,
+            'code' => 'MED-IGD-'.sprintf('%03d', $seq),
+            'title' => 'Perawat Gawat Darurat '.$seq,
             'unit' => 'IGD',
             'employment_type' => 'PKWT',
             'location' => 'RSI Fatimah Banyuwangi',
@@ -701,14 +703,14 @@ class ApplicationDocumentAndSubmissionTest extends TestCase
             ],
         ]);
 
-        $qualification = \App\Models\VacancyQualification::create([
+        $qualification = VacancyQualification::create([
             'job_vacancy_id' => $vacancy->id,
             'label' => 'Pendidikan Terakhir',
             'value' => 'S1 Keperawatan Ners',
             'sort_order' => 1,
         ]);
 
-        $stage = \App\Models\VacancySelectionStage::create([
+        $stage = VacancySelectionStage::create([
             'job_vacancy_id' => $vacancy->id,
             'name' => 'Ujian Tulis CBT',
             'description' => 'Tes kompetensi dasar komputer',

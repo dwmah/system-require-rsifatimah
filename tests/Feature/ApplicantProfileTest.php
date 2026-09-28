@@ -22,7 +22,7 @@ class ApplicantProfileTest extends TestCase
         $seq = $sequence++;
 
         $user = User::create(array_merge([
-            'name' => 'Pelamar Tes ' . $seq,
+            'name' => 'Pelamar Tes '.$seq,
             'email' => "pelamar.tes{$seq}@example.com",
             'phone' => sprintf('62812345%05d', $seq),
             'registration_number' => sprintf('PLM-2026-%06d', $seq),
@@ -434,7 +434,7 @@ class ApplicantProfileTest extends TestCase
 
     public function test_profile_completeness_service_evaluates_correctly(): void
     {
-        $service = new ProfileCompletenessService();
+        $service = new ProfileCompletenessService;
 
         // 1. Fresh user right after registration:
         // Has name, email, phone, NIK (4 criteria of 11 = 36%)
@@ -502,7 +502,7 @@ class ApplicantProfileTest extends TestCase
 
     public function test_profile_completeness_service_is_safe_without_applicant_profile(): void
     {
-        $service = new ProfileCompletenessService();
+        $service = new ProfileCompletenessService;
 
         // User without applicantProfile record
         $user = User::create([
@@ -559,7 +559,7 @@ class ApplicantProfileTest extends TestCase
             'photo_path' => 'profile-photos/sample.jpg',
         ]);
 
-        \App\Models\ApplicantEducation::create([
+        ApplicantEducation::create([
             'applicant_profile_id' => $user->applicantProfile->id,
             'education_level' => 'S1',
             'institution_name' => 'Universitas Airlangga',

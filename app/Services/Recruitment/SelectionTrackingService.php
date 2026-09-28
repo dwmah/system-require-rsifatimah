@@ -6,6 +6,7 @@ use App\Enums\ApplicationStageStatus;
 use App\Enums\JobApplicationStatus;
 use App\Models\ApplicationStageHistory;
 use App\Models\JobApplication;
+use Carbon\Carbon;
 
 class SelectionTrackingService
 {
@@ -226,8 +227,8 @@ class SelectionTrackingService
 
             $stageName = (string) ($stage['name'] ?? ($liveStage?->name ?? 'Tahapan Seleksi'));
             $stageDescription = $stage['description'] ?? ($liveStage?->description ?? null);
-            $startAt = ($liveStage && $liveStage->start_at) ? $liveStage->start_at : (!empty($stage['start_at']) ? \Carbon\Carbon::parse($stage['start_at']) : null);
-            $endAt = ($liveStage && $liveStage->end_at) ? $liveStage->end_at : (!empty($stage['end_at']) ? \Carbon\Carbon::parse($stage['end_at']) : null);
+            $startAt = ($liveStage && $liveStage->start_at) ? $liveStage->start_at : (! empty($stage['start_at']) ? Carbon::parse($stage['start_at']) : null);
+            $endAt = ($liveStage && $liveStage->end_at) ? $liveStage->end_at : (! empty($stage['end_at']) ? Carbon::parse($stage['end_at']) : null);
             $daysRemaining = $endAt ? (int) ceil(now()->diffInDays($endAt->endOfDay(), false)) : null;
             $isDeadlineApproaching = $endAt && $daysRemaining !== null && $daysRemaining >= 0 && $daysRemaining <= 3;
             $isPastDeadline = $endAt ? $endAt->endOfDay()->isPast() : false;
@@ -243,7 +244,7 @@ class SelectionTrackingService
                 || str_contains($stageNameLower, 'formulir');
 
             $requiresAction = ($publicState === 'in_progress' && $hasActionKeyword)
-                || (!empty($applicantMessage) && in_array($publicState, ['in_progress', 'pending'], true));
+                || (! empty($applicantMessage) && in_array($publicState, ['in_progress', 'pending'], true));
 
             $stagesOutput[] = [
                 'id' => $stageId,

@@ -28,7 +28,6 @@ class ProfileCompletenessService
     /**
      * Evaluate the completeness status of each criterion for the user.
      *
-     * @param User $user
      * @return array<string, bool>
      */
     public function details(User $user): array
@@ -55,9 +54,6 @@ class ProfileCompletenessService
 
     /**
      * Calculate the basic profile completeness percentage (0-100%).
-     *
-     * @param User $user
-     * @return int
      */
     public function percentage(User $user): int
     {
@@ -74,9 +70,6 @@ class ProfileCompletenessService
 
     /**
      * Determine whether the basic profile is 100% complete.
-     *
-     * @param User $user
-     * @return bool
      */
     public function isComplete(User $user): bool
     {
@@ -86,7 +79,6 @@ class ProfileCompletenessService
     /**
      * Return list of missing criteria labels.
      *
-     * @param User $user
      * @return array<string>
      */
     public function missingItems(User $user): array

@@ -114,7 +114,7 @@ class ApplicationSubmissionService
 
             // 10. Verifikasi Snapshot Belum Pernah Dibuat
             if ($lockedApplication->snapshot()->exists()) {
-                throw new ApplicationAlreadySnapshottedException();
+                throw new ApplicationAlreadySnapshottedException;
             }
 
             // 11. Tetapkan Timestamp Sinkron Identik

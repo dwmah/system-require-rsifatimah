@@ -11,8 +11,7 @@ class ApplicantRegistrationService
     /**
      * Register a new applicant user and profile atomically.
      *
-     * @param array<string, mixed> $data
-     * @return User
+     * @param  array<string, mixed>  $data
      */
     public function register(array $data): User
     {

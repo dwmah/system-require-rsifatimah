@@ -23,11 +23,17 @@ class RecruitmentFullWorkflowTest extends TestCase
     use RefreshDatabase;
 
     protected User $admin;
+
     protected User $applicant;
+
     protected RecruitmentPeriod $period;
+
     protected JobVacancy $vacancy;
+
     protected VacancyDocumentRequirement $docReqSurat;
+
     protected VacancyDocumentRequirement $docReqIjazah;
+
     protected VacancyDocumentRequirement $docReqStr;
 
     protected function setUp(): void

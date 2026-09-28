@@ -7,8 +7,6 @@ use App\Enums\JobVacancyStatus;
 use App\Enums\RecruitmentPeriodStatus;
 use App\Exceptions\Recruitment\ApplicationAlreadySnapshottedException;
 use App\Exceptions\Recruitment\DuplicateApplicationException;
-use App\Exceptions\Recruitment\InactiveVacancyException;
-use App\Exceptions\Recruitment\IncompleteProfileException;
 use App\Models\ApplicantCertification;
 use App\Models\ApplicantEducation;
 use App\Models\ApplicantLicense;
@@ -24,7 +22,6 @@ use App\Models\VacancyQualification;
 use App\Models\VacancySelectionStage;
 use App\Services\Recruitment\ApplicationSnapshotService;
 use App\Services\Recruitment\JobApplicationService;
-use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -38,7 +35,7 @@ class ApplicationDraftAndSnapshotTest extends TestCase
         $seq = $sequence++;
 
         $user = User::create(array_merge([
-            'name' => 'Pelamar Tes ' . $seq,
+            'name' => 'Pelamar Tes '.$seq,
             'email' => "pelamar{$seq}@example.com",
             'phone' => sprintf('62812345%05d', $seq),
             'registration_number' => sprintf('PLM-2026-%06d', $seq),
@@ -86,8 +83,8 @@ class ApplicationDraftAndSnapshotTest extends TestCase
         $seq = $vacSeq++;
 
         $period = RecruitmentPeriod::create([
-            'name' => 'Periode Rekrutmen Medis 2026 #' . $seq,
-            'code' => 'PR-2026-' . sprintf('%03d', $seq),
+            'name' => 'Periode Rekrutmen Medis 2026 #'.$seq,
+            'code' => 'PR-2026-'.sprintf('%03d', $seq),
             'status' => RecruitmentPeriodStatus::OPEN,
             'registration_start_at' => now()->subDays(5),
             'registration_end_at' => now()->addDays(15),
@@ -95,8 +92,8 @@ class ApplicationDraftAndSnapshotTest extends TestCase
 
         return JobVacancy::create(array_merge([
             'recruitment_period_id' => $period->id,
-            'code' => 'POS-2026-MED-' . sprintf('%03d', $seq),
-            'title' => 'Perawat IGD ' . $seq,
+            'code' => 'POS-2026-MED-'.sprintf('%03d', $seq),
+            'title' => 'Perawat IGD '.$seq,
             'unit' => 'Instalasi Gawat Darurat',
             'employment_type' => 'PKWT',
             'quota' => 5,

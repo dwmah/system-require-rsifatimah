@@ -46,7 +46,7 @@ class AdminTimelineController extends Controller
 
         RecruitmentPeriod::create([
             'name' => $validated['name'],
-            'code' => 'PER-' . date('Ymd') . '-' . strtoupper(Str::random(4)),
+            'code' => 'PER-'.date('Ymd').'-'.strtoupper(Str::random(4)),
             'registration_start_at' => $validated['start_date'],
             'registration_end_at' => $validated['submission_deadline'],
             'status' => $isActive ? RecruitmentPeriodStatus::OPEN : RecruitmentPeriodStatus::DRAFT,

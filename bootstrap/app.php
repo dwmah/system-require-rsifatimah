@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Middleware\EnsureApplicantAccountIsActive;
+use App\Http\Middleware\EnsurePublicRecruitmentIsOpen;
+use App\Http\Middleware\EnsureUserIsAdmin;
+use App\Http\Middleware\EnsureUserIsApplicant;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -17,14 +21,15 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($request->user()?->isAdmin()) {
                 return route('admin.dashboard');
             }
+
             return route('portal.home');
         });
 
         $middleware->alias([
-            'recruitment.open' => \App\Http\Middleware\EnsurePublicRecruitmentIsOpen::class,
-            'applicant.active' => \App\Http\Middleware\EnsureApplicantAccountIsActive::class,
-            'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
-            'applicant' => \App\Http\Middleware\EnsureUserIsApplicant::class,
+            'recruitment.open' => EnsurePublicRecruitmentIsOpen::class,
+            'applicant.active' => EnsureApplicantAccountIsActive::class,
+            'admin' => EnsureUserIsAdmin::class,
+            'applicant' => EnsureUserIsApplicant::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

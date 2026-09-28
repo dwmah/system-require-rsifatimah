@@ -10,7 +10,6 @@ use App\Models\ApplicantEducation;
 use App\Models\ApplicantLicense;
 use App\Models\ApplicantProfile;
 use App\Models\ApplicantWorkExperience;
-use App\Models\ApplicationDocument;
 use App\Models\JobApplication;
 use App\Models\JobVacancy;
 use App\Models\RecruitmentPeriod;
@@ -40,7 +39,7 @@ class ApplicantDraftCancellationAndVacancySwitchTest extends TestCase
         $seq = $sequence++;
 
         $user = User::create(array_merge([
-            'name' => 'Pelamar Lengkap ' . $seq,
+            'name' => 'Pelamar Lengkap '.$seq,
             'email' => "pelamar{$seq}@rsifatimah.test",
             'phone' => sprintf('0812345%05d', $seq),
             'registration_number' => sprintf('PLM-2026-%06d', $seq),
@@ -112,8 +111,8 @@ class ApplicantDraftCancellationAndVacancySwitchTest extends TestCase
         $seq = $pSeq++;
 
         return RecruitmentPeriod::create(array_merge([
-            'name' => 'Periode Rekrutmen 2026 #' . $seq,
-            'code' => 'PR-2026-' . sprintf('%03d', $seq),
+            'name' => 'Periode Rekrutmen 2026 #'.$seq,
+            'code' => 'PR-2026-'.sprintf('%03d', $seq),
             'status' => RecruitmentPeriodStatus::OPEN,
             'registration_start_at' => now()->subDays(5),
             'registration_end_at' => now()->addDays(15),
@@ -127,8 +126,8 @@ class ApplicantDraftCancellationAndVacancySwitchTest extends TestCase
 
         return JobVacancy::create(array_merge([
             'recruitment_period_id' => $period->id,
-            'code' => 'POS-2026-' . sprintf('%03d', $seq),
-            'title' => 'Formasi Lowongan ' . $seq,
+            'code' => 'POS-2026-'.sprintf('%03d', $seq),
+            'title' => 'Formasi Lowongan '.$seq,
             'unit' => 'Instalasi Pelayanan',
             'employment_type' => 'PKWT',
             'quota' => 3,
@@ -495,5 +494,3 @@ class ApplicantDraftCancellationAndVacancySwitchTest extends TestCase
         ]);
     }
 }
-
-

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ApplicationDocument;
 use App\Models\JobApplication;
 use App\Models\VacancyDocumentRequirement;
+use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -25,12 +26,12 @@ class ApplicantDocumentController extends Controller
             abort(403);
         }
 
-        if (!$application->isDraft()) {
+        if (! $application->isDraft()) {
             return back()->with('error', 'Lamaran telah dikirim, dokumen tidak dapat diubah lagi.');
         }
 
         $activePeriod = $application->recruitmentPeriod;
-        if (!$activePeriod || !$activePeriod->isOpenForSubmission()) {
+        if (! $activePeriod || ! $activePeriod->isOpenForSubmission()) {
             return back()->with('error', 'Periode upload dokumen telah ditutup.');
         }
 
@@ -96,7 +97,7 @@ class ApplicantDocumentController extends Controller
             abort(403);
         }
 
-        if (!$application->isDraft()) {
+        if (! $application->isDraft()) {
             return back()->with('error', 'Lamaran telah dikirim, dokumen tidak dapat dihapus.');
         }
 
@@ -113,11 +114,11 @@ class ApplicantDocumentController extends Controller
     /**
      * Cari disk dan path penyimpanan berkas dokumen yang valid.
      *
-     * @return array{\Illuminate\Contracts\Filesystem\Filesystem, string}
+     * @return array{Filesystem, string}
      */
     protected function getDocumentDiskAndPath(ApplicationDocument $document): array
     {
-        if (!$document->stored_path) {
+        if (! $document->stored_path) {
             abort(404, 'Berkas dokumen tidak memiliki path penyimpanan.');
         }
 
@@ -140,12 +141,12 @@ class ApplicantDocumentController extends Controller
         $user = Auth::user();
         $application = $document->jobApplication;
 
-        if (!$user) {
+        if (! $user) {
             abort(403);
         }
 
         // Cek hak akses: Pemilik dokumen ATAU Admin HRD
-        if ($user->id !== $application->user_id && !$user->isAdmin()) {
+        if ($user->id !== $application->user_id && ! $user->isAdmin()) {
             abort(403, 'Anda tidak memiliki akses ke dokumen ini.');
         }
 
@@ -153,7 +154,7 @@ class ApplicantDocumentController extends Controller
 
         return $disk->response($path, $document->original_name, [
             'Content-Type' => $document->mime_type ?: 'application/pdf',
-            'Content-Disposition' => 'inline; filename="' . $document->original_name . '"',
+            'Content-Disposition' => 'inline; filename="'.$document->original_name.'"',
         ]);
     }
 
@@ -166,12 +167,12 @@ class ApplicantDocumentController extends Controller
         $user = Auth::user();
         $application = $document->jobApplication;
 
-        if (!$user) {
+        if (! $user) {
             abort(403);
         }
 
         // Cek hak akses: Pemilik dokumen ATAU Admin HRD
-        if ($user->id !== $application->user_id && !$user->isAdmin()) {
+        if ($user->id !== $application->user_id && ! $user->isAdmin()) {
             abort(403, 'Anda tidak memiliki akses ke dokumen ini.');
         }
 

@@ -30,7 +30,7 @@ class ApplicantDashboardUiUxTest extends TestCase
         $seq = $sequence++;
 
         $user = User::create(array_merge([
-            'name' => 'Pelamar UIUX ' . $seq,
+            'name' => 'Pelamar UIUX '.$seq,
             'email' => "pelamar.uiux{$seq}@example.com",
             'phone' => sprintf('62813111%05d', $seq),
             'registration_number' => sprintf('PLM-2026-%06d', $seq),
@@ -72,8 +72,8 @@ class ApplicantDashboardUiUxTest extends TestCase
         $seq = $vacSeq++;
 
         $period = RecruitmentPeriod::create([
-            'name' => 'Rekrutmen Tenaga Medis RSI Fatimah ' . $seq,
-            'code' => 'PR-UIUX-2026-' . sprintf('%03d', $seq),
+            'name' => 'Rekrutmen Tenaga Medis RSI Fatimah '.$seq,
+            'code' => 'PR-UIUX-2026-'.sprintf('%03d', $seq),
             'status' => RecruitmentPeriodStatus::OPEN,
             'registration_start_at' => now()->subDays(5),
             'registration_end_at' => now()->addDays(15),
@@ -81,8 +81,8 @@ class ApplicantDashboardUiUxTest extends TestCase
 
         $vacancy = JobVacancy::create([
             'recruitment_period_id' => $period->id,
-            'code' => 'NRS-IGD-' . sprintf('%03d', $seq),
-            'title' => 'Perawat Gawat Darurat ' . $seq,
+            'code' => 'NRS-IGD-'.sprintf('%03d', $seq),
+            'title' => 'Perawat Gawat Darurat '.$seq,
             'unit' => 'Instalasi Gawat Darurat',
             'employment_type' => 'PKWT',
             'location' => 'RSI Fatimah Banyuwangi',
@@ -265,8 +265,8 @@ class ApplicantDashboardUiUxTest extends TestCase
                 ApplicationDocument::create([
                     'job_application_id' => $application->id,
                     'vacancy_document_requirement_id' => $req->id,
-                    'original_name' => 'dokumen_' . $req->id . '.pdf',
-                    'stored_path' => 'documents/test_' . $req->id . '.pdf',
+                    'original_name' => 'dokumen_'.$req->id.'.pdf',
+                    'stored_path' => 'documents/test_'.$req->id.'.pdf',
                     'mime_type' => 'application/pdf',
                     'file_size' => 102400,
                     'verification_status' => 'pending',

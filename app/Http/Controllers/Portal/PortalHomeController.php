@@ -3,9 +3,7 @@
 namespace App\Http\Controllers\Portal;
 
 use App\Http\Controllers\Controller;
-use App\Models\RecruitmentPeriod;
 use App\Services\Portal\ApplicantDashboardService;
-use App\Services\Profile\ProfileCompletenessService;
 use App\Services\Recruitment\RecruitmentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

@@ -7,17 +7,18 @@ use App\Http\Controllers\Controller;
 use App\Models\JobApplication;
 use App\Models\JobVacancy;
 use App\Models\User;
+use App\Services\Export\BiodataExcelExportService;
 use App\Services\Lifecycle\UserLifecycleService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class AdminLifecycleController extends Controller
 {
     public function __construct(
         protected UserLifecycleService $lifecycleService
-    ) {
-    }
+    ) {}
 
     /**
      * Tampilkan halaman pengelolaan siklus akun pengguna pasca-seleksi dengan filter interaktif.
@@ -33,9 +34,9 @@ class AdminLifecycleController extends Controller
                 $query->where(function ($q) use ($search) {
                     $q->whereHas('user', function ($uq) use ($search) {
                         $uq->where('name', 'like', "%{$search}%")
-                           ->orWhere('email', 'like', "%{$search}%")
-                           ->orWhere('phone', 'like', "%{$search}%")
-                           ->orWhere('registration_number', 'like', "%{$search}%");
+                            ->orWhere('email', 'like', "%{$search}%")
+                            ->orWhere('phone', 'like', "%{$search}%")
+                            ->orWhere('registration_number', 'like', "%{$search}%");
                     })->orWhere('application_number', 'like', "%{$search}%");
                 });
             }
@@ -50,9 +51,9 @@ class AdminLifecycleController extends Controller
 
             if ($request->filled('account_status')) {
                 if ($request->account_status === 'active') {
-                    $query->whereHas('user', fn($uq) => $uq->where('is_active', true));
+                    $query->whereHas('user', fn ($uq) => $uq->where('is_active', true));
                 } elseif ($request->account_status === 'inactive') {
-                    $query->whereHas('user', fn($uq) => $uq->where('is_active', false));
+                    $query->whereHas('user', fn ($uq) => $uq->where('is_active', false));
                 }
             }
         };
@@ -63,7 +64,7 @@ class AdminLifecycleController extends Controller
             JobApplicationStatus::IN_SELECTION,
             JobApplicationStatus::ACCEPTED,
         ])
-        ->with(['user.applicantProfile', 'jobVacancy', 'documents']);
+            ->with(['user.applicantProfile', 'jobVacancy', 'documents']);
 
         $applyFilters($passedQuery);
         $passedApplications = $passedQuery->latest('accepted_at')
@@ -83,12 +84,33 @@ class AdminLifecycleController extends Controller
             ->whereNotNull('announcement_seen_at')
             ->count();
 
+        $acceptedCount = JobApplication::where('status', JobApplicationStatus::ACCEPTED)->count();
+
         return view('admin.lifecycle.index', [
             'passedApplications' => $passedApplications,
             'rejectedApplications' => $rejectedApplications,
             'seenCount' => $seenCount,
+            'acceptedCount' => $acceptedCount,
             'vacancies' => $vacancies,
         ]);
+    }
+
+    /**
+     * Unduh seluruh data biodata pelamar yang diterima dalam format Excel (.xlsx).
+     */
+    public function exportAcceptedBiodata(Request $request, BiodataExcelExportService $exportService): BinaryFileResponse|RedirectResponse
+    {
+        $vacancyId = $request->filled('vacancy_id') ? (int) $request->vacancy_id : null;
+
+        $hasAccepted = JobApplication::where('status', JobApplicationStatus::ACCEPTED)
+            ->when($vacancyId, fn ($q) => $q->where('job_vacancy_id', $vacancyId))
+            ->exists();
+
+        if (! $hasAccepted) {
+            return back()->with('error', 'Belum ada pelamar dengan status Diterima untuk diekspor ke Excel.');
+        }
+
+        return $exportService->exportAcceptedApplicants($vacancyId);
     }
 
     /**

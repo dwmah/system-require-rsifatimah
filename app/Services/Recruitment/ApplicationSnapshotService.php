@@ -23,7 +23,7 @@ class ApplicationSnapshotService
     public function capture(JobApplication $application, ?CarbonInterface $capturedAt = null): ApplicationSnapshot
     {
         if ($application->snapshot()->exists()) {
-            throw new ApplicationAlreadySnapshottedException();
+            throw new ApplicationAlreadySnapshottedException;
         }
 
         $user = $application->user;

@@ -33,6 +33,6 @@ class RecruitmentNotification extends Model
 
     public function isRead(): bool
     {
-        return !is_null($this->read_at);
+        return ! is_null($this->read_at);
     }
 }

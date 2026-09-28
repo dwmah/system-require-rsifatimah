@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class JobVacancy extends Model
 {
@@ -88,7 +89,7 @@ class JobVacancy extends Model
 
     public function getSummaryAttribute(): ?string
     {
-        return $this->description ? \Illuminate\Support\Str::limit(strip_tags($this->description), 150) : null;
+        return $this->description ? Str::limit(strip_tags($this->description), 150) : null;
     }
 
     /**

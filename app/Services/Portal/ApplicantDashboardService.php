@@ -2,6 +2,7 @@
 
 namespace App\Services\Portal;
 
+use App\Enums\ApplicationStageStatus;
 use App\Enums\JobApplicationStatus;
 use App\Enums\RecruitmentPeriodStatus;
 use App\Models\JobApplication;
@@ -189,7 +190,7 @@ class ApplicantDashboardService
                         $publishedAt = null;
 
                         if ($isPublished && $history->status) {
-                            $stVal = $history->status instanceof \App\Enums\ApplicationStageStatus ? $history->status->value : (string) $history->status;
+                            $stVal = $history->status instanceof ApplicationStageStatus ? $history->status->value : (string) $history->status;
                             match ($stVal) {
                                 'passed' => [
                                     $publicState = 'passed',
