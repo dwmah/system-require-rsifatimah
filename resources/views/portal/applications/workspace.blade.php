@@ -46,7 +46,7 @@
                             <div>
                                 <strong class="text-sm block mb-0.5 text-sky-950">Petunjuk Pengunggahan Berkas</strong>
                                 <p class="text-sky-800">
-                                    Silakan unggah seluruh dokumen wajib bertanda <strong>(*)</strong> di bawah ini dalam format PDF atau Gambar (JPG/PNG), ukuran maksimal 5 MB per file. Pastikan dokumen terbaca dengan jelas sebelum menekan tombol <strong>Final Submit</strong>.
+                                    Silakan unggah seluruh dokumen wajib bertanda <strong>(*)</strong> di bawah ini dalam format <strong>PDF</strong>, ukuran maksimal 5 MB per file. Pastikan dokumen terbaca dengan jelas sebelum menekan tombol <strong>Final Submit</strong>.
                                 </p>
                             </div>
                         </div>
@@ -214,8 +214,8 @@
                         <input type="hidden" name="vacancy_document_requirement_id" :value="selectedReqId">
 
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Pilih Berkas (PDF, JPG, PNG)</label>
-                            <input type="file" name="document_file" required accept=".pdf,.jpg,.jpeg,.png"
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Pilih Berkas (PDF)</label>
+                            <input type="file" name="document_file" required accept=".pdf,application/pdf"
                                    class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-sky-50 file:text-[#0179B5] hover:file:bg-sky-100 cursor-pointer">
                             <p class="text-[11px] text-slate-400 mt-1">Ukuran maksimal file: 5 MB.</p>
                         </div>

@@ -9,6 +9,7 @@ use App\Models\RecruitmentPeriod;
 use App\Models\VacancyDocumentRequirement;
 use App\Models\VacancyQualification;
 use App\Models\VacancySelectionStage;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -29,9 +30,9 @@ class AdminVacancyController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('code', 'like', "%{$search}%")
-                  ->orWhere('unit', 'like', "%{$search}%")
-                  ->orWhere('employment_type', 'like', "%{$search}%");
+                    ->orWhere('code', 'like', "%{$search}%")
+                    ->orWhere('unit', 'like', "%{$search}%")
+                    ->orWhere('employment_type', 'like', "%{$search}%");
             });
         }
 
@@ -102,14 +103,14 @@ class AdminVacancyController extends Controller
         ]);
 
         DB::transaction(function () use ($request, $validated) {
-            $code = 'VAC-' . strtoupper(Str::slug($request->title, '')) . '-' . rand(100, 999);
+            $code = 'VAC-'.strtoupper(Str::slug($request->title, '')).'-'.rand(100, 999);
 
             $openAt = $request->filled('open_at')
-                ? (strlen($request->open_at) === 10 ? \Carbon\Carbon::parse($request->open_at)->startOfDay() : \Carbon\Carbon::parse($request->open_at))
+                ? (strlen($request->open_at) === 10 ? Carbon::parse($request->open_at)->startOfDay() : Carbon::parse($request->open_at))
                 : now();
 
             $closeAt = $request->filled('close_at')
-                ? (strlen($request->close_at) === 10 ? \Carbon\Carbon::parse($request->close_at)->endOfDay() : \Carbon\Carbon::parse($request->close_at))
+                ? (strlen($request->close_at) === 10 ? Carbon::parse($request->close_at)->endOfDay() : Carbon::parse($request->close_at))
                 : now()->addMonth()->endOfDay();
 
             $vacancy = JobVacancy::create([
@@ -127,7 +128,7 @@ class AdminVacancyController extends Controller
             ]);
 
             // Kualifikasi
-            if (!empty($request->qualifications)) {
+            if (! empty($request->qualifications)) {
                 $qualLabels = (array) $request->input('qualification_labels', []);
                 foreach ($request->qualifications as $idx => $desc) {
                     if (trim($desc ?? '') !== '') {
@@ -155,14 +156,14 @@ class AdminVacancyController extends Controller
             $docMaxSizes = (array) $request->input('document_max_sizes', []);
 
             $hasValidCustomDocs = false;
-            if (!empty($docNames)) {
+            if (! empty($docNames)) {
                 foreach ($docNames as $idx => $docName) {
                     if (trim($docName ?? '') !== '') {
                         $hasValidCustomDocs = true;
                         $isMandatory = isset($docMandatories[$idx]) && ($docMandatories[$idx] === '1' || $docMandatories[$idx] === 1 || $docMandatories[$idx] === true || $docMandatories[$idx] === 'true');
                         $desc = $docDescriptions[$idx] ?? null;
-                        $mimes = !empty($docMimes[$idx]) ? $docMimes[$idx] : 'application/pdf,image/jpeg,image/png';
-                        $maxSize = !empty($docMaxSizes[$idx]) ? (int) $docMaxSizes[$idx] : 5120;
+                        $mimes = ! empty($docMimes[$idx]) ? $docMimes[$idx] : 'application/pdf';
+                        $maxSize = ! empty($docMaxSizes[$idx]) ? (int) $docMaxSizes[$idx] : 5120;
 
                         VacancyDocumentRequirement::create([
                             'job_vacancy_id' => $vacancy->id,
@@ -177,7 +178,7 @@ class AdminVacancyController extends Controller
                 }
             }
 
-            if (!$hasValidCustomDocs && empty($docNames)) {
+            if (! $hasValidCustomDocs && empty($docNames)) {
                 // Default persyaratan sesuai standar RSI Fatimah
                 $defaultDocs = [
                     ['name' => 'Surat Lamaran Kerja', 'required' => true],
@@ -193,7 +194,7 @@ class AdminVacancyController extends Controller
                         'job_vacancy_id' => $vacancy->id,
                         'name' => $doc['name'],
                         'is_required' => $doc['required'],
-                        'allowed_mimes' => 'application/pdf,image/jpeg,image/png',
+                        'allowed_mimes' => 'application/pdf',
                         'max_size_kb' => 5120,
                         'sort_order' => $idx + 1,
                     ]);
@@ -207,13 +208,13 @@ class AdminVacancyController extends Controller
             $stageEndAts = (array) $request->input('stage_end_ats', []);
 
             $hasValidStages = false;
-            if (!empty($stageNames)) {
+            if (! empty($stageNames)) {
                 foreach ($stageNames as $idx => $stageName) {
                     if (trim($stageName ?? '') !== '') {
                         $hasValidStages = true;
                         $desc = $stageDescriptions[$idx] ?? null;
-                        $startAt = !empty($stageStartAts[$idx]) ? \Carbon\Carbon::parse($stageStartAts[$idx]) : null;
-                        $endAt = !empty($stageEndAts[$idx]) ? \Carbon\Carbon::parse($stageEndAts[$idx]) : null;
+                        $startAt = ! empty($stageStartAts[$idx]) ? Carbon::parse($stageStartAts[$idx]) : null;
+                        $endAt = ! empty($stageEndAts[$idx]) ? Carbon::parse($stageEndAts[$idx]) : null;
 
                         VacancySelectionStage::create([
                             'job_vacancy_id' => $vacancy->id,
@@ -227,7 +228,7 @@ class AdminVacancyController extends Controller
                 }
             }
 
-            if (!$hasValidStages && empty($stageNames)) {
+            if (! $hasValidStages && empty($stageNames)) {
                 $defaultStages = [
                     'Seleksi Administrasi & Verifikasi Berkas',
                     'Ujian Tulis & Kompetensi Bidang',
@@ -327,14 +328,14 @@ class AdminVacancyController extends Controller
 
         if ($request->filled('open_at')) {
             $updateData['open_at'] = strlen($request->open_at) === 10
-                ? \Carbon\Carbon::parse($request->open_at)->startOfDay()
-                : \Carbon\Carbon::parse($request->open_at);
+                ? Carbon::parse($request->open_at)->startOfDay()
+                : Carbon::parse($request->open_at);
         }
 
         if ($request->filled('close_at')) {
             $updateData['close_at'] = strlen($request->close_at) === 10
-                ? \Carbon\Carbon::parse($request->close_at)->endOfDay()
-                : \Carbon\Carbon::parse($request->close_at);
+                ? Carbon::parse($request->close_at)->endOfDay()
+                : Carbon::parse($request->close_at);
         }
 
         DB::transaction(function () use ($request, $vacancy, $updateData) {
@@ -343,7 +344,7 @@ class AdminVacancyController extends Controller
             // 1. Update Kualifikasi
             if ($request->has('qualifications')) {
                 $vacancy->qualifications()->delete();
-                if (!empty($request->qualifications)) {
+                if (! empty($request->qualifications)) {
                     $qualLabels = (array) $request->input('qualification_labels', []);
                     foreach ($request->qualifications as $idx => $desc) {
                         if (trim($desc ?? '') !== '') {
@@ -386,14 +387,14 @@ class AdminVacancyController extends Controller
                         continue;
                     }
 
-                    $docId = !empty($docIds[$idx]) ? (int) $docIds[$idx] : null;
+                    $docId = ! empty($docIds[$idx]) ? (int) $docIds[$idx] : null;
                     $isMandatory = isset($docMandatories[$idx]) && ($docMandatories[$idx] === '1' || $docMandatories[$idx] === 1 || $docMandatories[$idx] === true || $docMandatories[$idx] === 'true');
                     $desc = $docDescriptions[$idx] ?? null;
-                    $mimes = !empty($docMimes[$idx]) ? $docMimes[$idx] : 'application/pdf,image/jpeg,image/png';
-                    $maxSize = !empty($docMaxSizes[$idx]) ? (int) $docMaxSizes[$idx] : 5120;
+                    $mimes = ! empty($docMimes[$idx]) ? $docMimes[$idx] : 'application/pdf';
+                    $maxSize = ! empty($docMaxSizes[$idx]) ? (int) $docMaxSizes[$idx] : 5120;
 
                     // Jika docId tidak ada, cari requirement lama yang belum terproses dengan nama yang sama
-                    if (!$docId && $existingDoc = $existingDocReqs->whereNotIn('id', $processedIds)->firstWhere('name', trim($docName))) {
+                    if (! $docId && $existingDoc = $existingDocReqs->whereNotIn('id', $processedIds)->firstWhere('name', trim($docName))) {
                         $docId = $existingDoc->id;
                     }
 
@@ -422,8 +423,8 @@ class AdminVacancyController extends Controller
                 }
 
                 foreach ($existingDocReqs as $existing) {
-                    if (!in_array($existing->id, $processedIds, true)) {
-                        if (!in_array($existing->id, $usedRequirementIds, true)) {
+                    if (! in_array($existing->id, $processedIds, true)) {
+                        if (! in_array($existing->id, $usedRequirementIds, true)) {
                             $existing->delete();
                         }
                     }
@@ -452,13 +453,13 @@ class AdminVacancyController extends Controller
                         continue;
                     }
 
-                    $stageId = !empty($stageIds[$idx]) ? (int) $stageIds[$idx] : null;
+                    $stageId = ! empty($stageIds[$idx]) ? (int) $stageIds[$idx] : null;
                     $desc = $stageDescriptions[$idx] ?? null;
-                    $startAt = !empty($stageStartAts[$idx]) ? \Carbon\Carbon::parse($stageStartAts[$idx]) : null;
-                    $endAt = !empty($stageEndAts[$idx]) ? \Carbon\Carbon::parse($stageEndAts[$idx]) : null;
+                    $startAt = ! empty($stageStartAts[$idx]) ? Carbon::parse($stageStartAts[$idx]) : null;
+                    $endAt = ! empty($stageEndAts[$idx]) ? Carbon::parse($stageEndAts[$idx]) : null;
 
                     // Jika stageId tidak ada, cari tahapan lama yang belum terproses dengan nama yang sama
-                    if (!$stageId && $existingStage = $existingStages->whereNotIn('id', $processedStageIds)->firstWhere('name', trim($stageName))) {
+                    if (! $stageId && $existingStage = $existingStages->whereNotIn('id', $processedStageIds)->firstWhere('name', trim($stageName))) {
                         $stageId = $existingStage->id;
                     }
 
@@ -485,8 +486,8 @@ class AdminVacancyController extends Controller
                 }
 
                 foreach ($existingStages as $existing) {
-                    if (!in_array($existing->id, $processedStageIds, true)) {
-                        if (!in_array($existing->id, $usedStageIds, true)) {
+                    if (! in_array($existing->id, $processedStageIds, true)) {
+                        if (! in_array($existing->id, $usedStageIds, true)) {
                             $existing->delete();
                         }
                     }

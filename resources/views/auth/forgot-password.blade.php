@@ -1,7 +1,6 @@
 <x-layouts.auth
     title="Lupa Password Akun"
     card-title="Pemulihan Password"
-    card-subtitle="Masukkan email atau nomor WhatsApp yang terdaftar untuk menerima tautan pemulihan kata sandi"
     back-url="{{ route('login') }}"
     back-label="Kembali ke Halaman Masuk"
 >
@@ -29,25 +28,20 @@
         </div>
     @endif
 
-    <div class="mb-5 p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-600 leading-relaxed">
-        <p class="font-semibold text-slate-700 mb-1">Catatan Pemulihan:</p>
-        <p>Jika Anda memasukkan nomor WhatsApp, tautan reset akan dikirim ke <strong>email yang terdaftar</strong> pada akun tersebut.</p>
-    </div>
-
     <form method="POST" action="{{ route('password.email') }}" class="space-y-4" novalidate>
         @csrf
 
         {{-- Email atau Nomor WhatsApp --}}
         <div>
             <label for="identifier" class="block text-xs font-semibold text-slate-700 mb-1.5">
-                Email atau Nomor WhatsApp Terdaftar <span class="text-red-500 font-bold">*</span>
+                Email Terdaftar <span class="text-red-500 font-bold">*</span>
             </label>
             <input
                 type="text"
                 name="identifier"
                 id="identifier"
                 value="{{ old('identifier') }}"
-                placeholder="nama@email.com atau 081234567890"
+                placeholder="nama@email.com"
                 required
                 autofocus
                 class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $errors->has('identifier') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100' }} focus:outline-hidden focus:ring-2"

@@ -113,5 +113,22 @@ class ApplicantPublicNavigationTest extends TestCase
         $response->assertSee('Sudah punya lamaran?');
         $response->assertSee('Lanjutkan');
         $response->assertDontSee('Sudah punya akun?');
+        $response->assertSee(route('login', ['intended' => route('portal.applications.index')]));
+    }
+
+    public function test_clicking_continue_application_redirects_to_applications_page_after_login(): void
+    {
+        // 1. Kunjungi halaman login dengan intended portal.applications.index
+        $loginUrl = route('login', ['intended' => route('portal.applications.index')]);
+        $this->get($loginUrl)->assertStatus(200);
+
+        // 2. Submit login
+        $response = $this->post(route('login.store'), [
+            'login' => $this->applicant->email,
+            'password' => 'password',
+        ]);
+
+        // 3. Harus dialihkan ke Lamaran Saya (portal.applications.index)
+        $response->assertRedirect(route('portal.applications.index'));
     }
 }

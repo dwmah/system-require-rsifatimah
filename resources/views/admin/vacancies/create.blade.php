@@ -28,15 +28,15 @@
 
                       // Section 3: Persyaratan Dokumen
                       documents: [
-                          { name: 'Surat Lamaran Kerja', desc: 'Ditujukan kepada Direktur RSI Fatimah', mandatory: 1, mimes: 'application/pdf,image/jpeg,image/png', max_size: 5120 },
-                          { name: 'Ijazah Terakhir Legalisir', desc: 'Scan asli ijazah pendidikan formal', mandatory: 1, mimes: 'application/pdf,image/jpeg,image/png', max_size: 5120 },
-                          { name: 'STR / Sertifikat Keahlian Aktif', desc: 'Wajib masih berlaku aktif', mandatory: 1, mimes: 'application/pdf,image/jpeg,image/png', max_size: 5120 },
-                          { name: 'SKCK (Kepolisian)', desc: 'Surat Keterangan Catatan Kepolisian', mandatory: 0, mimes: 'application/pdf,image/jpeg,image/png', max_size: 5120 },
-                          { name: 'Rekomendasi Profesi / Ormas', desc: 'Surat rekomendasi bila ada', mandatory: 0, mimes: 'application/pdf,image/jpeg,image/png', max_size: 5120 },
-                          { name: 'Dokumen Pendukung Lainnya', desc: 'Sertifikat pelatihan / seminar terkait', mandatory: 0, mimes: 'application/pdf,image/jpeg,image/png', max_size: 5120 }
+                          { name: 'Surat Lamaran Kerja', desc: 'Ditujukan kepada Direktur RSI Fatimah', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
+                          { name: 'Ijazah Terakhir Legalisir', desc: 'Scan asli ijazah pendidikan formal', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
+                          { name: 'STR / Sertifikat Keahlian Aktif', desc: 'Wajib masih berlaku aktif', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
+                          { name: 'SKCK (Kepolisian)', desc: 'Surat Keterangan Catatan Kepolisian', mandatory: 0, mimes: 'application/pdf', max_size: 5120 },
+                          { name: 'Rekomendasi Profesi / Ormas', desc: 'Surat rekomendasi bila ada', mandatory: 0, mimes: 'application/pdf', max_size: 5120 },
+                          { name: 'Dokumen Pendukung Lainnya', desc: 'Sertifikat pelatihan / seminar terkait', mandatory: 0, mimes: 'application/pdf', max_size: 5120 }
                       ],
                       addDoc() {
-                          this.documents.push({ name: '', desc: '', mandatory: 1, mimes: 'application/pdf,image/jpeg,image/png', max_size: 5120 });
+                          this.documents.push({ name: '', desc: '', mandatory: 1, mimes: 'application/pdf', max_size: 5120 });
                       },
                       removeDoc(index) {
                           this.documents.splice(index, 1);
@@ -44,25 +44,25 @@
                       applyDocPreset(type) {
                           if (type === 'medis') {
                               this.documents = [
-                                  { name: 'Surat Lamaran Kerja', desc: 'Ditujukan kepada Direktur RSI Fatimah', mandatory: 1, mimes: 'application/pdf,image/jpeg,image/png', max_size: 5120 },
-                                  { name: 'Ijazah Profesi / Terakhir', desc: 'Scan ijazah asli legalisir', mandatory: 1, mimes: 'application/pdf,image/jpeg,image/png', max_size: 5120 },
-                                  { name: 'Transkrip Nilai Akademik', desc: 'Scan transkrip nilai akademik legalisir', mandatory: 1, mimes: 'application/pdf,image/jpeg,image/png', max_size: 5120 },
-                                  { name: 'STR (Surat Tanda Registrasi) Aktif', desc: 'Wajib masih aktif dari MTKI / KKI', mandatory: 1, mimes: 'application/pdf,image/jpeg,image/png', max_size: 5120 },
-                                  { name: 'Sertifikat ACLS / BTCLS / BCLS', desc: 'Sertifikat pelatihan kegawatdaruratan', mandatory: 0, mimes: 'application/pdf,image/jpeg,image/png', max_size: 5120 },
-                                  { name: 'SKCK Kepolisian', desc: 'Surat keterangan catatan kepolisian', mandatory: 0, mimes: 'application/pdf,image/jpeg,image/png', max_size: 5120 }
+                                  { name: 'Surat Lamaran Kerja', desc: 'Ditujukan kepada Direktur RSI Fatimah', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
+                                  { name: 'Ijazah Profesi / Terakhir', desc: 'Scan ijazah asli legalisir', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
+                                  { name: 'Transkrip Nilai Akademik', desc: 'Scan transkrip nilai akademik legalisir', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
+                                  { name: 'STR (Surat Tanda Registrasi) Aktif', desc: 'Wajib masih aktif dari MTKI / KKI', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
+                                  { name: 'Sertifikat ACLS / BTCLS / BCLS', desc: 'Sertifikat pelatihan kegawatdaruratan', mandatory: 0, mimes: 'application/pdf', max_size: 5120 },
+                                  { name: 'SKCK Kepolisian', desc: 'Surat keterangan catatan kepolisian', mandatory: 0, mimes: 'application/pdf', max_size: 5120 }
                               ];
                           } else if (type === 'umum') {
                               this.documents = [
-                                  { name: 'Surat Lamaran Kerja', desc: 'Ditujukan kepada Direktur RSI Fatimah', mandatory: 1, mimes: 'application/pdf,image/jpeg,image/png', max_size: 5120 },
-                                  { name: 'Curriculum Vitae (CV) & Portofolio', desc: 'Riwayat hidup dan bukti hasil karya / proyek', mandatory: 1, mimes: 'application/pdf,image/jpeg,image/png', max_size: 5120 },
-                                  { name: 'Ijazah & Transkrip Terakhir', desc: 'Scan legalisir ijazah dan transkrip nilai', mandatory: 1, mimes: 'application/pdf,image/jpeg,image/png', max_size: 5120 },
-                                  { name: 'KTP & Kartu Keluarga', desc: 'Scan identitas kependudukan', mandatory: 1, mimes: 'application/pdf,image/jpeg,image/png', max_size: 5120 },
-                                  { name: 'Sertifikat Keahlian / Kompetensi', desc: 'Sertifikat sertifikasi IT / akuntansi / administrasi', mandatory: 0, mimes: 'application/pdf,image/jpeg,image/png', max_size: 5120 },
-                                  { name: 'SKCK Kepolisian', desc: 'Surat catatan kepolisian aktif', mandatory: 0, mimes: 'application/pdf,image/jpeg,image/png', max_size: 5120 }
+                                  { name: 'Surat Lamaran Kerja', desc: 'Ditujukan kepada Direktur RSI Fatimah', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
+                                  { name: 'Curriculum Vitae (CV) & Portofolio', desc: 'Riwayat hidup dan bukti hasil karya / proyek', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
+                                  { name: 'Ijazah & Transkrip Terakhir', desc: 'Scan legalisir ijazah dan transkrip nilai', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
+                                  { name: 'KTP & Kartu Keluarga', desc: 'Scan identitas kependudukan', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
+                                  { name: 'Sertifikat Keahlian / Kompetensi', desc: 'Sertifikat sertifikasi IT / akuntansi / administrasi', mandatory: 0, mimes: 'application/pdf', max_size: 5120 },
+                                  { name: 'SKCK Kepolisian', desc: 'Surat catatan kepolisian aktif', mandatory: 0, mimes: 'application/pdf', max_size: 5120 }
                               ];
                           } else if (type === 'kosong') {
                               this.documents = [
-                                  { name: 'Surat Lamaran Kerja', desc: '', mandatory: 1, mimes: 'application/pdf,image/jpeg,image/png', max_size: 5120 }
+                                  { name: 'Surat Lamaran Kerja', desc: '', mandatory: 1, mimes: 'application/pdf', max_size: 5120 }
                               ];
                           }
                       },
@@ -258,9 +258,9 @@
                                                class="w-full h-9 px-3 text-sm bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-[#0179B5]">
                                     </div>
                                     <div class="flex items-center gap-2">
-                                        <input type="hidden" :name="'document_mimes[' + index + ']'" :value="doc.mimes || 'application/pdf,image/jpeg,image/png'">
+                                        <input type="hidden" :name="'document_mimes[' + index + ']'" :value="doc.mimes || 'application/pdf'">
                                         <input type="hidden" :name="'document_max_sizes[' + index + ']'" :value="doc.max_size || 5120">
-                                        <span class="text-xs text-slate-500 font-mono">Format: PDF, JPG, PNG &bull; Maks 5 MB</span>
+                                        <span class="text-xs text-slate-500 font-mono">Format: PDF &bull; Maks 5 MB</span>
                                     </div>
                                 </div>
                             </div>

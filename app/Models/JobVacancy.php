@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class JobVacancy extends Model
 {
@@ -88,7 +89,7 @@ class JobVacancy extends Model
 
     public function getSummaryAttribute(): ?string
     {
-        return $this->description ? \Illuminate\Support\Str::limit(strip_tags($this->description), 150) : null;
+        return $this->description ? Str::limit(strip_tags($this->description), 150) : null;
     }
 
     /**
@@ -133,6 +134,82 @@ class JobVacancy extends Model
             : $this->recruitmentPeriod()->first();
 
         return $period ? $period->isCurrentlyOpen($time) : false;
+    }
+
+    /**
+     * Memeriksa apakah lowongan akan segera ditutup dalam waktu dekat (default <= 3 hari).
+     */
+    public function isClosingSoon(?CarbonInterface $at = null, int $thresholdDays = 3): bool
+    {
+        if (! $this->close_at) {
+            return false;
+        }
+
+        $time = $at ?? now();
+
+        // Jika batas waktu penutupan sudah lewat
+        if ($this->close_at->lessThanOrEqualTo($time)) {
+            return false;
+        }
+
+        // Cek apakah sisa waktu dalam jam kurang dari atau sama dengan ambang batas (default 3 hari = 72 jam)
+        return $time->diffInHours($this->close_at, false) <= ($thresholdDays * 24);
+    }
+
+    /**
+     * Mendapatkan teks sisa waktu penutupan lowongan yang rapi dan mudah dibaca (hari dan jam).
+     * Contoh: "1 hari 8 jam", "2 hari", "5 jam 30 menit", atau "45 menit".
+     */
+    public function getClosingRemainingText(?CarbonInterface $at = null): ?string
+    {
+        if (! $this->close_at) {
+            return null;
+        }
+
+        $time = $at ?? now();
+
+        if ($this->close_at->lessThanOrEqualTo($time)) {
+            return null;
+        }
+
+        $diff = $time->diff($this->close_at);
+        $days = (int) $diff->days;
+        $hours = (int) $diff->h;
+        $minutes = (int) $diff->i;
+
+        $parts = [];
+
+        if ($days > 0) {
+            $parts[] = "{$days} hari";
+            if ($hours > 0) {
+                $parts[] = "{$hours} jam";
+            }
+        } elseif ($hours > 0) {
+            $parts[] = "{$hours} jam";
+            if ($minutes > 0) {
+                $parts[] = "{$minutes} menit";
+            }
+        } else {
+            $parts[] = $minutes > 0 ? "{$minutes} menit" : 'kurang dari 1 menit';
+        }
+
+        return implode(' ', $parts);
+    }
+
+    /**
+     * Accessor untuk closing_remaining_text
+     */
+    public function getClosingRemainingTextAttribute(): ?string
+    {
+        return $this->getClosingRemainingText();
+    }
+
+    /**
+     * Accessor untuk is_closing_soon
+     */
+    public function getIsClosingSoonAttribute(): bool
+    {
+        return $this->isClosingSoon();
     }
 
     /**

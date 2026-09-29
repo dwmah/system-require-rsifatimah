@@ -10,6 +10,8 @@ use App\Models\ApplicantWorkExperience;
 use App\Models\User;
 use App\Services\Profile\ProfileCompletenessService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class ApplicantProfileTest extends TestCase
@@ -22,7 +24,7 @@ class ApplicantProfileTest extends TestCase
         $seq = $sequence++;
 
         $user = User::create(array_merge([
-            'name' => 'Pelamar Tes ' . $seq,
+            'name' => 'Pelamar Tes '.$seq,
             'email' => "pelamar.tes{$seq}@example.com",
             'phone' => sprintf('62812345%05d', $seq),
             'registration_number' => sprintf('PLM-2026-%06d', $seq),
@@ -434,7 +436,7 @@ class ApplicantProfileTest extends TestCase
 
     public function test_profile_completeness_service_evaluates_correctly(): void
     {
-        $service = new ProfileCompletenessService();
+        $service = new ProfileCompletenessService;
 
         // 1. Fresh user right after registration:
         // Has name, email, phone, NIK (4 criteria of 11 = 36%)
@@ -502,7 +504,7 @@ class ApplicantProfileTest extends TestCase
 
     public function test_profile_completeness_service_is_safe_without_applicant_profile(): void
     {
-        $service = new ProfileCompletenessService();
+        $service = new ProfileCompletenessService;
 
         // User without applicantProfile record
         $user = User::create([
@@ -559,7 +561,7 @@ class ApplicantProfileTest extends TestCase
             'photo_path' => 'profile-photos/sample.jpg',
         ]);
 
-        \App\Models\ApplicantEducation::create([
+        ApplicantEducation::create([
             'applicant_profile_id' => $user->applicantProfile->id,
             'education_level' => 'S1',
             'institution_name' => 'Universitas Airlangga',
@@ -572,5 +574,69 @@ class ApplicantProfileTest extends TestCase
         $response->assertSee('Menuju ke Pemberkasan');
         $response->assertSee('id="btn-cta-pemberkasan"', false);
         $response->assertSee(route('portal.applications.index'));
+    }
+
+    public function test_unified_profile_update_saves_personal_data_and_photo_simultaneously(): void
+    {
+        Storage::fake('public');
+
+        $user = $this->createApplicantUser();
+
+        $photoFile = UploadedFile::fake()->image('my_pas_foto.jpg', 300, 400);
+
+        $response = $this->actingAs($user)->patch(route('profile.update'), [
+            'name' => 'Dawam Ahmadi Updated',
+            'birth_place' => 'Banyuwangi',
+            'birth_date' => '1998-05-14',
+            'gender' => 'Laki-laki',
+            'email' => 'dawam.updated@example.com',
+            'phone' => '081234567899',
+            'address_ktp' => 'Jl. Letjen Suprapto No. 45 Banyuwangi',
+            'same_as_ktp' => '1',
+            'photo' => $photoFile,
+        ]);
+
+        $response->assertRedirect(route('profile.show'));
+        $response->assertSessionHas('success', 'Data profil berhasil disimpan.');
+
+        $user->refresh();
+        $this->assertEquals('Dawam Ahmadi Updated', $user->name);
+        $this->assertEquals('dawam.updated@example.com', $user->email);
+        $this->assertEquals('6281234567899', $user->phone);
+        $this->assertEquals('Banyuwangi', $user->applicantProfile->birth_place);
+        $this->assertEquals('1998-05-14', $user->applicantProfile->birth_date->format('Y-m-d'));
+        $this->assertEquals('Laki-laki', $user->applicantProfile->gender);
+        $this->assertEquals('Jl. Letjen Suprapto No. 45 Banyuwangi', $user->applicantProfile->address_ktp);
+        $this->assertEquals('Jl. Letjen Suprapto No. 45 Banyuwangi', $user->applicantProfile->address_domicile);
+        $this->assertTrue($user->applicantProfile->same_as_ktp);
+        $this->assertNotNull($user->applicantProfile->photo_path);
+        Storage::disk('public')->assertExists($user->applicantProfile->photo_path);
+    }
+
+    public function test_unified_profile_update_can_remove_photo(): void
+    {
+        Storage::fake('public');
+
+        $user = $this->createApplicantUser([], [
+            'photo_path' => 'profile-photos/existing_old_photo.jpg',
+        ]);
+        Storage::disk('public')->put('profile-photos/existing_old_photo.jpg', 'fake-image-content');
+
+        $response = $this->actingAs($user)->patch(route('profile.update'), [
+            'name' => $user->name,
+            'birth_place' => 'Banyuwangi',
+            'birth_date' => '1998-05-14',
+            'gender' => 'Laki-laki',
+            'email' => $user->email,
+            'phone' => $user->phone,
+            'address_ktp' => 'Jl. Letjen Suprapto No. 45 Banyuwangi',
+            'same_as_ktp' => '1',
+            'remove_photo' => '1',
+        ]);
+
+        $response->assertRedirect(route('profile.show'));
+        $user->refresh();
+        $this->assertNull($user->applicantProfile->photo_path);
+        Storage::disk('public')->assertMissing('profile-photos/existing_old_photo.jpg');
     }
 }

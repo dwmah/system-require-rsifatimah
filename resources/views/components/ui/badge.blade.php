@@ -5,7 +5,7 @@
 ])
 
 @php
-    $baseClasses = 'inline-flex items-center font-medium rounded-full';
+    $baseClasses = 'inline-flex items-center font-medium rounded-full whitespace-nowrap';
 
     $sizeClasses = match($size) {
         'sm' => 'text-[11px] px-2 py-0.5 gap-1',

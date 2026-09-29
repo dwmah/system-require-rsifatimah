@@ -80,7 +80,6 @@
                 autocomplete="tel"
                 class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $errors->has('phone') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100' }} focus:outline-hidden focus:ring-2"
             >
-            <p class="text-[11px] text-slate-400 mt-1">Nomor telepon dapat digunakan untuk pemulihan akun jika lupa password.</p>
             <x-form.error name="phone" />
         </div>
 

@@ -4,8 +4,8 @@
 
 @php
     /** @var \App\Models\JobVacancy $vacancy */
-    $daysRemaining = now()->diffInDays($vacancy->close_at, false);
-    $isClosingSoon = $daysRemaining >= 0 && $daysRemaining <= 3;
+    $isClosingSoon = $vacancy->isClosingSoon();
+    $remainingText = $vacancy->getClosingRemainingText();
 @endphp
 
 <article {{ $attributes->merge(['class' => 'bg-white rounded-xl border border-slate-200 shadow-2xs hover:shadow-xs transition-shadow duration-200 flex flex-col justify-between overflow-hidden p-5']) }}>
@@ -16,9 +16,13 @@
                 {{ $vacancy->code }}
             </span>
 
-            @if ($isClosingSoon)
+            @if (! $vacancy->isCurrentlyOpen())
+                <x-ui.badge variant="neutral" size="sm">
+                    Ditutup
+                </x-ui.badge>
+            @elseif ($isClosingSoon && $remainingText)
                 <x-ui.badge variant="warning" dot size="sm">
-                    Segera Ditutup ({{ $daysRemaining }} hari)
+                    Segera Ditutup ({{ $remainingText }})
                 </x-ui.badge>
             @else
                 <x-ui.badge variant="success" dot size="sm">

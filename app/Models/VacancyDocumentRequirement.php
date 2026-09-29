@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\Recruitment\ApplicationDocumentService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -68,6 +69,23 @@ class VacancyDocumentRequirement extends Model
     public function setSequenceOrderAttribute($value): void
     {
         $this->attributes['sort_order'] = (int) $value;
+    }
+
+    /**
+     * Format allowed mimes menjadi label yang ramah pengguna (contoh: PDF).
+     */
+    public function getFormattedAllowedMimesAttribute(): string
+    {
+        if (empty($this->allowed_mimes)) {
+            return 'PDF';
+        }
+
+        $tokens = array_filter(array_map('trim', explode(',', $this->allowed_mimes)));
+        $formatted = array_map(function ($token) {
+            return strtoupper(ApplicationDocumentService::mimeToExtension($token) ?: $token);
+        }, $tokens);
+
+        return implode(', ', array_unique($formatted)) ?: 'PDF';
     }
 
     /**

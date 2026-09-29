@@ -7,28 +7,204 @@
     class="bg-white rounded-2xl border border-slate-200 shadow-2xs p-6 sm:p-7"
     x-data="{
         sameAsKtp: {{ old('same_as_ktp', $profile?->same_as_ktp ? 'true' : 'false') }},
-        addressKtp: '{{ addslashes(old('address_ktp', $profile?->address_ktp ?? '')) }}'
+        addressKtp: '{{ addslashes(old('address_ktp', $profile?->address_ktp ?? '')) }}',
+        previewUrl: null,
+        fileName: '',
+        fileSize: '',
+        hasNewPhoto: false,
+        removePhoto: false,
+        hasExistingPhoto: {{ $profile?->photo_url ? 'true' : 'false' }},
+        handlePhotoSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('Ukuran berkas melebihi 5 MB. Silakan pilih foto dengan ukuran maksimal 5 MB.');
+                    event.target.value = '';
+                    return;
+                }
+                this.previewUrl = URL.createObjectURL(file);
+                this.fileName = file.name;
+                this.fileSize = (file.size / 1024).toFixed(0) + ' KB';
+                this.hasNewPhoto = true;
+                this.removePhoto = false;
+            }
+        },
+        cancelPhoto() {
+            this.previewUrl = null;
+            this.fileName = '';
+            this.fileSize = '';
+            this.hasNewPhoto = false;
+            const input = document.getElementById('profile_photo_input');
+            if (input) input.value = '';
+        },
+        markRemovePhoto() {
+            this.removePhoto = true;
+            this.cancelPhoto();
+        },
+        undoRemovePhoto() {
+            this.removePhoto = false;
+        }
     }"
 >
     {{-- Card Header --}}
     <div class="flex items-center justify-between pb-4 mb-6 border-b border-slate-100">
         <div>
             <div class="flex items-center gap-2 mb-1">
-                <h3 class="text-base font-bold text-slate-900">Data Pribadi & Kontak</h3>
+                <h3 class="text-base font-bold text-slate-900">Data Pribadi & Profil</h3>
                 <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">
                     WAJIB
                 </span>
             </div>
-            <p class="text-xs text-slate-500">Identitas diri, alamat domisili, dan jalur komunikasi resmi.</p>
+            <p class="text-xs text-slate-500">Pas foto formal, identitas diri lengkap, serta alamat domisili dan kontak resmi Anda.</p>
         </div>
     </div>
 
-    {{-- Single Form --}}
-    <form method="POST" action="{{ route('profile.update') }}" class="space-y-6">
+    {{-- Single Unified Form --}}
+    <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="space-y-6">
         @csrf
         @method('PATCH')
 
-        {{-- Section: Identitas Diri --}}
+        {{-- Hidden input for remove_photo --}}
+        <input type="hidden" name="remove_photo" :value="removePhoto ? '1' : '0'">
+
+        {{-- SECTION 1: PAS FOTO FORMAL (Paling Atas Sendiri) --}}
+        <div class="p-4 sm:p-5 rounded-2xl bg-slate-50/80 border border-slate-200/90">
+            <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5">
+                {{-- Frame Pas Foto 3:4 (Strict 105px x 140px) --}}
+                <div class="relative shrink-0" style="width: 105px; height: 140px;">
+                    <div class="rounded-xl overflow-hidden bg-white border-2 border-slate-200 shadow-xs relative"
+                         style="width: 105px; height: 140px; min-width: 105px; min-height: 140px; max-width: 105px; max-height: 140px; position: relative; overflow: hidden;">
+
+                        {{-- Live Preview Image --}}
+                        <template x-if="previewUrl">
+                            <img :src="previewUrl"
+                                 alt="Pratinjau Pas Foto Baru"
+                                 class="w-full h-full object-cover"
+                                 style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;">
+                        </template>
+
+                        {{-- Existing Saved Photo --}}
+                        @if($profile?->photo_url)
+                            <img x-show="!previewUrl && !removePhoto"
+                                 src="{{ $profile->photo_url }}"
+                                 alt="{{ $user->name }}"
+                                 class="w-full h-full object-cover"
+                                 style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;">
+                        @endif
+
+                        {{-- Placeholder when no photo or marked for removal --}}
+                        <div x-show="(!hasExistingPhoto && !previewUrl) || (removePhoto && !previewUrl)"
+                             class="w-full h-full bg-slate-100 flex flex-col items-center justify-center text-slate-400 p-2 text-center"
+                             style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                            <svg class="w-10 h-10 text-slate-300 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                            <span class="text-[10px] font-semibold text-slate-400">Pas Foto 3x4</span>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Info & Action Controls --}}
+                <div class="flex-1 space-y-2.5 text-center sm:text-left min-w-0">
+                    <div>
+                        <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 mb-1">
+                            <h4 class="text-sm font-bold text-slate-900">Pas Foto Formal (3x4)</h4>
+
+                            <template x-if="hasNewPhoto">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-sky-50 text-sky-700 border border-sky-200">
+                                    FOTO BARU DIPILIH
+                                </span>
+                            </template>
+                            <template x-if="removePhoto && !hasNewPhoto">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+                                    AKAN DIHAPUS
+                                </span>
+                            </template>
+                            <template x-if="!hasNewPhoto && !removePhoto">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold {{ $profile?->photo_url ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200' }}">
+                                    {{ $profile?->photo_url ? 'DIUNGGAH' : 'WAJIB PROFIL LENGKAP' }}
+                                </span>
+                            </template>
+                        </div>
+                        <p class="text-xs text-slate-500 leading-relaxed">
+                            Pas foto formal berlatar belakang polos untuk identitas resmi dan kartu seleksi penerimaan karyawan. Format JPG, PNG, atau WEBP (maks. 5 MB).
+                        </p>
+                    </div>
+
+                    {{-- Hidden File Input --}}
+                    <input
+                        type="file"
+                        id="profile_photo_input"
+                        name="photo"
+                        accept="image/jpeg,image/png,image/webp"
+                        class="hidden"
+                        @change="handlePhotoSelect($event)"
+                    >
+
+                    {{-- Photo Actions --}}
+                    <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-1">
+                        <label
+                            for="profile_photo_input"
+                            class="cursor-pointer inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#0179B5] hover:bg-[#016293] text-white text-xs font-bold rounded-xl shadow-xs transition-colors"
+                        >
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            <span x-text="hasExistingPhoto || hasNewPhoto ? 'Ganti Pas Foto' : 'Pilih Pas Foto'"></span>
+                        </label>
+
+                        <template x-if="hasNewPhoto">
+                            <button
+                                type="button"
+                                @click="cancelPhoto()"
+                                class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold rounded-xl transition-colors cursor-pointer"
+                            >
+                                Batalkan Pilihan
+                            </button>
+                        </template>
+
+                        <template x-if="hasExistingPhoto && !hasNewPhoto && !removePhoto">
+                            <button
+                                type="button"
+                                @click="markRemovePhoto()"
+                                class="inline-flex items-center gap-1 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-semibold rounded-xl border border-rose-200 transition-colors cursor-pointer"
+                            >
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                                <span>Hapus Foto</span>
+                            </button>
+                        </template>
+
+                        <template x-if="removePhoto && !hasNewPhoto">
+                            <button
+                                type="button"
+                                @click="undoRemovePhoto()"
+                                class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition-colors cursor-pointer"
+                            >
+                                Batal Hapus
+                            </button>
+                        </template>
+                    </div>
+
+                    {{-- Selected file feedback indicator --}}
+                    <div x-show="hasNewPhoto" x-cloak class="pt-1">
+                        <div class="inline-flex items-center gap-2 px-2.5 py-1 bg-sky-50 border border-sky-200 rounded-lg text-xs text-slate-700">
+                            <span class="font-medium truncate max-w-xs" x-text="fileName"></span>
+                            <span class="text-slate-400 font-mono text-[11px]" x-text="'(' + fileSize + ')'"></span>
+                        </div>
+                    </div>
+
+                    <x-form.error name="photo" />
+                </div>
+            </div>
+        </div>
+
+        {{-- Divider --}}
+        <div class="border-t border-slate-100"></div>
+
+        {{-- SECTION 2: IDENTITAS DIRI --}}
         <div>
             <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Identitas Diri</p>
 
@@ -129,7 +305,7 @@
         {{-- Divider --}}
         <div class="border-t border-slate-100"></div>
 
-        {{-- Section: Alamat & Kontak --}}
+        {{-- SECTION 3: ALAMAT & KONTAK --}}
         <div>
             <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Alamat & Kontak</p>
 
@@ -217,10 +393,16 @@
             </div>
         </div>
 
-        {{-- Single CTA --}}
-        <div class="pt-2 flex justify-end border-t border-slate-100">
-            <x-ui.button type="submit" variant="primary" size="sm">
-                Simpan Perubahan
+        {{-- Single CTA: Simpan Perubahan --}}
+        <div class="pt-4 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-100">
+            <p class="text-xs text-slate-400 text-center sm:text-left">
+                Semua data pribadi dan foto akan disimpan secara bersamaan.
+            </p>
+            <x-ui.button type="submit" variant="primary" size="sm" class="w-full sm:w-auto shadow-xs">
+                <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span>Simpan Perubahan</span>
             </x-ui.button>
         </div>
     </form>
