@@ -10,6 +10,7 @@ use App\Models\JobApplication;
 use App\Models\User;
 use App\Models\VacancySelectionStage;
 use App\Services\Notification\RecruitmentNotificationService;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -17,8 +18,7 @@ class ApplicationVerificationService
 {
     public function __construct(
         protected RecruitmentNotificationService $notificationService
-    ) {
-    }
+    ) {}
 
     /**
      * Update status verifikasi dan catatan untuk satu item dokumen.
@@ -44,7 +44,7 @@ class ApplicationVerificationService
      */
     public function checkAndAutoApproveIfAllDocumentsValid(JobApplication $application, ?User $adminUser = null): bool
     {
-        if (!$application || $application->isRejected() || $application->isPassedAdministration()) {
+        if (! $application || $application->isRejected() || $application->isPassedAdministration()) {
             return false;
         }
 
@@ -58,7 +58,7 @@ class ApplicationVerificationService
 
         foreach ($reqsToCheck as $req) {
             $doc = $application->documents()->where('vacancy_document_requirement_id', $req->id)->first();
-            if (!$doc || $doc->verification_status !== 'valid') {
+            if (! $doc || $doc->verification_status !== 'valid') {
                 return false;
             }
         }
@@ -71,14 +71,14 @@ class ApplicationVerificationService
             return false;
         }
 
-        $admin = $adminUser ?? \Illuminate\Support\Facades\Auth::user() ?? User::where('role', User::ROLE_ADMIN)->first();
+        $admin = $adminUser ?? Auth::user() ?? User::where('role', User::ROLE_ADMIN)->first();
 
         // Temukan tahapan seleksi administrasi / berkas
         $adminStage = $application->jobVacancy->selectionStages()
             ->where(function ($q) {
                 $q->where('name', 'like', '%Administrasi%')
-                  ->orWhere('name', 'like', '%Berkas%')
-                  ->orWhere('name', 'like', '%Dokumen%');
+                    ->orWhere('name', 'like', '%Berkas%')
+                    ->orWhere('name', 'like', '%Dokumen%');
             })
             ->orderBy('sort_order', 'asc')
             ->first() ?? $application->jobVacancy->selectionStages()->orderBy('sort_order', 'asc')->first();
@@ -129,6 +129,7 @@ class ApplicationVerificationService
 
             // Kirim notifikasi lolos berkas administrasi
             $this->notificationService->notifyVerificationResult($application, true);
+
             return true;
         }
 
@@ -140,13 +141,13 @@ class ApplicationVerificationService
      */
     public function approveBiodata(JobApplication $application, User $adminUser, ?string $adminNote = null): JobApplication
     {
-        return DB::transaction(function () use ($application, $adminUser, $adminNote) {
+        return DB::transaction(function () use ($application, $adminNote) {
             // Temukan tahapan pendaftaran online / biodata / portofolio
             $biodataStage = $application->jobVacancy->selectionStages()
                 ->where(function ($q) {
                     $q->where('name', 'like', '%Pendaftaran%')
-                      ->orWhere('name', 'like', '%Biodata%')
-                      ->orWhere('name', 'like', '%Portofolio%');
+                        ->orWhere('name', 'like', '%Biodata%')
+                        ->orWhere('name', 'like', '%Portofolio%');
                 })
                 ->orderBy('sort_order', 'asc')
                 ->first() ?? $application->jobVacancy->selectionStages()->orderBy('sort_order', 'asc')->first();
@@ -223,8 +224,8 @@ class ApplicationVerificationService
             $adminStage = $application->jobVacancy->selectionStages()
                 ->where(function ($q) {
                     $q->where('name', 'like', '%Administrasi%')
-                      ->orWhere('name', 'like', '%Berkas%')
-                      ->orWhere('name', 'like', '%Dokumen%');
+                        ->orWhere('name', 'like', '%Berkas%')
+                        ->orWhere('name', 'like', '%Dokumen%');
                 })
                 ->orderBy('sort_order', 'asc')
                 ->first() ?? $application->jobVacancy->selectionStages()->orderBy('sort_order', 'asc')->first();
@@ -264,7 +265,7 @@ class ApplicationVerificationService
 
                 if ($nextStage) {
                     $application->update(['current_stage_id' => $nextStage->id]);
-                    
+
                     ApplicationStageHistory::updateOrCreate(
                         [
                             'job_application_id' => $application->id,

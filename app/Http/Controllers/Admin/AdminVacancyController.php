@@ -162,8 +162,8 @@ class AdminVacancyController extends Controller
                         $hasValidCustomDocs = true;
                         $isMandatory = isset($docMandatories[$idx]) && ($docMandatories[$idx] === '1' || $docMandatories[$idx] === 1 || $docMandatories[$idx] === true || $docMandatories[$idx] === 'true');
                         $desc = $docDescriptions[$idx] ?? null;
-                        $mimes = ! empty($docMimes[$idx]) ? $docMimes[$idx] : 'application/pdf';
-                        $maxSize = ! empty($docMaxSizes[$idx]) ? (int) $docMaxSizes[$idx] : 5120;
+                        $mimes = !empty($docMimes[$idx]) ? $docMimes[$idx] : 'application/pdf,image/jpeg,image/png';
+                        $maxSize = !empty($docMaxSizes[$idx]) ? (int) $docMaxSizes[$idx] : 5120;
 
                         VacancyDocumentRequirement::create([
                             'job_vacancy_id' => $vacancy->id,
@@ -390,8 +390,8 @@ class AdminVacancyController extends Controller
                     $docId = ! empty($docIds[$idx]) ? (int) $docIds[$idx] : null;
                     $isMandatory = isset($docMandatories[$idx]) && ($docMandatories[$idx] === '1' || $docMandatories[$idx] === 1 || $docMandatories[$idx] === true || $docMandatories[$idx] === 'true');
                     $desc = $docDescriptions[$idx] ?? null;
-                    $mimes = ! empty($docMimes[$idx]) ? $docMimes[$idx] : 'application/pdf';
-                    $maxSize = ! empty($docMaxSizes[$idx]) ? (int) $docMaxSizes[$idx] : 5120;
+                    $mimes = !empty($docMimes[$idx]) ? $docMimes[$idx] : 'application/pdf,image/jpeg,image/png';
+                    $maxSize = !empty($docMaxSizes[$idx]) ? (int) $docMaxSizes[$idx] : 5120;
 
                     // Jika docId tidak ada, cari requirement lama yang belum terproses dengan nama yang sama
                     if (! $docId && $existingDoc = $existingDocReqs->whereNotIn('id', $processedIds)->firstWhere('name', trim($docName))) {

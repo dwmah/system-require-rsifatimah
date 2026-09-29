@@ -79,14 +79,13 @@ class UpdateProfileRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'photo' => 'Pas Foto Formal',
-            'name' => 'Nama Lengkap',
-            'birth_place' => 'Tempat Lahir',
-            'birth_date' => 'Tanggal Lahir',
-            'gender' => 'Jenis Kelamin',
-            'email' => 'Alamat Email',
-            'phone' => 'Nomor WhatsApp / HP',
-            'address_ktp' => 'Alamat KTP',
+            'name'             => 'Nama Lengkap',
+            'birth_place'      => 'Tempat Lahir',
+            'birth_date'       => 'Tanggal Lahir',
+            'gender'           => 'Jenis Kelamin',
+            'email'            => 'Alamat Email',
+            'phone'            => 'Nomor WhatsApp / HP',
+            'address_ktp'      => 'Alamat KTP',
             'address_domicile' => 'Alamat Domisili',
             'same_as_ktp' => 'Sama dengan KTP',
         ];
@@ -100,22 +99,19 @@ class UpdateProfileRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'photo.image' => 'Berkas pas foto harus berupa file gambar valid.',
-            'photo.mimes' => 'Format pas foto yang diperbolehkan hanya JPG, JPEG, PNG, atau WEBP.',
-            'photo.max' => 'Ukuran pas foto maksimal adalah 5 MB.',
-            'name.required' => 'Nama lengkap wajib diisi.',
-            'birth_place.required' => 'Tempat lahir wajib diisi.',
-            'birth_date.required' => 'Tanggal lahir wajib diisi.',
-            'birth_date.before' => 'Tanggal lahir harus sebelum hari ini.',
-            'gender.required' => 'Jenis kelamin wajib dipilih.',
-            'gender.in' => 'Pilihan jenis kelamin tidak valid.',
-            'email.required' => 'Alamat email wajib diisi.',
-            'email.email' => 'Format alamat email tidak valid.',
-            'email.unique' => 'Alamat email sudah digunakan oleh pengguna lain.',
-            'phone.required' => 'Nomor WhatsApp / HP wajib diisi.',
-            'phone.regex' => 'Format nomor WhatsApp / HP tidak valid. Gunakan format nomor Indonesia (contoh: 081234567890).',
-            'phone.unique' => 'Nomor WhatsApp / HP sudah digunakan oleh pengguna lain.',
-            'address_ktp.required' => 'Alamat sesuai KTP wajib diisi.',
+            'name.required'             => 'Nama lengkap wajib diisi.',
+            'birth_place.required'      => 'Tempat lahir wajib diisi.',
+            'birth_date.required'       => 'Tanggal lahir wajib diisi.',
+            'birth_date.before'         => 'Tanggal lahir harus sebelum hari ini.',
+            'gender.required'           => 'Jenis kelamin wajib dipilih.',
+            'gender.in'                 => 'Pilihan jenis kelamin tidak valid.',
+            'email.required'            => 'Alamat email wajib diisi.',
+            'email.email'               => 'Format alamat email tidak valid.',
+            'email.unique'              => 'Alamat email sudah digunakan oleh pengguna lain.',
+            'phone.required'            => 'Nomor WhatsApp / HP wajib diisi.',
+            'phone.regex'               => 'Format nomor WhatsApp / HP tidak valid. Gunakan format nomor Indonesia (contoh: 081234567890).',
+            'phone.unique'              => 'Nomor WhatsApp / HP sudah digunakan oleh pengguna lain.',
+            'address_ktp.required'      => 'Alamat sesuai KTP wajib diisi.',
             'address_domicile.required' => 'Alamat domisili wajib diisi jika berbeda dengan KTP.',
         ];
     }

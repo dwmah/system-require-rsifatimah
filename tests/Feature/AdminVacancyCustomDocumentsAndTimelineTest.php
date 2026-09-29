@@ -23,7 +23,9 @@ class AdminVacancyCustomDocumentsAndTimelineTest extends TestCase
     use RefreshDatabase;
 
     protected User $admin;
+
     protected User $applicant;
+
     protected RecruitmentPeriod $period;
 
     protected function setUp(): void

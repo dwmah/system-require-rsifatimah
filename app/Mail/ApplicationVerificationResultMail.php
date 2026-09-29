@@ -16,8 +16,7 @@ class ApplicationVerificationResultMail extends Mailable
     public function __construct(
         public JobApplication $application,
         public bool $isPassed
-    ) {
-    }
+    ) {}
 
     public function envelope(): Envelope
     {

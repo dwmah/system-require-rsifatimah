@@ -17,8 +17,7 @@ class SelectionStageUpdatedMail extends Mailable
         public JobApplication $application,
         public string $stageName,
         public ?string $stageNote = null
-    ) {
-    }
+    ) {}
 
     public function envelope(): Envelope
     {

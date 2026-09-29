@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 
 class ApplicantProfile extends Model
 {
@@ -46,8 +47,8 @@ class ApplicantProfile extends Model
      */
     public function getPhotoUrlAttribute(): ?string
     {
-        if ($this->photo_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($this->photo_path)) {
-            return asset('storage/' . $this->photo_path);
+        if ($this->photo_path && Storage::disk('public')->exists($this->photo_path)) {
+            return asset('storage/'.$this->photo_path);
         }
 
         return null;

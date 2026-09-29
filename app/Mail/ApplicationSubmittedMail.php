@@ -13,9 +13,7 @@ class ApplicationSubmittedMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public function __construct(public JobApplication $application)
-    {
-    }
+    public function __construct(public JobApplication $application) {}
 
     public function envelope(): Envelope
     {

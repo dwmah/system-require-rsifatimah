@@ -100,7 +100,7 @@ class ApplicationDocumentController extends Controller
             );
 
             return redirect()->route('portal.applications.documents.index', $jobApplication)
-                ->with('success', 'Berkas "' . $targetRequirement->name . '" berhasil disimpan.');
+                ->with('success', 'Berkas "'.$targetRequirement->name.'" berhasil disimpan.');
         } catch (ValidationException $e) {
             return back()->withErrors($e->errors())->withInput();
         } catch (DomainException $e) {

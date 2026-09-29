@@ -160,7 +160,14 @@ class ProfileController extends Controller
 
             $user->applicantProfile()->updateOrCreate(
                 ['user_id' => $user->id],
-                $profileData
+                [
+                    'birth_place'      => $validated['birth_place'],
+                    'birth_date'       => $validated['birth_date'],
+                    'gender'           => $validated['gender'],
+                    'address_ktp'      => $validated['address_ktp'],
+                    'same_as_ktp'      => $sameAsKtp,
+                    'address_domicile' => $addressDomicile,
+                ]
             );
         });
 

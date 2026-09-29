@@ -131,3 +131,134 @@ Untuk memastikan pengembangan berjalan terstandarisasi, efisien, dan mudah diraw
 • Basis Data & Manajemen Penyimpanan (MySQL): Sistem menggunakan MySQL (Relational Database Management System) sebagai basis data utama yang dikelola melalui Eloquent ORM Laravel. MySQL dipilih karena performanya yang stabil, sangat kompatibel dengan server web dan hosting RSI Fatimah, serta mudah dipelihara oleh tim IT internal. Penyimpanan berkas PDF fisik (lamaran, ijazah, STR) dikelola melalui direktori Storage Link Laravel, sedangkan tabel MySQL menyimpan data akun, relasi formasi, riwayat status, dan log verifikasi berkas.
 • Kesesuaian dengan Tim IT Internal: Pemilihan stack Laravel + Bootstrap memudahkan koordinasi teknis dan kesinambungan pemeliharaan bersama Mas Bima dan Mas Wisnu, mengingat kedua framework ini merupakan standar umum pengembangan web di lingkungan RSI Fatimah.
 
+11. Rancangan yang Sudah Diimplementasikan (Status Pengembangan per 28 September 2026)
+
+Berikut adalah daftar rancangan dan fitur yang sudah berhasil diimplementasikan dalam sistem:
+
+A. Modul Autentikasi & Manajemen Akun
+   • Halaman Registrasi Pelamar Baru (/daftar) — dengan auto-link ke formasi lowongan yang dipilih
+   • Halaman Login (/masuk) — mendukung login dengan email, dilengkapi toggle show/hide password
+   • Fitur Lupa Password (/lupa-password) — kirim link reset via email
+   • Reset Password (/reset-password/{token}) — form reset aman dengan token
+   • Rate Limiting pada registrasi (throttle:registration) dan password reset (throttle:password-reset-link)
+   • Role-based Middleware: middleware `applicant` untuk pelamar, `admin` untuk Tim SDI
+   • Login tetap tersedia meskipun periode rekrutmen publik ditutup
+
+B. Portal Publik (Halaman Terbuka untuk Umum)
+   • Halaman Utama / Landing Page — listing seluruh lowongan aktif dengan statistik pelamar
+   • Detail Lowongan (/lowongan/{id}) — kualifikasi, persyaratan dokumen, timeline seleksi
+   • Panduan Alur Pendaftaran (/panduan/alur-pendaftaran) — step-by-step guide visual
+   • Panduan Persyaratan Umum (/panduan/persyaratan) — daftar berkas & ketentuan
+   • Halaman Rekrutmen Ditutup (/rekrutmen-ditutup) — tampil otomatis saat periode berakhir
+   • Middleware `recruitment.open` — mengunci akses publik saat tidak ada periode aktif
+
+C. Dashboard & Profil Pelamar (Self-Service Portal)
+   • Dashboard Beranda (/portal) — ringkasan status lamaran, progres tahapan, notifikasi
+   • Profil Lengkap (/portal/profil) — biodata pribadi, alamat KTP, alamat domisili, kontak
+   • Upload Foto Profil — dengan validasi ukuran & tipe file, replace/delete foto lama
+   • CRUD Riwayat Pendidikan — institusi, program studi, tahun lulus, IPK, akreditasi
+   • CRUD Lisensi / STR — nomor STR, masa berlaku, status aktif
+   • CRUD Sertifikasi — nama sertifikat, penerbit, tanggal
+   • CRUD Pengalaman Kerja — posisi, perusahaan, durasi kerja
+   • Profile Completeness Service — tracking persentase kelengkapan profil pelamar
+
+D. Alur Lamaran Pekerjaan (Workflow Lengkap)
+   • Pilih Formasi Lowongan — dropdown formasi aktif sesuai periode rekrutmen
+   • Draft Lamaran — inisialisasi lamaran dengan status Draft, belum bisa disubmit
+   • Upload Berkas Persyaratan — upload per jenis dokumen (wajib/opsional), preview & download
+   • Review Sebelum Submit (/portal/lamaran/{id}/review) — rangkuman final seluruh data & berkas
+   • Final Submit — validasi dokumen wajib, lock lamaran, kirim notifikasi dual-channel
+   • Auto-Lock setelah Submit — form upload otomatis disabled, data tidak bisa diubah
+   • Pembatalan Draft Lamaran — batalkan draft + hapus akun sesuai kebijakan lifecycle
+   • Kebijakan 1 Formasi per Periode — setiap pelamar hanya boleh melamar 1 formasi per periode
+   • Application Snapshot — snapshot data pada saat submit untuk audit trail
+
+E. Manajemen Berkas & Dokumen Persyaratan
+   • Konfigurasi Persyaratan per Lowongan (VacancyDocumentRequirement)
+   • Tipe Berkas: Wajib (*) dan Opsional sesuai tabel spesifikasi TODO.md Poin 4
+   • Dukungan: Surat Lamaran, Ijazah, STR/Sertifikat Keahlian, SKCK, Rekomendasi Profesi, Dokumen Pendukung
+   • Validasi file: tipe (PDF/gambar), ukuran maksimal, format
+   • Preview dokumen dalam browser & download file asli
+   • Admin: Download ZIP seluruh berkas per pelamar
+
+F. Panel Admin SDI — Verifikasi Berkas & Manajemen Lamaran
+   • Dashboard Admin (/admin/dashboard) — statistik rekrutmen, grafik pelamar per formasi
+   • Daftar Seluruh Lamaran (/admin/applications) — filter berdasarkan formasi, status, dan pencarian
+   • Detail Lamaran (/admin/applications/{id}) — panel biodata lengkap + berkas dokumen + timeline seleksi
+   • Verifikasi per-Dokumen — status Valid / Invalid per item berkas + catatan verifikasi
+   • Auto-Approve Administrasi — otomatis loloskan jika semua dokumen wajib berstatus Valid
+   • Approve / Reject Keseluruhan — approve atau tolak administrasi secara bulk
+   • Catatan Alasan Penolakan — wajib diisi saat reject (contoh: "STR kedaluwarsa", "Ijazah belum dilegalisir")
+   • Download ZIP Semua Berkas — unduh seluruh dokumen pelamar dalam satu file ZIP
+
+G. Timeline Tracker & Tahapan Seleksi Lanjutan
+   • Tahapan Seleksi Kustom per Lowongan (VacancySelectionStage) — Admin menentukan urutan tahap
+   • Riwayat Progres per Tahap (ApplicationStageHistory) — status, catatan, tanggal keputusan
+   • Pewarnaan Indikator Tahapan:
+     – Abu-abu (Inactive/Pending): Tahapan belum dimulai
+     – Biru/Sky (In Progress): Sedang berjalan
+     – Hijau (Passed): Tahapan lolos
+     – Merah (Failed/Rejected): Tidak lolos
+     – Amber (Draft): Draft lamaran
+   • Auto-Advance ke Tahap Berikutnya — otomatis pindah ke tahap selanjutnya setelah lolos
+   • Halaman Tracking Pelamar (/portal/lamaran/{id}/tracking) — visualisasi timeline step-by-step
+   • Admin Update Tahapan — Tes Tulis, Wawancara, MCU, Pengumuman Akhir
+   • Validasi Kuota Formasi — cegah melebihi kuota saat lolos tahap akhir
+   • Reset / Rollback Tahapan — admin bisa mengembalikan status ke tahap sebelumnya
+
+H. Notifikasi Ganda (Dual-Channel Notification)
+   • In-App Notification — pusat notifikasi di portal pelamar (/portal/notifikasi)
+   • Email Notification — 3 jenis email otomatis:
+     1. ApplicationSubmittedMail — konfirmasi lamaran berhasil dikirim
+     2. ApplicationVerificationResultMail — hasil verifikasi berkas (Lolos/Tidak Lolos)
+     3. SelectionStageUpdatedMail — update tahapan seleksi & jadwal tes
+   • Mark as Read / Mark All as Read — tandai notifikasi sudah dibaca
+   • Template email profesional dengan branding RSI Fatimah
+
+I. Manajemen Siklus Akun (User Lifecycle Management)
+   • Deactivate Akun Pelamar Lolos — admin menonaktifkan akun, data tetap tersimpan sebagai arsip kepegawaian
+   • Reactivate Akun — admin mengaktifkan kembali akun jika diperlukan
+   • Acknowledge Announcement — pelamar tidak lolos wajib konfirmasi melihat pengumuman
+   • Auto-Cleanup Pelamar Tidak Lolos — akun & berkas dihapus otomatis setelah pelamar konfirmasi
+   • Batch Cleanup — hapus massal seluruh pelamar rejected yang sudah konfirmasi
+   • Halaman Lifecycle Admin (/admin/lifecycle) — daftar pelamar lolos (arsip) & tidak lolos (antrean cleanup)
+   • Export Biodata ke Excel (.xlsx) — unduh rekapitulasi data pelamar diterima dengan format profesional
+   • Filter Lifecycle — pencarian, filter formasi, status lamaran, dan status akun
+
+J. Manajemen Lowongan (Admin CRUD Lengkap)
+   • Buat Lowongan Baru (/admin/jobs/create) — judul, deskripsi, kuota, persyaratan, tahapan seleksi
+   • Edit Lowongan (/admin/jobs/{id}/edit) — ubah data lowongan yang sudah dibuat
+   • Detail Lowongan (/admin/jobs/{id}) — lihat statistik pendaftar per formasi
+   • Toggle Publish/Unpublish — buka/tutup lowongan untuk publik
+   • Hapus Lowongan — hapus formasi yang tidak jadi dibuka
+   • Kualifikasi Kustom per Lowongan (VacancyQualification) — konfigurasi syarat per formasi
+   • Document Requirements Kustom — tentukan berkas wajib/opsional per lowongan
+   • Tahapan Seleksi Kustom — tentukan urutan tahapan (Pendaftaran → Berkas → Tes → MCU → Final)
+
+K. Manajemen Timeline & Kalender Seleksi
+   • Halaman Timeline Admin (/admin/timelines) — kelola periode rekrutmen
+   • CRUD Periode Rekrutmen (RecruitmentPeriod) — tanggal mulai, batas upload, verifikasi, pengumuman
+   • Date-Driven Lock — form otomatis terkunci saat melewati batas waktu (sesuai TODO Poin 5 Tahap 2)
+   • Status Periode: Mendatang, Aktif (Terbuka), Ditutup, Selesai
+
+L. Identitas Visual & Desain UI/UX
+   • Warna Tema Biru RSI Fatimah (#0179B5) — navbar, header, tombol utama, badge status
+   • Font Tahoma — font utama sesuai permintaan (ukuran agak besar untuk kemudahan baca admin & user)
+   • Layout Responsive — mendukung smartphone, tablet, dan desktop
+   • Sidebar Navigasi Portal Pelamar — menu: Beranda, Lamaran, Profil, Notifikasi, Panduan
+   • Navbar Admin Terpisah — layout admin dengan sidebar menu yang berbeda dari portal pelamar
+   • Logo RSI Fatimah — ditampilkan pada navbar dan halaman autentikasi
+   • Design System — komponen reusable (button, badge, card, modal, form) yang konsisten
+   • Dark/Light Badge Status — indikator visual per status lamaran
+   • Tailwind CSS — framework CSS utility-first untuk styling konsisten dan cepat (menggantikan Bootstrap)
+
+M. Infrastruktur Teknis & Keamanan
+   • Proteksi CSRF — seluruh form dilindungi token CSRF Laravel
+   • Enkripsi Password — menggunakan bcrypt hashing
+   • Middleware Auth & Role — pembatasan akses berdasarkan autentikasi dan peran
+   • Rate Limiting — mencegah brute force pada login, registrasi, dan password reset
+   • Storage Link — file berkas dikelola melalui Laravel Storage dengan path terenkripsi
+   • SQLite untuk Testing — database ringan untuk automated test tanpa perlu MySQL
+   • 223 Automated Tests (PHPUnit) — 20 file test feature untuk validasi alur bisnis
+   • Vite Build System — asset bundling modern untuk CSS dan JavaScript
+

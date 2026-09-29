@@ -6,9 +6,6 @@ class PhoneNumberNormalizer
 {
     /**
      * Normalize an Indonesian phone number to canonical digits-only format '628...'.
-     *
-     * @param string|null $phone
-     * @return string|null
      */
     public static function normalize(?string $phone): ?string
     {
@@ -25,7 +22,7 @@ class PhoneNumberNormalizer
         $cleaned = preg_replace('/[^\d+]/', '', $trimmed);
 
         if (str_starts_with($cleaned, '+62')) {
-            $cleaned = '62' . substr($cleaned, 3);
+            $cleaned = '62'.substr($cleaned, 3);
         } elseif (str_starts_with($cleaned, '+')) {
             $cleaned = substr($cleaned, 1);
         }
@@ -34,9 +31,9 @@ class PhoneNumberNormalizer
         $digits = preg_replace('/\D/', '', $cleaned);
 
         if (str_starts_with($digits, '08')) {
-            $digits = '628' . substr($digits, 2);
+            $digits = '628'.substr($digits, 2);
         } elseif (str_starts_with($digits, '8')) {
-            $digits = '62' . $digits;
+            $digits = '62'.$digits;
         }
 
         return $digits !== '' ? $digits : null;

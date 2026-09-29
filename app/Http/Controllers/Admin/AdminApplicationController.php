@@ -12,15 +12,18 @@ use App\Services\Recruitment\ApplicationVerificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use ZipArchive;
 
 class AdminApplicationController extends Controller
 {
     public function __construct(
         protected ApplicationVerificationService $verificationService
-    ) {
-    }
+    ) {}
 
     /**
      * Tampilkan daftar seluruh lamaran yang masuk dengan multi-filter.
@@ -40,12 +43,12 @@ class AdminApplicationController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('application_number', 'like', "%{$search}%")
-                  ->orWhereHas('user', function ($uq) use ($search) {
-                      $uq->where('name', 'like', "%{$search}%")
-                         ->orWhere('email', 'like', "%{$search}%")
-                         ->orWhere('registration_number', 'like', "%{$search}%")
-                         ->orWhere('phone', 'like', "%{$search}%");
-                  });
+                    ->orWhereHas('user', function ($uq) use ($search) {
+                        $uq->where('name', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%")
+                            ->orWhere('registration_number', 'like', "%{$search}%")
+                            ->orWhere('phone', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -138,14 +141,42 @@ class AdminApplicationController extends Controller
             'rejection_reason.required_if' => 'Catatan alasan penolakan wajib diisi bila berkas ditolak/tidak lengkap.',
         ]);
 
+        $target = $request->input('target');
+
+        $biodataStage = $application->jobVacancy->selectionStages()
+            ->where(function ($q) {
+                $q->where('name', 'like', '%Pendaftaran%')
+                    ->orWhere('name', 'like', '%Biodata%')
+                    ->orWhere('name', 'like', '%Portofolio%');
+            })
+            ->first();
+
+        $isBiodataAction = $target === 'biodata' || ($biodataStage && (int) $application->current_stage_id === (int) $biodataStage->id);
+
         if ($request->action === 'approve') {
-            $this->verificationService->approveBiodata($application, $admin, $request->admin_note);
-            return redirect()->to(route('admin.applications.show', ['application' => $application, 'tab' => 'profil']) . '#biodata-panel')
-                ->with('success', "Verifikasi Biodata atas nama {$application->user->name} berhasil DISETUJUI (Lolos Biodata & Portofolio).");
+            if ($isBiodataAction) {
+                $this->verificationService->approveBiodata($application, $admin, $request->admin_note);
+
+                return redirect()->to(route('admin.applications.show', ['application' => $application, 'tab' => 'profil']).'#biodata-panel')
+                    ->with('success', "Verifikasi Biodata atas nama {$application->user->name} berhasil DISETUJUI (Lolos Biodata & Portofolio).");
+            }
+
+            $this->verificationService->approveAdministration($application, $admin, $request->admin_note);
+
+            return redirect()->to(route('admin.applications.show', ['application' => $application, 'tab' => 'profil']).'#biodata-panel')
+                ->with('success', "Verifikasi Administrasi atas nama {$application->user->name} berhasil DISETUJUI (Lolos Seleksi Berkas).");
         } else {
-            $this->verificationService->rejectBiodata($application, $admin, $request->rejection_reason);
-            return redirect()->to(route('admin.applications.show', ['application' => $application, 'tab' => 'profil']) . '#biodata-panel')
-                ->with('info', "Verifikasi Biodata atas nama {$application->user->name} telah DITOLAK dengan alasan: {$request->rejection_reason}.");
+            if ($isBiodataAction) {
+                $this->verificationService->rejectBiodata($application, $admin, $request->rejection_reason);
+
+                return redirect()->to(route('admin.applications.show', ['application' => $application, 'tab' => 'profil']).'#biodata-panel')
+                    ->with('info', "Verifikasi Biodata atas nama {$application->user->name} telah DITOLAK dengan alasan: {$request->rejection_reason}.");
+            }
+
+            $this->verificationService->rejectAdministration($application, $admin, $request->rejection_reason);
+
+            return redirect()->to(route('admin.applications.show', ['application' => $application, 'tab' => 'profil']).'#biodata-panel')
+                ->with('info', "Verifikasi atas nama {$application->user->name} telah DITOLAK dengan alasan: {$request->rejection_reason}.");
         }
     }
 
@@ -168,7 +199,7 @@ class AdminApplicationController extends Controller
 
         $document->jobApplication->refresh();
 
-        return redirect()->to(route('admin.applications.show', ['application' => $document->jobApplication, 'tab' => 'berkas']) . '#doc-row-' . $document->id)
+        return redirect()->to(route('admin.applications.show', ['application' => $document->jobApplication, 'tab' => 'berkas']).'#doc-row-'.$document->id)
             ->with('success', "Status dokumen '{$document->documentRequirement->document_name}' berhasil diperbarui ({$request->verification_status}).");
     }
 
@@ -186,7 +217,7 @@ class AdminApplicationController extends Controller
         $stage = VacancySelectionStage::findOrFail($request->stage_id);
 
         if ($stage->job_vacancy_id !== $application->job_vacancy_id) {
-            return redirect()->to(route('admin.applications.show', ['application' => $application, 'tab' => 'tahapan']) . '#tahapan-timeline')
+            return redirect()->to(route('admin.applications.show', ['application' => $application, 'tab' => 'tahapan']).'#tahapan-timeline')
                 ->with('error', 'Tahapan seleksi tidak valid untuk formasi ini.');
         }
 
@@ -199,11 +230,76 @@ class AdminApplicationController extends Controller
             );
         } catch (ValidationException $e) {
             $errorMessage = $e->errors()['quota'][0] ?? $e->getMessage();
-            return redirect()->to(route('admin.applications.show', ['application' => $application, 'tab' => 'tahapan']) . '#tahapan-timeline')
+
+            return redirect()->to(route('admin.applications.show', ['application' => $application, 'tab' => 'tahapan']).'#tahapan-timeline')
                 ->with('error', $errorMessage);
         }
 
-        return redirect()->to(route('admin.applications.show', ['application' => $application, 'tab' => 'tahapan']) . '#stage-item-' . $stage->id)
+        return redirect()->to(route('admin.applications.show', ['application' => $application, 'tab' => 'tahapan']).'#stage-item-'.$stage->id)
             ->with('success', "Tahapan seleksi '{$stage->stage_name}' berhasil diperbarui.");
+    }
+
+    /**
+     * Download seluruh berkas dokumen lamaran pelamar dalam format ZIP.
+     */
+    public function downloadAllDocuments(JobApplication $application): BinaryFileResponse|RedirectResponse
+    {
+        $documents = $application->documents()->with('documentRequirement')->get();
+
+        if ($documents->isEmpty()) {
+            return back()->with('error', 'Tidak ada berkas dokumen yang terunggah untuk diunduh.');
+        }
+
+        $applicantName = $application->user ? Str::slug($application->user->name, '_') : 'pelamar';
+        $regNumber = $application->user ? Str::slug($application->user->registration_number ?? $application->application_number ?? (string) $application->id, '_') : (string) $application->id;
+        $zipFileName = "Berkas_{$applicantName}_{$regNumber}.zip";
+
+        $tempDir = storage_path('app/temp');
+        if (! file_exists($tempDir)) {
+            mkdir($tempDir, 0755, true);
+        }
+        $tempZipPath = $tempDir.'/'.uniqid('zip_bundle_').'.zip';
+
+        $zip = new ZipArchive;
+        if ($zip->open($tempZipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+            return back()->with('error', 'Gagal membuat file arsip ZIP.');
+        }
+
+        $addedCount = 0;
+        $applicantDisk = Storage::disk('applicant_documents');
+        $localDisk = Storage::disk('local');
+
+        foreach ($documents as $index => $doc) {
+            $realPath = null;
+            if ($doc->stored_path) {
+                if ($applicantDisk->exists($doc->stored_path)) {
+                    $realPath = $applicantDisk->path($doc->stored_path);
+                } elseif ($localDisk->exists($doc->stored_path)) {
+                    $realPath = $localDisk->path($doc->stored_path);
+                } elseif (file_exists($doc->stored_path)) {
+                    $realPath = $doc->stored_path;
+                }
+            }
+
+            if ($realPath && file_exists($realPath)) {
+                $reqName = $doc->documentRequirement ? Str::slug($doc->documentRequirement->document_name, '_') : 'dokumen_'.($index + 1);
+                $ext = pathinfo($doc->original_name, PATHINFO_EXTENSION) ?: 'pdf';
+                $entryName = sprintf('%02d_%s.%s', $index + 1, $reqName, $ext);
+                $zip->addFile($realPath, $entryName);
+                $addedCount++;
+            }
+        }
+
+        $zip->close();
+
+        if ($addedCount === 0) {
+            if (file_exists($tempZipPath)) {
+                @unlink($tempZipPath);
+            }
+
+            return back()->with('error', 'Berkas dokumen fisik tidak ditemukan di penyimpanan server.');
+        }
+
+        return response()->download($tempZipPath, $zipFileName)->deleteFileAfterSend(true);
     }
 }

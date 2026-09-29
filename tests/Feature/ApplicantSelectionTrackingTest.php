@@ -17,6 +17,7 @@ use App\Models\User;
 use App\Models\VacancySelectionStage;
 use App\Services\Recruitment\SelectionTrackingService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
 class ApplicantSelectionTrackingTest extends TestCase
@@ -29,7 +30,7 @@ class ApplicantSelectionTrackingTest extends TestCase
         $seq = $sequence++;
 
         $user = User::create(array_merge([
-            'name' => 'Pelamar Seleksi ' . $seq,
+            'name' => 'Pelamar Seleksi '.$seq,
             'email' => "pelamar.seleksi{$seq}@example.com",
             'phone' => sprintf('62812777%05d', $seq),
             'registration_number' => sprintf('PLM-2026-%06d', $seq),
@@ -70,8 +71,8 @@ class ApplicantSelectionTrackingTest extends TestCase
         $seq = $vacSeq++;
 
         $period = RecruitmentPeriod::create([
-            'name' => 'Rekrutmen Tenaga Medis Periode ' . $seq,
-            'code' => 'PR-SEL-2026-' . sprintf('%03d', $seq),
+            'name' => 'Rekrutmen Tenaga Medis Periode '.$seq,
+            'code' => 'PR-SEL-2026-'.sprintf('%03d', $seq),
             'status' => RecruitmentPeriodStatus::OPEN,
             'registration_start_at' => now()->subDays(10),
             'registration_end_at' => now()->addDays(10),
@@ -79,8 +80,8 @@ class ApplicantSelectionTrackingTest extends TestCase
 
         $vacancy = JobVacancy::create([
             'recruitment_period_id' => $period->id,
-            'code' => 'BID-VK-' . sprintf('%03d', $seq),
-            'title' => 'Bidan Ruang Bersalin ' . $seq,
+            'code' => 'BID-VK-'.sprintf('%03d', $seq),
+            'title' => 'Bidan Ruang Bersalin '.$seq,
             'unit' => 'Kamar Bersalin',
             'employment_type' => 'PKWT',
             'location' => 'RSI Fatimah Banyuwangi',
@@ -832,8 +833,8 @@ class ApplicantSelectionTrackingTest extends TestCase
         [$period, $vacancy, $stages] = $this->createVacancyWithStages();
         $application = $this->createSubmittedApplicationWithSnapshot($user, $vacancy, $stages);
 
-        $frozenTime = \Illuminate\Support\Carbon::create(2026, 9, 12, 10, 0, 0, 'Asia/Jakarta');
-        \Illuminate\Support\Carbon::setTestNow($frozenTime);
+        $frozenTime = Carbon::create(2026, 9, 12, 10, 0, 0, 'Asia/Jakarta');
+        Carbon::setTestNow($frozenTime);
 
         try {
             $history = ApplicationStageHistory::create([
@@ -879,7 +880,7 @@ class ApplicantSelectionTrackingTest extends TestCase
             $this->assertNull($service->finalResult($application->fresh()));
             $this->assertEquals('Menunggu Pengumuman Akhir', $service->publicApplicationStatus($application->fresh())['label']);
         } finally {
-            \Illuminate\Support\Carbon::setTestNow(); // Pastikan waktu di-reset
+            Carbon::setTestNow(); // Pastikan waktu di-reset
         }
     }
 

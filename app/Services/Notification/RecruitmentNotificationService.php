@@ -7,7 +7,6 @@ use App\Mail\ApplicationVerificationResultMail;
 use App\Mail\SelectionStageUpdatedMail;
 use App\Models\JobApplication;
 use App\Models\RecruitmentNotification;
-use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
@@ -59,7 +58,7 @@ class RecruitmentNotificationService
             RecruitmentNotification::create([
                 'user_id' => $user->id,
                 'title' => 'Hasil Verifikasi Berkas Administrasi',
-                'message' => "Berkas lamaran Anda untuk formasi {$application->jobVacancy->title} belum memenuhi syarat: " . ($application->rejection_reason ?? 'Berkas tidak lengkap/tidak sesuai.'),
+                'message' => "Berkas lamaran Anda untuk formasi {$application->jobVacancy->title} belum memenuhi syarat: ".($application->rejection_reason ?? 'Berkas tidak lengkap/tidak sesuai.'),
                 'type' => 'danger',
                 'action_url' => route('portal.home'),
             ]);
@@ -85,7 +84,7 @@ class RecruitmentNotificationService
         RecruitmentNotification::create([
             'user_id' => $user->id,
             'title' => "Pembaruan Tahapan: {$stageName}",
-            'message' => "Tahapan seleksi Anda telah diperbarui ke: {$stageName}. " . ($note ? "Catatan: {$note}" : ''),
+            'message' => "Tahapan seleksi Anda telah diperbarui ke: {$stageName}. ".($note ? "Catatan: {$note}" : ''),
             'type' => 'info',
             'action_url' => route('portal.home'),
         ]);

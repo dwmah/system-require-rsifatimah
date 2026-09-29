@@ -20,7 +20,7 @@ class EnsurePublicRecruitmentIsOpen
      * Jika tidak ada rekrutmen/lowongan yang aktif dibuka, dialihkan ke halaman info penutupan.
      * Tidak membatasi akses login/dashboard pelamar terdaftar di fase selanjutnya.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  Closure(Request): (Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {

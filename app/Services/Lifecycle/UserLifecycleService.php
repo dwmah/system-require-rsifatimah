@@ -17,7 +17,7 @@ class UserLifecycleService
      */
     public function deactivatePassedApplicant(User $user): bool
     {
-        if (!$user->isApplicant()) {
+        if (! $user->isApplicant()) {
             return false;
         }
 

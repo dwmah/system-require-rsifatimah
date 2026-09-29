@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('application_documents', function (Blueprint $table) {
             $table->id();
             $table->foreignId('job_application_id')->constrained('job_applications')->cascadeOnDelete();
-            
+
             // Invariant: vacancy_document_requirement_id harus milik job_vacancy yang dilamar oleh job_application
             $table->foreignId('vacancy_document_requirement_id')->constrained('vacancy_document_requirements')->restrictOnDelete();
-            
+
             $table->string('original_name');
             $table->string('stored_path');
             $table->string('mime_type');

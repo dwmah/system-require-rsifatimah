@@ -64,6 +64,21 @@
             <h1 class="text-xs sm:text-lg font-bold text-slate-900 tracking-tight">
                 Lowongan Tidak Tersedia
             </h1>
+            <p class="mt-2 text-xs text-slate-500">
+                Rekrutmen Sedang Ditutup atau belum ada periode seleksi aktif saat ini.
+            </p>
+
+            <div class="mt-6 pt-4 border-t border-slate-100 flex flex-col gap-2">
+                @auth
+                    <a href="{{ route('portal.home') }}" class="w-full inline-flex items-center justify-center px-4 py-2 text-xs font-semibold rounded-lg bg-[#0179B5] text-white hover:bg-[#016699] transition-colors">
+                        Kembali ke Portal Saya
+                    </a>
+                @else
+                    <a href="{{ route('login') }}" class="w-full inline-flex items-center justify-center px-4 py-2 text-xs font-semibold rounded-lg bg-[#0179B5] text-white hover:bg-[#016699] transition-colors">
+                        Masuk ke Akun Pelamar
+                    </a>
+                @endauth
+            </div>
         </div>
     </main>
 

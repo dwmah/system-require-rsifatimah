@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Enums\JobApplicationStatus;
+use App\Enums\JobVacancyStatus;
+use App\Enums\RecruitmentPeriodStatus;
 use App\Http\Controllers\Controller;
 use App\Models\JobApplication;
 use App\Models\JobVacancy;
@@ -19,13 +21,13 @@ class AdminDashboardController extends Controller
     public function index(Request $request): View
     {
         $activePeriod = RecruitmentPeriod::currentlyOpen()->first()
-            ?? RecruitmentPeriod::where('status', \App\Enums\RecruitmentPeriodStatus::OPEN)->first()
+            ?? RecruitmentPeriod::where('status', RecruitmentPeriodStatus::OPEN)->first()
             ?? RecruitmentPeriod::latest('registration_start_at')->first();
 
         // Statistik Lowongan
         $totalVacancies = JobVacancy::count();
-        $activeVacancies = JobVacancy::where('status', \App\Enums\JobVacancyStatus::OPEN)->count();
-        $closedVacancies = JobVacancy::where('status', '!=', \App\Enums\JobVacancyStatus::OPEN)->count();
+        $activeVacancies = JobVacancy::where('status', JobVacancyStatus::OPEN)->count();
+        $closedVacancies = JobVacancy::where('status', '!=', JobVacancyStatus::OPEN)->count();
 
         // Statistik Pelamar
         $totalApplicants = User::where('role', User::ROLE_APPLICANT)->count();
@@ -59,7 +61,7 @@ class AdminDashboardController extends Controller
         $selectedVacancy = null;
         if ($selectedVacancyId) {
             $selectedVacancy = JobVacancy::find($selectedVacancyId);
-            if (!$selectedVacancy) {
+            if (! $selectedVacancy) {
                 $selectedVacancyId = null;
             }
         }

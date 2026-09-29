@@ -1,6 +1,6 @@
 <x-layouts.auth
     title="Masuk ke Portal Pelamar"
-    card-title="Login"
+    card-title="Masuk Portal Pelamar"
     back-url="{{ route('vacancies.index') }}"
     back-label="Kembali ke Beranda"
 >

@@ -61,6 +61,7 @@ class ApplicationDocumentService
      * Mem-parsing konfigurasi allowed_mimes requirement secara aman dan fail-closed.
      *
      * @return list<string>
+     *
      * @throws DomainException
      */
     public function parseAllowedMimes(?string $allowedMimesConfig): array

@@ -93,6 +93,6 @@ class RegisteredUserController extends Controller
         $request->session()->forget('target_vacancy_id');
 
         return redirect()->route('portal.applications.index')
-            ->with('success', 'Akun berhasil dibuat! Lamaran untuk posisi ' . $targetVacancy->title . ' telah otomatis ditambahkan ke menu Lamaran Saya.');
+            ->with('success', 'Akun berhasil dibuat! Lamaran untuk posisi '.$targetVacancy->title.' telah otomatis ditambahkan ke menu Lamaran Saya.');
     }
 }

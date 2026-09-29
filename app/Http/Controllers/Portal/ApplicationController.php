@@ -191,9 +191,9 @@ class ApplicationController extends Controller
         $completenessPercentage = $completenessService->percentage($jobApplication->user);
 
         return view('portal.applications.show', [
-            'jobApplication'         => $jobApplication,
-            'publicStatus'           => $publicStatus,
-            'isProfileComplete'      => $isProfileComplete,
+            'jobApplication' => $jobApplication,
+            'publicStatus' => $publicStatus,
+            'isProfileComplete' => $isProfileComplete,
             'completenessPercentage' => $completenessPercentage,
         ]);
     }

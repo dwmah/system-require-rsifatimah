@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Enums\RecruitmentPeriodStatus;
 use App\Models\RecruitmentPeriod;
 use Illuminate\Console\Command;
 
@@ -29,7 +30,7 @@ class RecruitmentCheckDeadlinesCommand extends Command
         $this->info('Memeriksa status batas waktu pendaftaran rekrutmen...');
 
         $now = now();
-        $expiredPeriods = RecruitmentPeriod::where('status', \App\Enums\RecruitmentPeriodStatus::OPEN)
+        $expiredPeriods = RecruitmentPeriod::where('status', RecruitmentPeriodStatus::OPEN)
             ->where('registration_end_at', '<', $now)
             ->get();
 

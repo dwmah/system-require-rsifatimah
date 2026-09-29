@@ -14,13 +14,13 @@ return new class extends Migration
         Schema::create('job_applications', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-            
+
             // Invariant: recruitment_period_id HARUS sama dengan job_vacancies.recruitment_period_id.
             // Dipertahankan sebagai foreign key normal dan di-enforce via validasi aplikasi/service layer
             // untuk menjaga kompatibilitas standar Eloquent ORM.
             $table->foreignId('recruitment_period_id')->constrained('recruitment_periods')->restrictOnDelete();
             $table->foreignId('job_vacancy_id')->constrained('job_vacancies')->restrictOnDelete();
-            
+
             $table->string('application_number')->nullable()->unique();
             $table->string('status')->default('draft');
             $table->dateTime('submitted_at')->nullable();

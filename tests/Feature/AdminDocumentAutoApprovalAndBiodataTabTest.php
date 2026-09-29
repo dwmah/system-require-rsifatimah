@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Enums\ApplicationStageStatus;
 use App\Enums\JobApplicationStatus;
 use App\Enums\JobVacancyStatus;
 use App\Enums\RecruitmentPeriodStatus;
@@ -28,10 +29,15 @@ class AdminDocumentAutoApprovalAndBiodataTabTest extends TestCase
     use RefreshDatabase;
 
     protected User $admin;
+
     protected User $applicant;
+
     protected JobVacancy $vacancy;
+
     protected JobApplication $application;
+
     protected VacancyDocumentRequirement $reqKtp;
+
     protected VacancyDocumentRequirement $reqIjazah;
 
     protected function setUp(): void
@@ -235,7 +241,7 @@ class AdminDocumentAutoApprovalAndBiodataTabTest extends TestCase
             'verification_note' => 'KTP jelas dan terbaca.',
         ]);
 
-        $response1->assertRedirect(route('admin.applications.show', ['application' => $this->application, 'tab' => 'berkas']) . '#doc-row-' . $docKtp->id);
+        $response1->assertRedirect(route('admin.applications.show', ['application' => $this->application, 'tab' => 'berkas']).'#doc-row-'.$docKtp->id);
         $docKtp->refresh();
         $this->assertEquals('valid', $docKtp->verification_status);
         $this->application->refresh();
@@ -248,7 +254,7 @@ class AdminDocumentAutoApprovalAndBiodataTabTest extends TestCase
             'verification_note' => 'Ijazah terlegalisir.',
         ]);
 
-        $response2->assertRedirect(route('admin.applications.show', ['application' => $this->application, 'tab' => 'berkas']) . '#doc-row-' . $docIjazah->id);
+        $response2->assertRedirect(route('admin.applications.show', ['application' => $this->application, 'tab' => 'berkas']).'#doc-row-'.$docIjazah->id);
         $docIjazah->refresh();
         $this->assertEquals('valid', $docIjazah->verification_status);
         $this->application->refresh();
@@ -316,13 +322,13 @@ class AdminDocumentAutoApprovalAndBiodataTabTest extends TestCase
             'admin_note' => 'Biodata sangat sesuai persyaratan.',
         ]);
 
-        $response->assertRedirect(route('admin.applications.show', ['application' => $this->application, 'tab' => 'profil']) . '#biodata-panel');
+        $response->assertRedirect(route('admin.applications.show', ['application' => $this->application, 'tab' => 'profil']).'#biodata-panel');
         $this->application->refresh();
 
         // Check Stage 1 history is PASSED
         $history1 = $this->application->stageHistories()->where('vacancy_selection_stage_id', $stage1->id)->first();
         $this->assertNotNull($history1);
-        $this->assertEquals(\App\Enums\ApplicationStageStatus::PASSED, $history1->status);
+        $this->assertEquals(ApplicationStageStatus::PASSED, $history1->status);
         $this->assertNotNull($history1->published_at);
 
         // Documents remain in pending state (verified separately)
@@ -369,7 +375,7 @@ class AdminDocumentAutoApprovalAndBiodataTabTest extends TestCase
             'stage_note' => 'Pemeriksaan ulang berkas dan biodata pelamar.',
         ]);
 
-        $response->assertRedirect(route('admin.applications.show', ['application' => $this->application, 'tab' => 'tahapan']) . '#stage-item-' . $stage->id);
+        $response->assertRedirect(route('admin.applications.show', ['application' => $this->application, 'tab' => 'tahapan']).'#stage-item-'.$stage->id);
         $this->application->refresh();
 
         // 3. Application returns to SUBMITTED status (so Tolak & Lolos buttons appear again in UI)
@@ -407,5 +413,77 @@ class AdminDocumentAutoApprovalAndBiodataTabTest extends TestCase
         ]));
         $resTahapan->assertStatus(200);
         $this->assertStringContainsString("|| 'tahapan'", $resTahapan->getContent());
+    }
+
+    public function test_admin_can_download_all_documents_as_zip(): void
+    {
+        $fakeFile1 = UploadedFile::fake()->create('ktp_custom.pdf', 200, 'application/pdf');
+        $fakeFile2 = UploadedFile::fake()->create('ijazah_custom.pdf', 300, 'application/pdf');
+
+        $path1 = $fakeFile1->store('documents', ApplicationDocumentService::DISK_NAME);
+        $path2 = $fakeFile2->store('documents', ApplicationDocumentService::DISK_NAME);
+
+        ApplicationDocument::create([
+            'job_application_id' => $this->application->id,
+            'vacancy_document_requirement_id' => $this->reqKtp->id,
+            'original_name' => 'ktp_custom.pdf',
+            'stored_path' => $path1,
+            'file_size' => 200 * 1024,
+            'mime_type' => 'application/pdf',
+            'verification_status' => 'valid',
+        ]);
+
+        ApplicationDocument::create([
+            'job_application_id' => $this->application->id,
+            'vacancy_document_requirement_id' => $this->reqIjazah->id,
+            'original_name' => 'ijazah_custom.pdf',
+            'stored_path' => $path2,
+            'file_size' => 300 * 1024,
+            'mime_type' => 'application/pdf',
+            'verification_status' => 'valid',
+        ]);
+
+        $response = $this->actingAs($this->admin)->get(route('admin.applications.documents.download-all', $this->application));
+        $response->assertStatus(200);
+        $this->assertStringContainsString('application/zip', $response->headers->get('content-type') ?? '');
+    }
+
+    public function test_admin_view_shows_preview_and_download_all_button_when_all_documents_are_valid(): void
+    {
+        $fakeFile1 = UploadedFile::fake()->create('ktp_custom.pdf', 200, 'application/pdf');
+        $fakeFile2 = UploadedFile::fake()->create('ijazah_custom.pdf', 300, 'application/pdf');
+
+        $path1 = $fakeFile1->store('documents', ApplicationDocumentService::DISK_NAME);
+        $path2 = $fakeFile2->store('documents', ApplicationDocumentService::DISK_NAME);
+
+        ApplicationDocument::create([
+            'job_application_id' => $this->application->id,
+            'vacancy_document_requirement_id' => $this->reqKtp->id,
+            'original_name' => 'ktp_custom.pdf',
+            'stored_path' => $path1,
+            'file_size' => 200 * 1024,
+            'mime_type' => 'application/pdf',
+            'verification_status' => 'valid',
+        ]);
+
+        ApplicationDocument::create([
+            'job_application_id' => $this->application->id,
+            'vacancy_document_requirement_id' => $this->reqIjazah->id,
+            'original_name' => 'ijazah_custom.pdf',
+            'stored_path' => $path2,
+            'file_size' => 300 * 1024,
+            'mime_type' => 'application/pdf',
+            'verification_status' => 'valid',
+        ]);
+
+        $response = $this->actingAs($this->admin)->get(route('admin.applications.show', [
+            'application' => $this->application,
+            'tab' => 'berkas',
+        ]));
+
+        $response->assertStatus(200);
+        $response->assertSee('Seluruh Berkas Persyaratan Terverifikasi Valid');
+        $response->assertSee('Preview &amp; Unduh Semua Berkas', false);
+        $response->assertSee('Unduh Semua (.ZIP)');
     }
 }

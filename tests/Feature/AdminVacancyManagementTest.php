@@ -16,6 +16,7 @@ class AdminVacancyManagementTest extends TestCase
     use RefreshDatabase;
 
     protected User $admin;
+
     protected RecruitmentPeriod $period;
 
     protected function setUp(): void
