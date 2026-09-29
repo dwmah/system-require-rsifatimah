@@ -47,13 +47,7 @@
             </div>
         @endif
 
-        {{-- 1. Pas Foto Formal Pelamar (3:4) --}}
-        @include('portal.profile.partials.photo', [
-            'user' => $user,
-            'profile' => $profile,
-        ])
-
-        {{-- 2. Profile Completeness Overview --}}
+        {{-- 1. Profile Completeness Overview --}}
         @include('portal.profile.partials.completeness', [
             'percentage' => $percentage,
             'isComplete' => $isComplete,
@@ -61,7 +55,7 @@
             'missingItems' => $missingItems,
         ])
 
-        {{-- 2. Data Pribadi --}}
+        {{-- 2. Formulir Profil Lengkap (1 Card: Pas Foto Teratas, Data Pribadi, Kontak & Alamat) --}}
         @include('portal.profile.partials.personal-data', [
             'user' => $user,
             'profile' => $profile,

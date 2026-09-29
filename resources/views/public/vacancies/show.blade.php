@@ -1,7 +1,7 @@
 @php
     /** @var \App\Models\JobVacancy $jobVacancy */
-    $daysRemaining = now()->diffInDays($jobVacancy->close_at, false);
-    $isClosingSoon = $daysRemaining >= 0 && $daysRemaining <= 3;
+    $isClosingSoon = $jobVacancy->isClosingSoon();
+    $remainingText = $jobVacancy->getClosingRemainingText();
 @endphp
 
 <x-layouts.public :title="$jobVacancy->title" active-menu="lowongan">
@@ -19,9 +19,13 @@
                     <span class="text-xs font-mono font-semibold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-md">
                         {{ $jobVacancy->code }}
                     </span>
-                    @if ($isClosingSoon)
+                    @if (! $jobVacancy->isCurrentlyOpen())
+                        <x-ui.badge variant="neutral" dot size="sm">
+                            Ditutup
+                        </x-ui.badge>
+                    @elseif ($isClosingSoon && $remainingText)
                         <x-ui.badge variant="warning" dot size="sm">
-                            Segera Ditutup (Sisa {{ $daysRemaining }} hari)
+                            Segera Ditutup (Sisa {{ $remainingText }})
                         </x-ui.badge>
                     @else
                         <x-ui.badge variant="success" dot size="sm">
@@ -122,7 +126,7 @@
                             @foreach ($jobVacancy->documentRequirements as $doc)
                                 @php
                                     $sizeText = $doc->max_size_kb ? ($doc->max_size_kb >= 1024 ? round($doc->max_size_kb / 1024, 1) . ' MB' : $doc->max_size_kb . ' KB') : '2 MB';
-                                    $mimeText = $doc->allowed_mimes ?: 'PDF';
+                                    $mimeText = $doc->formatted_allowed_mimes ?: 'PDF';
                                 @endphp
                                 <div class="p-3 rounded-xl border border-slate-100 bg-slate-50/70 flex items-start justify-between gap-3 text-xs">
                                     <div class="min-w-0">
@@ -206,8 +210,8 @@
                             <span class="text-slate-500">Status Seleksi:</span>
                             @if (! $jobVacancy->isCurrentlyOpen())
                                 <x-ui.badge variant="neutral" size="sm">Ditutup</x-ui.badge>
-                            @elseif ($isClosingSoon)
-                                <x-ui.badge variant="warning" dot size="sm">Segera Ditutup (Sisa {{ $daysRemaining }} hari)</x-ui.badge>
+                            @elseif ($isClosingSoon && $remainingText)
+                                <x-ui.badge variant="warning" dot size="sm">Segera Ditutup (Sisa {{ $remainingText }})</x-ui.badge>
                             @else
                                 <x-ui.badge variant="success" dot size="sm">Pendaftaran Dibuka</x-ui.badge>
                             @endif
@@ -323,7 +327,7 @@
                                     </svg>
                                 </a>
                                 <p class="text-[11px] text-center text-slate-500">
-                                    Sudah punya lamaran? <a href="{{ route('login', ['intended' => route('vacancies.show', $jobVacancy)]) }}" class="text-rsi-700 font-semibold hover:underline">Lanjutkan</a>
+                                    Sudah punya lamaran? <a href="{{ route('login', ['intended' => route('portal.applications.index')]) }}" class="text-rsi-700 font-semibold hover:underline">Lanjutkan</a>
                                 </p>
                             @else
                                 <button

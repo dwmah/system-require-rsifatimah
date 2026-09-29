@@ -28,13 +28,13 @@
                     'name' => $d->name,
                     'desc' => $d->description ?? '',
                     'mandatory' => $d->is_required ? 1 : 0,
-                    'mimes' => $d->allowed_mimes ?? 'application/pdf,image/jpeg,image/png',
+                    'mimes' => $d->allowed_mimes ?? 'application/pdf',
                     'max_size' => $d->max_size_kb ?? 5120,
                 ])->values();
                 if ($docData->isEmpty()) {
                     $docData = collect([
-                        ['id' => null, 'name' => 'Surat Lamaran Kerja', 'desc' => 'Ditujukan ke Direktur RSI Fatimah', 'mandatory' => 1, 'mimes' => 'application/pdf,image/jpeg,image/png', 'max_size' => 5120],
-                        ['id' => null, 'name' => 'Ijazah Terakhir Legalisir', 'desc' => 'Scan ijazah asli legalisir', 'mandatory' => 1, 'mimes' => 'application/pdf,image/jpeg,image/png', 'max_size' => 5120],
+                        ['id' => null, 'name' => 'Surat Lamaran Kerja', 'desc' => 'Ditujukan ke Direktur RSI Fatimah', 'mandatory' => 1, 'mimes' => 'application/pdf', 'max_size' => 5120],
+                        ['id' => null, 'name' => 'Ijazah Terakhir Legalisir', 'desc' => 'Scan ijazah asli legalisir', 'mandatory' => 1, 'mimes' => 'application/pdf', 'max_size' => 5120],
                     ]);
                 }
 
@@ -66,7 +66,7 @@
                       // Section 3: Persyaratan Dokumen
                       documents: {{ Js::from($docData) }},
                       addDoc() {
-                          this.documents.push({ id: null, name: '', desc: '', mandatory: 1, mimes: 'application/pdf,image/jpeg,image/png', max_size: 5120 });
+                          this.documents.push({ id: null, name: '', desc: '', mandatory: 1, mimes: 'application/pdf', max_size: 5120 });
                       },
                       removeDoc(index) {
                           this.documents.splice(index, 1);
@@ -74,25 +74,25 @@
                       applyDocPreset(type) {
                           if (type === 'medis') {
                               this.documents = [
-                                  { id: null, name: 'Surat Lamaran Kerja', desc: 'Ditujukan kepada Direktur RSI Fatimah', mandatory: 1, mimes: 'application/pdf,image/jpeg,image/png', max_size: 5120 },
-                                  { id: null, name: 'Ijazah Profesi / Terakhir', desc: 'Scan ijazah asli legalisir', mandatory: 1, mimes: 'application/pdf,image/jpeg,image/png', max_size: 5120 },
-                                  { id: null, name: 'Transkrip Nilai Akademik', desc: 'Scan transkrip nilai akademik legalisir', mandatory: 1, mimes: 'application/pdf,image/jpeg,image/png', max_size: 5120 },
-                                  { id: null, name: 'STR (Surat Tanda Registrasi) Aktif', desc: 'Wajib masih aktif dari MTKI / KKI', mandatory: 1, mimes: 'application/pdf,image/jpeg,image/png', max_size: 5120 },
-                                  { id: null, name: 'Sertifikat ACLS / BTCLS / BCLS', desc: 'Sertifikat pelatihan kegawatdaruratan', mandatory: 0, mimes: 'application/pdf,image/jpeg,image/png', max_size: 5120 },
-                                  { id: null, name: 'SKCK Kepolisian', desc: 'Surat keterangan catatan kepolisian', mandatory: 0, mimes: 'application/pdf,image/jpeg,image/png', max_size: 5120 }
+                                  { id: null, name: 'Surat Lamaran Kerja', desc: 'Ditujukan kepada Direktur RSI Fatimah', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
+                                  { id: null, name: 'Ijazah Profesi / Terakhir', desc: 'Scan ijazah asli legalisir', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
+                                  { id: null, name: 'Transkrip Nilai Akademik', desc: 'Scan transkrip nilai akademik legalisir', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
+                                  { id: null, name: 'STR (Surat Tanda Registrasi) Aktif', desc: 'Wajib masih aktif dari MTKI / KKI', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
+                                  { id: null, name: 'Sertifikat ACLS / BTCLS / BCLS', desc: 'Sertifikat pelatihan kegawatdaruratan', mandatory: 0, mimes: 'application/pdf', max_size: 5120 },
+                                  { id: null, name: 'SKCK Kepolisian', desc: 'Surat keterangan catatan kepolisian', mandatory: 0, mimes: 'application/pdf', max_size: 5120 }
                               ];
                           } else if (type === 'umum') {
                               this.documents = [
-                                  { id: null, name: 'Surat Lamaran Kerja', desc: 'Ditujukan kepada Direktur RSI Fatimah', mandatory: 1, mimes: 'application/pdf,image/jpeg,image/png', max_size: 5120 },
-                                  { id: null, name: 'Curriculum Vitae (CV) & Portofolio', desc: 'Riwayat hidup dan bukti hasil karya / proyek', mandatory: 1, mimes: 'application/pdf,image/jpeg,image/png', max_size: 5120 },
-                                  { id: null, name: 'Ijazah & Transkrip Terakhir', desc: 'Scan legalisir ijazah dan transkrip nilai', mandatory: 1, mimes: 'application/pdf,image/jpeg,image/png', max_size: 5120 },
-                                  { id: null, name: 'KTP & Kartu Keluarga', desc: 'Scan identitas kependudukan', mandatory: 1, mimes: 'application/pdf,image/jpeg,image/png', max_size: 5120 },
-                                  { id: null, name: 'Sertifikat Keahlian / Kompetensi', desc: 'Sertifikat sertifikasi IT / akuntansi / administrasi', mandatory: 0, mimes: 'application/pdf,image/jpeg,image/png', max_size: 5120 },
-                                  { id: null, name: 'SKCK Kepolisian', desc: 'Surat catatan kepolisian aktif', mandatory: 0, mimes: 'application/pdf,image/jpeg,image/png', max_size: 5120 }
+                                  { id: null, name: 'Surat Lamaran Kerja', desc: 'Ditujukan kepada Direktur RSI Fatimah', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
+                                  { id: null, name: 'Curriculum Vitae (CV) & Portofolio', desc: 'Riwayat hidup dan bukti hasil karya / proyek', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
+                                  { id: null, name: 'Ijazah & Transkrip Terakhir', desc: 'Scan legalisir ijazah dan transkrip nilai', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
+                                  { id: null, name: 'KTP & Kartu Keluarga', desc: 'Scan identitas kependudukan', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
+                                  { id: null, name: 'Sertifikat Keahlian / Kompetensi', desc: 'Sertifikat sertifikasi IT / akuntansi / administrasi', mandatory: 0, mimes: 'application/pdf', max_size: 5120 },
+                                  { id: null, name: 'SKCK Kepolisian', desc: 'Surat catatan kepolisian aktif', mandatory: 0, mimes: 'application/pdf', max_size: 5120 }
                               ];
                           } else if (type === 'kosong') {
                               this.documents = [
-                                  { id: null, name: 'Surat Lamaran Kerja', desc: '', mandatory: 1, mimes: 'application/pdf,image/jpeg,image/png', max_size: 5120 }
+                                  { id: null, name: 'Surat Lamaran Kerja', desc: '', mandatory: 1, mimes: 'application/pdf', max_size: 5120 }
                               ];
                           }
                       },
@@ -297,9 +297,9 @@
                                                class="w-full h-9 px-3 text-sm bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-[#0179B5]">
                                     </div>
                                     <div class="flex items-center gap-2">
-                                        <input type="hidden" :name="'document_mimes[' + index + ']'" :value="doc.mimes || 'application/pdf,image/jpeg,image/png'">
+                                        <input type="hidden" :name="'document_mimes[' + index + ']'" :value="doc.mimes || 'application/pdf'">
                                         <input type="hidden" :name="'document_max_sizes[' + index + ']'" :value="doc.max_size || 5120">
-                                        <span class="text-xs text-slate-500 font-mono">Format: PDF, JPG, PNG &bull; Maks 5 MB</span>
+                                        <span class="text-xs text-slate-500 font-mono">Format: PDF &bull; Maks 5 MB</span>
                                     </div>
                                 </div>
                             </div>

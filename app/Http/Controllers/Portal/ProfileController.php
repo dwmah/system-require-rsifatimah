@@ -121,27 +121,57 @@ class ProfileController extends Controller
         $sameAsKtp = (bool) ($validated['same_as_ktp'] ?? false);
         $addressDomicile = $sameAsKtp ? $validated['address_ktp'] : ($validated['address_domicile'] ?? null);
 
-        DB::transaction(function () use ($user, $validated, $sameAsKtp, $addressDomicile) {
+        DB::transaction(function () use ($user, $validated, $sameAsKtp, $addressDomicile, $request) {
             $user->update([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
                 'phone' => $validated['phone'],
             ]);
 
+            $profileData = [
+                'birth_place' => $validated['birth_place'],
+                'birth_date' => $validated['birth_date'],
+                'gender' => $validated['gender'],
+                'address_ktp' => $validated['address_ktp'],
+                'same_as_ktp' => $sameAsKtp,
+                'address_domicile' => $addressDomicile,
+            ];
+
+            // Penanganan unggah pas foto baru
+            if ($request->hasFile('photo')) {
+                $file = $request->file('photo');
+                if ($file && $file->isValid()) {
+                    $storedPath = $file->store('profile-photos', 'public');
+
+                    $existingProfile = $user->applicantProfile;
+                    if ($existingProfile && $existingProfile->photo_path && Storage::disk('public')->exists($existingProfile->photo_path)) {
+                        Storage::disk('public')->delete($existingProfile->photo_path);
+                    }
+
+                    $profileData['photo_path'] = $storedPath;
+                }
+            } elseif ($request->boolean('remove_photo')) {
+                $existingProfile = $user->applicantProfile;
+                if ($existingProfile && $existingProfile->photo_path && Storage::disk('public')->exists($existingProfile->photo_path)) {
+                    Storage::disk('public')->delete($existingProfile->photo_path);
+                }
+                $profileData['photo_path'] = null;
+            }
+
             $user->applicantProfile()->updateOrCreate(
                 ['user_id' => $user->id],
                 [
-                    'birth_place' => $validated['birth_place'],
-                    'birth_date' => $validated['birth_date'],
-                    'gender' => $validated['gender'],
-                    'address_ktp' => $validated['address_ktp'],
-                    'same_as_ktp' => $sameAsKtp,
+                    'birth_place'      => $validated['birth_place'],
+                    'birth_date'       => $validated['birth_date'],
+                    'gender'           => $validated['gender'],
+                    'address_ktp'      => $validated['address_ktp'],
+                    'same_as_ktp'      => $sameAsKtp,
                     'address_domicile' => $addressDomicile,
                 ]
             );
         });
 
-        return redirect()->route('profile.show')->with('success', 'Profil berhasil disimpan.');
+        return redirect()->route('profile.show')->with('success', 'Data profil berhasil disimpan.');
     }
 
     /**
