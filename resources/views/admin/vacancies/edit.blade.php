@@ -47,11 +47,11 @@
                 ])->values();
                 if ($stageData->isEmpty()) {
                     $stageData = collect([
-                        ['id' => null, 'name' => 'Seleksi Administrasi & Verifikasi Berkas', 'desc' => 'Pengecekan berkas pelamar', 'start_at' => now()->format('Y-m-d'), 'end_at' => now()->addDays(7)->format('Y-m-d')],
-                        ['id' => null, 'name' => 'Ujian Tulis & Kompetensi Bidang', 'desc' => 'Tes tertulis', 'start_at' => now()->addDays(8)->format('Y-m-d'), 'end_at' => now()->addDays(12)->format('Y-m-d')],
-                        ['id' => null, 'name' => 'Wawancara SDI & Direksi', 'desc' => 'Wawancara', 'start_at' => now()->addDays(13)->format('Y-m-d'), 'end_at' => now()->addDays(17)->format('Y-m-d')],
-                        ['id' => null, 'name' => 'Medical Check-Up (MCU)', 'desc' => 'Pemeriksaan kesehatan', 'start_at' => now()->addDays(18)->format('Y-m-d'), 'end_at' => now()->addDays(22)->format('Y-m-d')],
-                        ['id' => null, 'name' => 'Pengumuman Kelulusan Akhir', 'desc' => 'Pengumuman resmi', 'start_at' => now()->addDays(23)->format('Y-m-d'), 'end_at' => now()->addDays(25)->format('Y-m-d')],
+                        ['id' => null, 'name' => 'Pendaftaran Online & Review Portofolio', 'desc' => 'Pemeriksaan kelengkapan berkas biodata dan portofolio pelamar', 'start_at' => now()->format('Y-m-d'), 'end_at' => now()->addDays(7)->format('Y-m-d')],
+                        ['id' => null, 'name' => 'Seleksi Administrasi', 'desc' => 'Verifikasi kelengkapan dan keabsahan berkas lamaran', 'start_at' => now()->addDays(8)->format('Y-m-d'), 'end_at' => now()->addDays(12)->format('Y-m-d')],
+                        ['id' => null, 'name' => 'Ujian Tulis & Kompetensi Bidang', 'desc' => 'Tes kemampuan teknis dan pengetahuan umum keislaman/kesehatan', 'start_at' => now()->addDays(13)->format('Y-m-d'), 'end_at' => now()->addDays(17)->format('Y-m-d')],
+                        ['id' => null, 'name' => 'Wawancara SDI & Direksi', 'desc' => 'Wawancara kompetensi kerja, kepribadian, dan komitmen', 'start_at' => now()->addDays(18)->format('Y-m-d'), 'end_at' => now()->addDays(22)->format('Y-m-d')],
+                        ['id' => null, 'name' => 'Medical Check-Up (MCU)', 'desc' => 'Pemeriksaan kesehatan fisik bebas narkoba dan penyakit menular', 'start_at' => now()->addDays(23)->format('Y-m-d'), 'end_at' => now()->addDays(25)->format('Y-m-d')],
                     ]);
                 }
             @endphp
