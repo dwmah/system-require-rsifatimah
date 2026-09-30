@@ -100,7 +100,8 @@ class ApplicationDocumentController extends Controller
             );
 
             return redirect()->route('portal.applications.documents.index', $jobApplication)
-                ->with('success', 'Berkas "'.$targetRequirement->name.'" berhasil disimpan.');
+                ->with('success', 'Berkas "'.$targetRequirement->name.'" berhasil disimpan.')
+                ->with('uploaded_requirement_id', $targetRequirement->id);
         } catch (ValidationException $e) {
             return back()->withErrors($e->errors())->withInput();
         } catch (DomainException $e) {
@@ -133,10 +134,12 @@ class ApplicationDocumentController extends Controller
         }
 
         try {
+            $requirementId = $document->vacancy_document_requirement_id;
             $documentService->delete($jobApplication, $document);
 
             return redirect()->route('portal.applications.documents.index', $jobApplication)
-                ->with('success', 'Berkas berhasil dihapus.');
+                ->with('success', 'Berkas berhasil dihapus.')
+                ->with('deleted_requirement_id', $requirementId);
         } catch (DomainException $e) {
             return redirect()->back()
                 ->with('error', $e->getMessage());

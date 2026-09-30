@@ -158,16 +158,13 @@ class ProfileController extends Controller
                 $profileData['photo_path'] = null;
             }
 
+            if (! $user->applicantProfile && empty($profileData['nik'])) {
+                $profileData['nik'] = $user->registration_number ?? (string) rand(1000000000000000, 9999999999999999);
+            }
+
             $user->applicantProfile()->updateOrCreate(
                 ['user_id' => $user->id],
-                [
-                    'birth_place'      => $validated['birth_place'],
-                    'birth_date'       => $validated['birth_date'],
-                    'gender'           => $validated['gender'],
-                    'address_ktp'      => $validated['address_ktp'],
-                    'same_as_ktp'      => $sameAsKtp,
-                    'address_domicile' => $addressDomicile,
-                ]
+                $profileData
             );
         });
 

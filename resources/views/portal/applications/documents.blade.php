@@ -129,7 +129,10 @@
                         $maxMb = round($requirement->max_size_kb / 1024, 1);
                     @endphp
 
-                    <div class="p-3.5 sm:px-5 sm:py-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3 hover:bg-slate-50/60 transition-colors {{ $uploaded ? '' : ($requirement->is_required ? 'bg-amber-50/15' : '') }}">
+                    <div
+                        id="requirement-row-{{ $requirement->id }}"
+                        class="p-3.5 sm:px-5 sm:py-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3 hover:bg-slate-50/60 transition-all duration-300 {{ $uploaded ? '' : ($requirement->is_required ? 'bg-amber-50/15' : '') }}"
+                    >
                         {{-- Requirement Info --}}
                         <div class="space-y-0.5 flex-1 min-w-0">
                             <div class="flex flex-wrap items-center gap-2">
@@ -217,6 +220,8 @@
                                                         $el.value = '';
                                                         return;
                                                     }
+                                                    sessionStorage.setItem('last_doc_target', 'requirement-row-{{ $requirement->id }}');
+                                                    sessionStorage.setItem('last_doc_scroll_y', window.scrollY);
                                                     uploading = true;
                                                     $el.closest('form').submit();
                                                 }"
@@ -241,7 +246,11 @@
                                         <form
                                             action="{{ route('portal.applications.documents.destroy', [$jobApplication, $uploaded]) }}"
                                             method="POST"
-                                            onsubmit="return confirm('Apakah Anda yakin ingin menghapus berkas ini?');"
+                                            onsubmit="if (confirm('Apakah Anda yakin ingin menghapus berkas ini?')) {
+                                                sessionStorage.setItem('last_doc_target', 'requirement-row-{{ $requirement->id }}');
+                                                sessionStorage.setItem('last_doc_scroll_y', window.scrollY);
+                                                return true;
+                                            } return false;"
                                             class="inline"
                                         >
                                             @csrf
@@ -283,6 +292,8 @@
                                                     $el.value = '';
                                                     return;
                                                 }
+                                                sessionStorage.setItem('last_doc_target', 'requirement-row-{{ $requirement->id }}');
+                                                sessionStorage.setItem('last_doc_scroll_y', window.scrollY);
                                                 uploading = true;
                                                 $el.closest('form').submit();
                                             }"
@@ -359,4 +370,57 @@
             </div>
         </div>
     </div>
+
+    {{-- Script pemulihan posisi scroll setelah unggah / ganti / hapus berkas --}}
+    <script>
+        (function () {
+            const sessionTargetId = @json(session('uploaded_requirement_id') ? 'requirement-row-' . session('uploaded_requirement_id') : (session('deleted_requirement_id') ? 'requirement-row-' . session('deleted_requirement_id') : null));
+            const storedTargetId = sessionStorage.getItem('last_doc_target');
+            const storedScrollY = sessionStorage.getItem('last_doc_scroll_y');
+
+            const targetId = sessionTargetId || storedTargetId;
+
+            // Bersihkan sessionStorage setelah dibaca
+            sessionStorage.removeItem('last_doc_target');
+            sessionStorage.removeItem('last_doc_scroll_y');
+
+            if (targetId || storedScrollY !== null) {
+                if ('scrollRestoration' in history) {
+                    history.scrollRestoration = 'manual';
+                }
+
+                let hasScrolled = false;
+
+                const performScroll = () => {
+                    if (hasScrolled) return;
+                    const el = targetId ? document.getElementById(targetId) : null;
+                    if (el) {
+                        hasScrolled = true;
+                        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        el.classList.add('bg-emerald-50/70', 'ring-2', 'ring-emerald-400/40', 'rounded-xl');
+                        setTimeout(() => {
+                            el.classList.remove('bg-emerald-50/70', 'ring-2', 'ring-emerald-400/40', 'rounded-xl');
+                        }, 2500);
+                    } else if (storedScrollY !== null) {
+                        hasScrolled = true;
+                        window.scrollTo({ top: parseInt(storedScrollY, 10), behavior: 'smooth' });
+                    }
+                };
+
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', () => {
+                        setTimeout(performScroll, 50);
+                    });
+                } else {
+                    setTimeout(performScroll, 50);
+                }
+
+                window.addEventListener('load', () => {
+                    if (!hasScrolled) {
+                        performScroll();
+                    }
+                });
+            }
+        })();
+    </script>
 </x-layouts.applicant>
