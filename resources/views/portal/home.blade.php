@@ -109,12 +109,6 @@
                                     {{ $stage['description'] }}
                                 </p>
                             @endif
-
-                            @if(!empty($stage['applicant_message']))
-                                <div class="mt-1.5 p-2 rounded bg-white/90 border border-slate-200 text-[11px] text-slate-700 leading-relaxed">
-                                    {{ $stage['applicant_message'] }}
-                                </div>
-                            @endif
                         </div>
 
                         @if(!empty($stage['published_at']))

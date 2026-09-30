@@ -153,7 +153,12 @@ Route::middleware(['auth', 'applicant'])->prefix('portal')->name('portal.')->gro
 
     // Notifikasi Portal Pelamar
     Route::get('/notifikasi', [ApplicantNotificationController::class, 'index'])->name('notifications.index');
-    Route::post('/notifikasi/{notification}/read', [ApplicantNotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::get('/notifikasi/{notification}', [ApplicantNotificationController::class, 'show'])
+        ->whereNumber('notification')
+        ->name('notifications.show');
+    Route::post('/notifikasi/{notification}/read', [ApplicantNotificationController::class, 'markAsRead'])
+        ->whereNumber('notification')
+        ->name('notifications.read');
     Route::post('/notifikasi/read-all', [ApplicantNotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
 });
 

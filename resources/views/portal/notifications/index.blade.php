@@ -47,7 +47,7 @@
 
                         <div class="flex items-center gap-3 mt-3">
                             @if($notif->action_url)
-                                <a href="{{ $notif->action_url }}" class="text-xs font-semibold text-[#0179B5] hover:underline">
+                                <a href="{{ route('portal.notifications.show', $notif) }}" class="text-xs font-semibold text-[#0179B5] hover:underline">
                                     Lihat Detail &rarr;
                                 </a>
                             @endif

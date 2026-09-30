@@ -25,6 +25,28 @@ class ApplicantNotificationController extends Controller
     }
 
     /**
+     * Buka detail notifikasi dan otomatis tandai sebagai telah dibaca.
+     */
+    public function show(RecruitmentNotification $notification): RedirectResponse
+    {
+        $user = Auth::user();
+
+        if ($notification->user_id !== $user->id) {
+            abort(403);
+        }
+
+        if (is_null($notification->read_at)) {
+            $notification->update(['read_at' => now()]);
+        }
+
+        if ($notification->action_url) {
+            return redirect($notification->action_url);
+        }
+
+        return redirect()->route('portal.notifications.index');
+    }
+
+    /**
      * Tandai notifikasi spesifik sebagai telah dibaca.
      */
     public function markAsRead(RecruitmentNotification $notification): RedirectResponse
