@@ -246,9 +246,9 @@ class ApplicantAuthenticationTest extends TestCase
         $this->assertAuthenticatedAs($user);
     }
 
-    public function test_login_succeeds_using_registration_number(): void
+    public function test_login_fails_using_registration_number(): void
     {
-        $user = User::create([
+        User::create([
             'name' => 'Bambang Pelamar',
             'email' => 'bambang@example.com',
             'phone' => '6281234567802',
@@ -262,8 +262,27 @@ class ApplicantAuthenticationTest extends TestCase
             'password' => 'Password123',
         ]);
 
-        $response->assertRedirect(route('portal.home'));
-        $this->assertAuthenticatedAs($user);
+        $response->assertSessionHasErrors(['login']);
+        $this->assertGuest();
+    }
+
+    public function test_login_fails_using_phone_number(): void
+    {
+        User::create([
+            'name' => 'Phone Pelamar',
+            'email' => 'phone@example.com',
+            'phone' => '6281234567809',
+            'password' => 'Password123',
+            'is_active' => true,
+        ]);
+
+        $response = $this->post(route('login.store'), [
+            'email' => '6281234567809',
+            'password' => 'Password123',
+        ]);
+
+        $response->assertSessionHasErrors(['email']);
+        $this->assertGuest();
     }
 
     public function test_login_fails_with_incorrect_password(): void
@@ -425,11 +444,11 @@ class ApplicantAuthenticationTest extends TestCase
         Notification::assertSentTo($user, ResetPassword::class);
     }
 
-    public function test_forgot_password_accepts_phone_and_sends_reset_link_to_associated_email(): void
+    public function test_forgot_password_rejects_phone_number_and_requires_email(): void
     {
         Notification::fake();
 
-        $user = User::create([
+        User::create([
             'name' => 'Phone User',
             'email' => 'phoneuser@example.com',
             'phone' => '6281234567899',
@@ -437,13 +456,13 @@ class ApplicantAuthenticationTest extends TestCase
             'is_active' => true,
         ]);
 
-        // Input using 08...
+        // Input using phone should now be rejected as invalid email
         $response = $this->post(route('password.email'), [
-            'identifier' => '081234567899',
+            'email' => '081234567899',
         ]);
 
-        $response->assertSessionHas('status');
-        Notification::assertSentTo($user, ResetPassword::class);
+        $response->assertSessionHasErrors(['email']);
+        Notification::assertNothingSent();
     }
 
     public function test_forgot_password_gives_generic_response_for_unregistered_identifier(): void

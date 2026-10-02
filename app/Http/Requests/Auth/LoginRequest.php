@@ -30,9 +30,40 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'login' => ['required', 'string'],
+            'email' => ['required_without:login', 'nullable', 'string', 'email'],
+            'login' => ['required_without:email', 'nullable', 'string', 'email'],
             'password' => ['required', 'string'],
             'remember' => ['nullable', 'boolean'],
+        ];
+    }
+
+    /**
+     * Get custom attributes for validator errors.
+     *
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        return [
+            'email' => 'Alamat Email',
+            'login' => 'Alamat Email',
+            'password' => 'Password',
+        ];
+    }
+
+    /**
+     * Get custom messages for validator errors.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'email.required_without' => 'Alamat email wajib diisi.',
+            'email.email' => 'Format alamat email tidak valid.',
+            'login.required_without' => 'Alamat email wajib diisi.',
+            'login.email' => 'Format alamat email tidak valid.',
+            'password.required' => 'Password wajib diisi.',
         ];
     }
 
@@ -45,15 +76,15 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        $loginInput = trim((string) $this->input('login'));
-        $field = filter_var($loginInput, FILTER_VALIDATE_EMAIL) ? 'email' : 'registration_number';
+        $emailInput = trim((string) ($this->input('email') ?? $this->input('login')));
 
-        $user = User::where($field, $loginInput)->first();
+        $user = User::where('email', $emailInput)->first();
 
         if (! $user || ! Hash::check($this->input('password'), $user->password)) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
+                'email' => trans('auth.failed'),
                 'login' => trans('auth.failed'),
             ]);
         }
@@ -62,6 +93,7 @@ class LoginRequest extends FormRequest
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
+                'email' => 'Akun pelamar Anda sudah tidak aktif. Silakan hubungi panitia rekrutmen.',
                 'login' => 'Akun pelamar Anda sudah tidak aktif. Silakan hubungi panitia rekrutmen.',
             ]);
         }
@@ -91,6 +123,10 @@ class LoginRequest extends FormRequest
                 'seconds' => $seconds,
                 'minutes' => ceil($seconds / 60),
             ]),
+            'email' => trans('auth.throttle', [
+                'seconds' => $seconds,
+                'minutes' => ceil($seconds / 60),
+            ]),
         ]);
     }
 
@@ -100,7 +136,7 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        $normalizedLogin = Str::lower(trim((string) $this->input('login')));
+        $normalizedLogin = Str::lower(trim((string) ($this->input('email') ?? $this->input('login'))));
 
         return hash('sha256', $normalizedLogin.'|'.$this->ip());
     }

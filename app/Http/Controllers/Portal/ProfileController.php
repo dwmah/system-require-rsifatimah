@@ -162,10 +162,29 @@ class ProfileController extends Controller
                 $profileData['nik'] = $user->registration_number ?? (string) rand(1000000000000000, 9999999999999999);
             }
 
-            $user->applicantProfile()->updateOrCreate(
+            $profile = $user->applicantProfile()->updateOrCreate(
                 ['user_id' => $user->id],
                 $profileData
             );
+
+            // Simpan / perbarui riwayat pendidikan terakhir jika diisi
+            if (! empty($validated['institution_name']) || ! empty($validated['study_program']) || ! empty($validated['education_level'])) {
+                $educationData = [
+                    'education_level' => $validated['education_level'] ?: 'D3',
+                    'institution_name' => $validated['institution_name'] ?? '',
+                    'study_program' => $validated['study_program'] ?? '',
+                    'graduation_year' => ! empty($validated['graduation_year']) ? (int) $validated['graduation_year'] : null,
+                    'gpa' => ! empty($validated['gpa']) ? $validated['gpa'] : null,
+                    'accreditation' => ! empty($validated['accreditation']) ? $validated['accreditation'] : null,
+                ];
+
+                $existingEducation = $profile->educations()->first();
+                if ($existingEducation) {
+                    $existingEducation->update($educationData);
+                } else {
+                    $profile->educations()->create($educationData);
+                }
+            }
         });
 
         return redirect()->route('profile.show')->with('success', 'Data profil berhasil disimpan.');

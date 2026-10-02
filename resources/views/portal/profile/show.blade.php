@@ -55,16 +55,10 @@
             'missingItems' => $missingItems,
         ])
 
-        {{-- 2. Formulir Profil Lengkap (1 Card: Pas Foto Teratas, Data Pribadi, Kontak & Alamat) --}}
+        {{-- 2. Formulir Profil Lengkap (1 Card: Pas Foto Teratas, Data Pribadi, Kontak & Alamat, Riwayat Pendidikan) --}}
         @include('portal.profile.partials.personal-data', [
             'user' => $user,
             'profile' => $profile,
-        ])
-
-
-        {{-- 4. Riwayat Pendidikan --}}
-        @include('portal.profile.partials.educations', [
-            'educations' => $profile?->educations ?? collect(),
         ])
 
         {{-- 5. CTA Menuju Pemberkasan (Pojok Kanan Bawah) --}}

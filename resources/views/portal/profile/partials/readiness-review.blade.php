@@ -41,8 +41,8 @@
 
         @if ($isComplete)
             <div class="shrink-0 self-end sm:self-center">
-                <a href="{{ route('vacancies.index') }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-[#0179B5] hover:bg-[#016293] text-white text-xs font-bold rounded-xl shadow-xs transition-colors whitespace-nowrap">
-                    <span>Jelajahi Lowongan Terbuka</span>
+                <a href="{{ route('portal.applications.index') }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-[#0179B5] hover:bg-[#016293] text-white text-xs font-bold rounded-xl shadow-xs transition-colors whitespace-nowrap">
+                    <span>Lihat Lamaran Saya</span>
                     <span>&rarr;</span>
                 </a>
             </div>

@@ -31,22 +31,24 @@
     <form method="POST" action="{{ route('login.store') }}" class="space-y-4" novalidate>
         @csrf
 
-        {{-- Email atau Nomor Registrasi --}}
+        {{-- Alamat Email Terdaftar --}}
         <div>
-            <label for="login" class="block text-xs font-semibold text-slate-700 mb-1.5">
-                Email<span class="text-red-500 font-bold">*</span>
+            <label for="email" class="block text-xs font-semibold text-slate-700 mb-1.5">
+                Alamat Email Terdaftar <span class="text-red-500 font-bold">*</span>
             </label>
             <input
-                type="text"
-                name="login"
-                id="login"
-                value="{{ old('login') }}"
+                type="email"
+                name="email"
+                id="email"
+                value="{{ old('email', old('login')) }}"
                 placeholder="nama@email.com"
                 required
                 autofocus
-                autocomplete="username"
-                class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $errors->has('login') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100' }} focus:outline-hidden focus:ring-2"
+                autocomplete="username email"
+                class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $errors->has('email') || $errors->has('login') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100' }} focus:outline-hidden focus:ring-2"
             >
+            <x-form.error name="email" />
+            <x-form.error name="login" />
         </div>
 
         {{-- Password dengan Show/Hide Alpine.js --}}

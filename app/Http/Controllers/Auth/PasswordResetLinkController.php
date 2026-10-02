@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Support\PhoneNumberNormalizer;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
@@ -26,21 +25,18 @@ class PasswordResetLinkController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'identifier' => ['required', 'string'],
+            'email' => ['required_without:identifier', 'nullable', 'string', 'email'],
+            'identifier' => ['required_without:email', 'nullable', 'string', 'email'],
         ], [
-            'identifier.required' => 'Email atau Nomor WhatsApp wajib diisi.',
+            'email.required_without' => 'Alamat email terdaftar wajib diisi.',
+            'email.email' => 'Format alamat email tidak valid.',
+            'identifier.required_without' => 'Alamat email terdaftar wajib diisi.',
+            'identifier.email' => 'Format alamat email tidak valid.',
         ]);
 
-        $rawIdentifier = trim((string) $request->input('identifier'));
-        $normalizedPhone = PhoneNumberNormalizer::normalize($rawIdentifier);
+        $emailInput = trim((string) ($request->input('email') ?? $request->input('identifier')));
 
-        $user = null;
-
-        if (filter_var($rawIdentifier, FILTER_VALIDATE_EMAIL)) {
-            $user = User::where('email', $rawIdentifier)->where('is_active', true)->first();
-        } elseif ($normalizedPhone) {
-            $user = User::where('phone', $normalizedPhone)->where('is_active', true)->first();
-        }
+        $user = User::where('email', $emailInput)->where('is_active', true)->first();
 
         if ($user) {
             Password::broker()->sendResetLink(['email' => $user->email]);

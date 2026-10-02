@@ -4,6 +4,7 @@ use App\Http\Middleware\EnsureApplicantAccountIsActive;
 use App\Http\Middleware\EnsurePublicRecruitmentIsOpen;
 use App\Http\Middleware\EnsureUserIsAdmin;
 use App\Http\Middleware\EnsureUserIsApplicant;
+use App\Http\Middleware\RedirectAuthenticatedApplicants;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -30,6 +31,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'applicant.active' => EnsureApplicantAccountIsActive::class,
             'admin' => EnsureUserIsAdmin::class,
             'applicant' => EnsureUserIsApplicant::class,
+            'applicant.redirect' => RedirectAuthenticatedApplicants::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

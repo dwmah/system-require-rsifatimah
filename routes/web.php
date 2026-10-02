@@ -36,13 +36,16 @@ use Illuminate\Support\Facades\Route;
 // Halaman Pengumuman Pendaftaran Ditutup
 Route::get('/rekrutmen-ditutup', function () {
     return view('public.recruitment-closed');
-})->name('recruitment.closed');
+})->middleware('applicant.redirect')->name('recruitment.closed');
 
 // Portal Rekrutmen Publik (Informasi Terbuka)
-Route::middleware('recruitment.open')->group(function () {
+Route::middleware(['recruitment.open', 'applicant.redirect'])->group(function () {
     Route::get('/', [VacancyController::class, 'index'])->name('recruitment.index');
     Route::get('/lowongan', [VacancyController::class, 'index'])->name('vacancies.index');
     Route::get('/lowongan/{jobVacancy}', [VacancyController::class, 'show'])->name('vacancies.show');
+});
+
+Route::middleware('recruitment.open')->group(function () {
     Route::get('/panduan/alur-pendaftaran', [GuideController::class, 'flow'])->name('guides.flow');
     Route::get('/panduan/persyaratan', [GuideController::class, 'requirements'])->name('guides.requirements');
 });

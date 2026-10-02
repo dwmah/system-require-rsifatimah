@@ -55,31 +55,57 @@ class ApplicantPublicNavigationTest extends TestCase
         ]);
     }
 
-    public function test_authenticated_applicant_sees_applicant_sidebar_on_vacancies_page(): void
+    public function test_authenticated_applicant_cannot_access_vacancies_page_and_is_redirected_to_portal_home(): void
     {
         $response = $this->actingAs($this->applicant)->get(route('vacancies.index'));
 
-        $response->assertStatus(200);
-        $response->assertSee('Portal Pelamar');
-        $response->assertSee('Beranda Portal');
-        $response->assertSee('Lamaran Saya');
-        $response->assertSee('Profil Saya');
-        $response->assertSee('Notifikasi');
-        $response->assertSee('Lowongan Pekerjaan');
-        $response->assertSee('Panduan & Info', false);
-        $response->assertSee('Pusat Informasi SDM');
+        $response->assertRedirect(route('portal.home'));
     }
 
-    public function test_authenticated_applicant_sees_applicant_sidebar_on_vacancy_detail_page(): void
+    public function test_authenticated_applicant_cannot_access_vacancy_detail_page_and_is_redirected_to_portal_home(): void
     {
         $response = $this->actingAs($this->applicant)->get(route('vacancies.show', $this->vacancy));
 
+        $response->assertRedirect(route('portal.home'));
+    }
+
+    public function test_authenticated_applicant_cannot_access_root_page_and_is_redirected_to_portal_home(): void
+    {
+        $response = $this->actingAs($this->applicant)->get(route('recruitment.index'));
+
+        $response->assertRedirect(route('portal.home'));
+    }
+
+    public function test_authenticated_applicant_cannot_access_recruitment_closed_page_and_is_redirected_to_portal_home(): void
+    {
+        $response = $this->actingAs($this->applicant)->get(route('recruitment.closed'));
+
+        $response->assertRedirect(route('portal.home'));
+    }
+
+    public function test_authenticated_admin_visiting_root_or_closed_is_redirected_to_admin_dashboard(): void
+    {
+        $admin = User::factory()->create([
+            'email' => 'admin@rsifatimah.com',
+            'role' => User::ROLE_ADMIN,
+            'is_active' => true,
+        ]);
+
+        $this->actingAs($admin)->get(route('recruitment.index'))->assertRedirect(route('admin.dashboard'));
+        $this->actingAs($admin)->get(route('recruitment.closed'))->assertRedirect(route('admin.dashboard'));
+    }
+
+    public function test_authenticated_admin_can_preview_vacancies_page(): void
+    {
+        $admin = User::factory()->create([
+            'email' => 'admin-preview@rsifatimah.com',
+            'role' => User::ROLE_ADMIN,
+            'is_active' => true,
+        ]);
+
+        $response = $this->actingAs($admin)->get(route('vacancies.index'));
         $response->assertStatus(200);
-        $response->assertSee('Portal Pelamar');
-        $response->assertSee('Beranda Portal');
-        $response->assertSee('Lamaran Saya');
-        $response->assertSee('Profil Saya');
-        $response->assertSee('Pusat Informasi SDM');
+        $response->assertSee('Lowongan Pekerjaan');
     }
 
     public function test_authenticated_applicant_sees_applicant_sidebar_on_guides_page(): void

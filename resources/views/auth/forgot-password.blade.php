@@ -1,6 +1,7 @@
 <x-layouts.auth
     title="Lupa Password Akun"
     card-title="Pemulihan Password"
+    card-subtitle="Masukkan alamat email terdaftar untuk menerima tautan pemulihan kata sandi akun Anda."
     back-url="{{ route('login') }}"
     back-label="Kembali ke Halaman Masuk"
 >
@@ -31,21 +32,22 @@
     <form method="POST" action="{{ route('password.email') }}" class="space-y-4" novalidate>
         @csrf
 
-        {{-- Email atau Nomor WhatsApp --}}
+        {{-- Alamat Email Terdaftar --}}
         <div>
-            <label for="identifier" class="block text-xs font-semibold text-slate-700 mb-1.5">
-                Email Terdaftar <span class="text-red-500 font-bold">*</span>
+            <label for="email" class="block text-xs font-semibold text-slate-700 mb-1.5">
+                Alamat Email Terdaftar <span class="text-red-500 font-bold">*</span>
             </label>
             <input
-                type="text"
-                name="identifier"
-                id="identifier"
-                value="{{ old('identifier') }}"
+                type="email"
+                name="email"
+                id="email"
+                value="{{ old('email', old('identifier')) }}"
                 placeholder="nama@email.com"
                 required
                 autofocus
-                class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $errors->has('identifier') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100' }} focus:outline-hidden focus:ring-2"
+                class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $errors->has('email') || $errors->has('identifier') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100' }} focus:outline-hidden focus:ring-2"
             >
+            <x-form.error name="email" />
             <x-form.error name="identifier" />
         </div>
 

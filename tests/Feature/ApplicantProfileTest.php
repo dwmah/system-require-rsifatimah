@@ -639,4 +639,61 @@ class ApplicantProfileTest extends TestCase
         $this->assertNull($user->applicantProfile->photo_path);
         Storage::disk('public')->assertMissing('profile-photos/existing_old_photo.jpg');
     }
+
+    public function test_unified_profile_update_saves_education_together_with_profile_data(): void
+    {
+        $user = $this->createApplicantUser();
+
+        $response = $this->actingAs($user)->patch(route('profile.update'), [
+            'name' => 'Dawam Ahmadi Updated',
+            'birth_place' => 'Banyuwangi',
+            'birth_date' => '1998-05-14',
+            'gender' => 'Laki-laki',
+            'email' => 'dawam.edu@example.com',
+            'phone' => '081234567899',
+            'address_ktp' => 'Jl. Letjen Suprapto No. 45 Banyuwangi',
+            'same_as_ktp' => '1',
+            'education_level' => 'D4',
+            'institution_name' => 'Politeknik Negeri Banyuwangi',
+            'study_program' => 'Teknologi Rekayasa Perangkat Lunak',
+            'graduation_year' => 2026,
+            'gpa' => '3.90',
+            'accreditation' => 'Unggul',
+        ]);
+
+        $response->assertRedirect(route('profile.show'));
+        $response->assertSessionHas('success', 'Data profil berhasil disimpan.');
+
+        $user->refresh();
+        $this->assertDatabaseHas('applicant_educations', [
+            'applicant_profile_id' => $user->applicantProfile->id,
+            'education_level' => 'D4',
+            'institution_name' => 'Politeknik Negeri Banyuwangi',
+            'study_program' => 'Teknologi Rekayasa Perangkat Lunak',
+            'graduation_year' => 2026,
+            'accreditation' => 'Unggul',
+        ]);
+
+        // Updating again updates the existing education record
+        $response2 = $this->actingAs($user)->patch(route('profile.update'), [
+            'name' => 'Dawam Ahmadi Updated',
+            'birth_place' => 'Banyuwangi',
+            'birth_date' => '1998-05-14',
+            'gender' => 'Laki-laki',
+            'email' => 'dawam.edu@example.com',
+            'phone' => '081234567899',
+            'address_ktp' => 'Jl. Letjen Suprapto No. 45 Banyuwangi',
+            'same_as_ktp' => '1',
+            'education_level' => 'D4',
+            'institution_name' => 'Politeknik Negeri Banyuwangi',
+            'study_program' => 'Teknologi Rekayasa Perangkat Lunak',
+            'graduation_year' => 2026,
+            'gpa' => '3.95',
+            'accreditation' => 'Unggul',
+        ]);
+
+        $response2->assertRedirect(route('profile.show'));
+        $this->assertCount(1, $user->applicantProfile->educations);
+        $this->assertEquals('3.95', $user->applicantProfile->educations->first()->gpa);
+    }
 }

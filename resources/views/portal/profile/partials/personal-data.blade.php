@@ -55,7 +55,7 @@
                     WAJIB
                 </span>
             </div>
-            <p class="text-xs text-slate-500">Pas foto formal, identitas diri lengkap, serta alamat domisili dan kontak resmi Anda.</p>
+            <p class="text-xs text-slate-500">Pas foto formal, identitas diri lengkap, alamat kontak resmi, serta riwayat pendidikan formal terakhir Anda.</p>
         </div>
     </div>
 
@@ -393,10 +393,138 @@
             </div>
         </div>
 
+        {{-- Divider --}}
+        <div class="border-t border-slate-100"></div>
+
+        {{-- SECTION 4: RIWAYAT PENDIDIKAN TERAKHIR --}}
+        @php
+            $education = $profile?->educations?->first();
+        @endphp
+        <div>
+            <div class="flex items-center justify-between mb-4">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Riwayat Pendidikan Terakhir</p>
+                <span class="text-[11px] text-slate-400">Pendidikan formal terakhir yang telah diselesaikan</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {{-- Jenjang Pendidikan --}}
+                <div>
+                    <label for="education_level" class="block text-xs font-semibold text-slate-700 mb-1.5">
+                        Jenjang Pendidikan <span class="text-red-500 font-bold">*</span>
+                    </label>
+                    <select
+                        name="education_level"
+                        id="education_level"
+                        class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $errors->has('education_level') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100' }} focus:outline-hidden focus:ring-2 bg-white"
+                    >
+                        <option value="">-- Pilih Jenjang Pendidikan --</option>
+                        @foreach ([
+                            'SMA/SMK' => 'SMA / SMK / Sederajat',
+                            'D3' => 'D3 (Diploma 3)',
+                            'D4' => 'D4 (Diploma 4)',
+                            'S1' => 'S1 (Sarjana)',
+                            'Profesi' => 'Profesi / Ners / Apoteker',
+                            'S2' => 'S2 (Magister)',
+                        ] as $key => $label)
+                            <option value="{{ $key }}" {{ old('education_level', $education?->education_level ?? 'D3') === $key ? 'selected' : '' }}>
+                                {{ $label }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <x-form.error name="education_level" />
+                </div>
+
+                {{-- Tahun Kelulusan --}}
+                <div>
+                    <label for="graduation_year" class="block text-xs font-semibold text-slate-700 mb-1.5">
+                        Tahun Kelulusan
+                    </label>
+                    <input
+                        type="number"
+                        name="graduation_year"
+                        id="graduation_year"
+                        min="1970"
+                        max="{{ now()->year }}"
+                        value="{{ old('graduation_year', $education?->graduation_year) }}"
+                        placeholder="Contoh: {{ now()->year }}"
+                        class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $errors->has('graduation_year') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100' }} focus:outline-hidden focus:ring-2"
+                    >
+                    <x-form.error name="graduation_year" />
+                </div>
+
+                {{-- Nama Institusi / Universitas --}}
+                <div>
+                    <label for="institution_name" class="block text-xs font-semibold text-slate-700 mb-1.5">
+                        Nama Institusi / Universitas <span class="text-red-500 font-bold">*</span>
+                    </label>
+                    <input
+                        type="text"
+                        name="institution_name"
+                        id="institution_name"
+                        value="{{ old('institution_name', $education?->institution_name) }}"
+                        placeholder="Contoh: Politeknik Negeri Banyuwangi"
+                        class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $errors->has('institution_name') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100' }} focus:outline-hidden focus:ring-2"
+                    >
+                    <x-form.error name="institution_name" />
+                </div>
+
+                {{-- Program Studi / Jurusan --}}
+                <div>
+                    <label for="study_program" class="block text-xs font-semibold text-slate-700 mb-1.5">
+                        Program Studi / Jurusan <span class="text-red-500 font-bold">*</span>
+                    </label>
+                    <input
+                        type="text"
+                        name="study_program"
+                        id="study_program"
+                        value="{{ old('study_program', $education?->study_program) }}"
+                        placeholder="Contoh: Teknologi Rekayasa Perangkat Lunak"
+                        class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $errors->has('study_program') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100' }} focus:outline-hidden focus:ring-2"
+                    >
+                    <x-form.error name="study_program" />
+                </div>
+
+                {{-- IPK / Nilai --}}
+                <div>
+                    <label for="gpa" class="block text-xs font-semibold text-slate-700 mb-1.5">
+                        IPK / Nilai Rata-rata
+                    </label>
+                    <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        max="4"
+                        name="gpa"
+                        id="gpa"
+                        value="{{ old('gpa', $education?->gpa ? number_format((float) $education->gpa, 2, '.', '') : '') }}"
+                        placeholder="Contoh: 3.90"
+                        class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $errors->has('gpa') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100' }} focus:outline-hidden focus:ring-2"
+                    >
+                    <x-form.error name="gpa" />
+                </div>
+
+                {{-- Akreditasi --}}
+                <div>
+                    <label for="accreditation" class="block text-xs font-semibold text-slate-700 mb-1.5">
+                        Akreditasi
+                    </label>
+                    <input
+                        type="text"
+                        name="accreditation"
+                        id="accreditation"
+                        value="{{ old('accreditation', $education?->accreditation) }}"
+                        placeholder="Contoh: Unggul / A / B"
+                        class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $errors->has('accreditation') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100' }} focus:outline-hidden focus:ring-2"
+                    >
+                    <x-form.error name="accreditation" />
+                </div>
+            </div>
+        </div>
+
         {{-- Single CTA: Simpan Perubahan --}}
         <div class="pt-4 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-100">
             <p class="text-xs text-slate-400 text-center sm:text-left">
-                Semua data pribadi dan foto akan disimpan secara bersamaan.
+                Semua data pribadi, kontak, pas foto, dan riwayat pendidikan akan disimpan secara bersamaan.
             </p>
             <x-ui.button type="submit" variant="primary" size="sm" class="w-full sm:w-auto shadow-xs">
                 <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
