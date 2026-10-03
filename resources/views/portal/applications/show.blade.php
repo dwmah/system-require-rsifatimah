@@ -421,11 +421,15 @@
 
                     {{-- 1. Data Diri Snapshot --}}
                     @php
+                        $sectionNumber = 1;
                         $pd = $snapshot->personal_data ?? [];
+                        $edus = $snapshot->educations ?? [];
+                        $lics = $snapshot->licenses ?? [];
+                        $exps = $snapshot->work_experiences ?? [];
                     @endphp
                     <div class="px-6 space-y-3">
                         <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider border-b border-slate-100 pb-2">
-                            1. Identitas Pelamar
+                            {{ $sectionNumber++ }}. Identitas Pelamar
                         </h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
                             <div>
@@ -472,12 +476,9 @@
                     </div>
 
                     {{-- 2. Pendidikan Snapshot --}}
-                    @php
-                        $edus = $snapshot->educations ?? [];
-                    @endphp
                     <div class="px-6 space-y-3">
                         <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider border-b border-slate-100 pb-2">
-                            2. Riwayat Pendidikan ({{ count($edus) }})
+                            {{ $sectionNumber++ }}. Riwayat Pendidikan ({{ count($edus) }})
                         </h3>
                         @if (! empty($edus))
                             <div class="divide-y divide-slate-100">
@@ -500,15 +501,12 @@
                         @endif
                     </div>
 
-                    {{-- 3. STR / Lisensi Snapshot --}}
-                    @php
-                        $lics = $snapshot->licenses ?? [];
-                    @endphp
-                    <div class="px-6 space-y-3">
-                        <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider border-b border-slate-100 pb-2">
-                            3. STR / Lisensi Profesi ({{ count($lics) }})
-                        </h3>
-                        @if (! empty($lics))
+                    {{-- 3. STR / Lisensi Snapshot (Hanya jika ada) --}}
+                    @if (! empty($lics))
+                        <div class="px-6 space-y-3">
+                            <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider border-b border-slate-100 pb-2">
+                                {{ $sectionNumber++ }}. STR / Lisensi Profesi ({{ count($lics) }})
+                            </h3>
                             <div class="divide-y divide-slate-100">
                                 @foreach ($lics as $lic)
                                     <div class="py-2.5 first:pt-0 last:pb-0 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
@@ -526,20 +524,15 @@
                                     </div>
                                 @endforeach
                             </div>
-                        @else
-                            <div class="text-xs text-slate-400 italic">Tidak ada STR / lisensi profesi.</div>
-                        @endif
-                    </div>
+                        </div>
+                    @endif
 
-                    {{-- 4. Pengalaman Kerja Snapshot --}}
-                    @php
-                        $exps = $snapshot->work_experiences ?? [];
-                    @endphp
-                    <div class="px-6 space-y-3">
-                        <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider border-b border-slate-100 pb-2">
-                            4. Riwayat Pengalaman Kerja ({{ count($exps) }})
-                        </h3>
-                        @if (! empty($exps))
+                    {{-- 4. Pengalaman Kerja Snapshot (Hanya jika ada) --}}
+                    @if (! empty($exps))
+                        <div class="px-6 space-y-3">
+                            <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider border-b border-slate-100 pb-2">
+                                {{ $sectionNumber++ }}. Riwayat Pengalaman Kerja ({{ count($exps) }})
+                            </h3>
                             <div class="divide-y divide-slate-100">
                                 @foreach ($exps as $exp)
                                     <div class="py-2.5 first:pt-0 last:pb-0 space-y-1 text-xs">
@@ -556,10 +549,8 @@
                                     </div>
                                 @endforeach
                             </div>
-                        @else
-                            <div class="text-xs text-slate-400 italic">Tidak ada pengalaman kerja (Fresh Graduate).</div>
-                        @endif
-                    </div>
+                        </div>
+                    @endif
 
                     <div class="pb-4"></div>
                 </div>
