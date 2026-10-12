@@ -107,11 +107,15 @@
                         >
                             Edit
                         </button>
-                        <form method="POST" action="{{ route('profile.work-experiences.destroy', $work) }}" onsubmit="return confirm('Apakah Anda yakin ingin menghapus pengalaman kerja ini?')">
+                        <form method="POST" action="{{ route('profile.work-experiences.destroy', $work) }}">
                             @csrf
                             @method('DELETE')
                             <button
-                                type="submit"
+                                type="button"
+                                data-confirm="Apakah Anda yakin ingin menghapus data pengalaman kerja di {{ $work->company_name }} ({{ $work->position }})?"
+                                data-confirm-title="Hapus Pengalaman Kerja"
+                                data-confirm-btn="Ya, Hapus Data"
+                                data-confirm-variant="danger"
                                 class="px-2.5 py-1 text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
                             >
                                 Hapus

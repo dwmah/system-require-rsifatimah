@@ -175,5 +175,8 @@
             {{ $slot }}
         </main>
     </div>
+
+    {{-- Global Confirmation & Alert Modal --}}
+    <x-ui.confirm-modal />
 </body>
 </html>

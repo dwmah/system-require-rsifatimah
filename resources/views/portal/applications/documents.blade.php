@@ -131,7 +131,7 @@
 
                     <div
                         id="requirement-row-{{ $requirement->id }}"
-                        class="p-3.5 sm:px-5 sm:py-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3 hover:bg-slate-50/60 transition-all duration-300 {{ $uploaded ? '' : ($requirement->is_required ? 'bg-amber-50/15' : '') }}"
+                        class="p-3.5 sm:px-5 sm:py-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3 transition-all duration-300 {{ $uploaded ? 'bg-emerald-50/50 hover:bg-emerald-50/70' : ($requirement->is_required ? 'bg-amber-50/15 hover:bg-amber-50/30' : 'hover:bg-slate-50/60') }}"
                     >
                         {{-- Requirement Info --}}
                         <div class="space-y-0.5 flex-1 min-w-0">
@@ -216,7 +216,7 @@
                                                     const file = $event.target.files[0];
                                                     const maxKb = {{ $requirement->max_size_kb }};
                                                     if (file.size > maxKb * 1024) {
-                                                        alert('Ukuran berkas melebihi batas maksimal {{ $maxMb }} MB ({{ number_format($requirement->max_size_kb) }} KB).');
+                                                        window.rsiAlert('Ukuran berkas melebihi batas maksimal {{ $maxMb }} MB ({{ number_format($requirement->max_size_kb) }} KB).', 'Ukuran Berkas Melebihi Batas', 'warning');
                                                         $el.value = '';
                                                         return;
                                                     }
@@ -244,19 +244,26 @@
 
                                         {{-- Delete button --}}
                                         <form
+                                            id="delete_doc_form_{{ $uploaded->id }}"
                                             action="{{ route('portal.applications.documents.destroy', [$jobApplication, $uploaded]) }}"
                                             method="POST"
-                                            onsubmit="if (confirm('Apakah Anda yakin ingin menghapus berkas ini?')) {
-                                                sessionStorage.setItem('last_doc_target', 'requirement-row-{{ $requirement->id }}');
-                                                sessionStorage.setItem('last_doc_scroll_y', window.scrollY);
-                                                return true;
-                                            } return false;"
                                             class="inline"
                                         >
                                             @csrf
                                             @method('DELETE')
                                             <button
-                                                type="submit"
+                                                type="button"
+                                                onclick="window.rsiConfirm({
+                                                    title: 'Hapus Berkas Persyaratan',
+                                                    message: 'Apakah Anda yakin ingin menghapus berkas {{ $requirement->document_name }} ini?',
+                                                    confirmText: 'Ya, Hapus Berkas',
+                                                    variant: 'danger',
+                                                    onConfirm: () => {
+                                                        sessionStorage.setItem('last_doc_target', 'requirement-row-{{ $requirement->id }}');
+                                                        sessionStorage.setItem('last_doc_scroll_y', window.scrollY);
+                                                        document.getElementById('delete_doc_form_{{ $uploaded->id }}').submit();
+                                                    }
+                                                })"
                                                 class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
                                                 title="Hapus berkas"
                                             >
@@ -288,7 +295,7 @@
                                                 const file = $event.target.files[0];
                                                 const maxKb = {{ $requirement->max_size_kb }};
                                                 if (file.size > maxKb * 1024) {
-                                                    alert('Ukuran berkas melebihi batas maksimal {{ $maxMb }} MB ({{ number_format($requirement->max_size_kb) }} KB).');
+                                                    window.rsiAlert('Ukuran berkas melebihi batas maksimal {{ $maxMb }} MB ({{ number_format($requirement->max_size_kb) }} KB).', 'Ukuran Berkas Melebihi Batas', 'warning');
                                                     $el.value = '';
                                                     return;
                                                 }
@@ -397,9 +404,9 @@
                     if (el) {
                         hasScrolled = true;
                         el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        el.classList.add('bg-emerald-50/70', 'ring-2', 'ring-emerald-400/40', 'rounded-xl');
+                        el.classList.add('bg-emerald-100/80');
                         setTimeout(() => {
-                            el.classList.remove('bg-emerald-50/70', 'ring-2', 'ring-emerald-400/40', 'rounded-xl');
+                            el.classList.remove('bg-emerald-100/80');
                         }, 2500);
                     } else if (storedScrollY !== null) {
                         hasScrolled = true;

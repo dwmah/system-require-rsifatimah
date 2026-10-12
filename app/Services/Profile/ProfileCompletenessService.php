@@ -37,6 +37,11 @@ class ProfileCompletenessService
 
         $profile = $user->applicantProfile;
 
+        $hasValidEducation = ($profile?->educations?->filter(function ($edu) {
+            return ! empty(trim((string) ($edu->institution_name ?? '')))
+                && ! empty(trim((string) ($edu->education_level ?? '')));
+        })->count() ?? 0) >= 1;
+
         return [
             'photo' => ! empty($profile?->photo_path),
             'name' => ! empty(trim((string) ($user->name ?? ''))),
@@ -48,7 +53,7 @@ class ProfileCompletenessService
             'gender' => ! empty(trim((string) ($profile?->gender ?? ''))),
             'address_ktp' => ! empty(trim((string) ($profile?->address_ktp ?? ''))),
             'address_domicile' => ! empty(trim((string) ($profile?->address_domicile ?? ''))),
-            'education' => ($profile?->educations?->count() ?? 0) >= 1,
+            'education' => $hasValidEducation,
         ];
     }
 

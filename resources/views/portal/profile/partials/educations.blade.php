@@ -119,11 +119,15 @@
                         >
                             Edit
                         </button>
-                        <form method="POST" action="{{ route('profile.educations.destroy', $edu) }}" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data pendidikan ini?')">
+                        <form method="POST" action="{{ route('profile.educations.destroy', $edu) }}">
                             @csrf
                             @method('DELETE')
                             <button
-                                type="submit"
+                                type="button"
+                                data-confirm="Apakah Anda yakin ingin menghapus data pendidikan {{ $edu->institution_name }} ({{ $edu->education_level }})?"
+                                data-confirm-title="Hapus Riwayat Pendidikan"
+                                data-confirm-btn="Ya, Hapus Data"
+                                data-confirm-variant="danger"
                                 class="px-2.5 py-1 text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
                             >
                                 Hapus

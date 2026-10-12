@@ -52,9 +52,16 @@
                         </div>
 
                         <!-- Submit Final Button -->
-                        <form method="POST" action="{{ route('portal.applications.submit', $application) }}" onsubmit="return confirm('Apakah Anda yakin seluruh berkas dokumen telah sesuai? Berkas yang sudah disubmit tidak dapat diubah kembali.')">
+                        <form method="POST" action="{{ route('portal.applications.submit', $application) }}">
                             @csrf
-                            <button type="submit" class="px-5 py-2.5 bg-[#0179B5] hover:bg-[#016293] text-white text-xs font-bold rounded-lg shadow-sm transition-colors whitespace-nowrap">
+                            <button
+                                type="button"
+                                data-confirm="Apakah Anda yakin seluruh berkas dokumen telah sesuai? Berkas yang sudah disubmit tidak dapat diubah kembali."
+                                data-confirm-title="Konfirmasi Submit Lamaran"
+                                data-confirm-btn="Ya, Submit Lamaran"
+                                data-confirm-variant="primary"
+                                class="px-5 py-2.5 bg-[#0179B5] hover:bg-[#016293] text-white text-xs font-bold rounded-lg shadow-sm transition-colors whitespace-nowrap cursor-pointer"
+                            >
                                 Final Submit Lamaran &rarr;
                             </button>
                         </form>
@@ -170,10 +177,18 @@
                                                         Ganti File
                                                     </button>
 
-                                                    <form method="POST" action="{{ route('portal.applications.documents.destroy', [$application, $doc]) }}" onsubmit="return confirm('Hapus dokumen ini?')">
+                                                    <form method="POST" action="{{ route('portal.applications.documents.destroy', [$application, $doc]) }}">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" class="p-1 text-rose-500 hover:bg-rose-50 rounded" title="Hapus">
+                                                        <button
+                                                            type="button"
+                                                            data-confirm="Apakah Anda yakin ingin menghapus berkas dokumen ini?"
+                                                            data-confirm-title="Hapus Dokumen"
+                                                            data-confirm-btn="Ya, Hapus"
+                                                            data-confirm-variant="danger"
+                                                            class="p-1 text-rose-500 hover:bg-rose-50 rounded cursor-pointer"
+                                                            title="Hapus"
+                                                        >
                                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                                         </button>
                                                     </form>

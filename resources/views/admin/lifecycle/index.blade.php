@@ -177,9 +177,16 @@
                                             </a>
 
                                             @if($app->user->is_active)
-                                                <form method="POST" action="{{ route('admin.lifecycle.deactivate', $app->user) }}" onsubmit="return confirm('Nonaktifkan akun pelamar ini? (Data dan berkas tetap tersimpan utuh di arsip)')">
+                                                <form method="POST" action="{{ route('admin.lifecycle.deactivate', $app->user) }}">
                                                     @csrf
-                                                    <button type="submit" class="px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 font-semibold rounded-lg text-xs transition-colors">
+                                                    <button
+                                                        type="button"
+                                                        data-confirm="Nonaktifkan akun pelamar {{ $app->user->name }}? Data dan berkas lamaran tetap tersimpan utuh di arsip."
+                                                        data-confirm-title="Konfirmasi Nonaktifkan Akun"
+                                                        data-confirm-btn="Ya, Nonaktifkan Akun"
+                                                        data-confirm-variant="warning"
+                                                        class="px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 font-semibold rounded-lg text-xs transition-colors cursor-pointer"
+                                                    >
                                                         Nonaktifkan Akun
                                                     </button>
                                                 </form>
@@ -225,9 +232,16 @@
                 </div>
 
                 @if($seenCount > 0)
-                    <form method="POST" action="{{ route('admin.lifecycle.cleanup-all-seen') }}" onsubmit="return confirm('PERINGATAN: Apakah Anda yakin ingin membersihkan data & file fisik seluruh pelamar tidak lolos yang telah membuka pengumuman?')">
+                    <form method="POST" action="{{ route('admin.lifecycle.cleanup-all-seen') }}">
                         @csrf
-                        <button type="submit" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold rounded-lg shadow-sm transition-colors flex items-center gap-1.5">
+                        <button
+                            type="button"
+                            data-confirm="PERINGATAN: Apakah Anda yakin ingin membersihkan data & file fisik seluruh {{ $seenCount }} pelamar tidak lolos yang telah membuka pengumuman?"
+                            data-confirm-title="Pembersihan Massal Berkas & Data"
+                            data-confirm-btn="Ya, Bersihkan Seluruh Data"
+                            data-confirm-variant="danger"
+                            class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold rounded-lg shadow-sm transition-colors flex items-center gap-1.5 cursor-pointer"
+                        >
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                             <span>Bersihkan {{ $seenCount }} Data Terkonfirmasi</span>
                         </button>
@@ -273,10 +287,17 @@
                                     </td>
                                     <td class="py-3.5 px-4 text-right">
                                         @if($app->user)
-                                            <form method="POST" action="{{ route('admin.lifecycle.cleanup', $app->user) }}" onsubmit="return confirm('Hapus permanen akun & seluruh berkas fisik {{ $app->user->name }}?')" class="inline">
+                                            <form method="POST" action="{{ route('admin.lifecycle.cleanup', $app->user) }}" class="inline">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold rounded-lg text-xs transition-colors">
+                                                <button
+                                                    type="button"
+                                                    data-confirm="Hapus permanen akun & seluruh berkas fisik {{ $app->user->name }}? Tindakan ini tidak dapat dibatalkan."
+                                                    data-confirm-title="Hapus Permanen Akun & Berkas"
+                                                    data-confirm-btn="Ya, Hapus Permanen"
+                                                    data-confirm-variant="danger"
+                                                    class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold rounded-lg text-xs transition-colors cursor-pointer"
+                                                >
                                                     Hapus Permanen
                                                 </button>
                                             </form>

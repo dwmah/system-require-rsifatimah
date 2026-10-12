@@ -18,7 +18,7 @@
             const file = event.target.files[0];
             if (file) {
                 if (file.size > 5 * 1024 * 1024) {
-                    alert('Ukuran berkas melebihi 5 MB. Silakan pilih foto dengan ukuran maksimal 5 MB.');
+                    window.rsiAlert('Ukuran berkas melebihi 5 MB. Silakan pilih foto dengan ukuran maksimal 5 MB.', 'Ukuran Foto Terlalu Besar', 'warning');
                     event.target.value = '';
                     return;
                 }
@@ -426,7 +426,7 @@
                             'Profesi' => 'Profesi / Ners / Apoteker',
                             'S2' => 'S2 (Magister)',
                         ] as $key => $label)
-                            <option value="{{ $key }}" {{ old('education_level', $education?->education_level ?? 'D3') === $key ? 'selected' : '' }}>
+                            <option value="{{ $key }}" {{ old('education_level', $education?->education_level) === $key ? 'selected' : '' }}>
                                 {{ $label }}
                             </option>
                         @endforeach
