@@ -433,13 +433,25 @@
                     </p>
                 </div>
                 <div class="flex items-center gap-2.5 flex-wrap sm:flex-nowrap">
+                    @if($uploadedDocuments->isNotEmpty() && $uploadedDocuments->contains(fn($d) => $d->verification_status !== 'valid'))
+                        <form method="POST" action="{{ route('admin.applications.documents.verify-all', $application) }}" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin memvalidkan sekaligus semua berkas yang sudah diunggah oleh pelamar ({{ $uploadedDocuments->count() }} berkas)?');">
+                            @csrf
+                            <button type="submit" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-sm hover:shadow-md transition-all flex items-center gap-1.5 cursor-pointer group" title="Satu klik untuk memvalidkan seluruh berkas yang sudah diisi/diunggah pelamar">
+                                <svg class="w-4 h-4 text-emerald-100 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span>Validkan Semua Berkas ({{ $uploadedDocuments->count() }})</span>
+                            </button>
+                        </form>
+                    @endif
+
                     @if($isAllDocumentsValid)
                         <button type="button" @click="allDocsModalOpen = true; selectedDocIdx = 0" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-sm transition-all flex items-center gap-1.5 cursor-pointer">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                             <span>Preview &amp; Unduh Semua (ZIP)</span>
                         </button>
                     @endif
-                    <span class="px-3 py-1.5 bg-slate-100 text-slate-700 text-xs font-semibold rounded-lg">
+                    <span class="px-3 py-1.5 bg-slate-100 text-slate-700 text-xs font-semibold rounded-lg shrink-0">
                         Terunggah: <strong>{{ $uploadedDocuments->count() }}</strong> dari <strong>{{ $requirements->count() }}</strong> Berkas
                     </span>
                 </div>

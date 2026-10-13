@@ -39,6 +39,31 @@ class ApplicationVerificationService
     }
 
     /**
+     * Memvalidkan sekaligus seluruh berkas dokumen yang telah diunggah oleh pelamar.
+     * Jika seluruh berkas persyaratan telah berstatus valid, tahap administrasi otomatis lolos.
+     */
+    public function verifyAllDocuments(JobApplication $application, ?User $adminUser = null, ?string $note = 'Divalidasi langsung oleh verifikator.'): int
+    {
+        $documents = $application->documents()->get();
+        if ($documents->isEmpty()) {
+            return 0;
+        }
+
+        $admin = $adminUser ?? Auth::user();
+
+        foreach ($documents as $doc) {
+            $doc->update([
+                'verification_status' => 'valid',
+                'verification_note' => $doc->verification_note ?: $note,
+            ]);
+        }
+
+        $this->checkAndAutoApproveIfAllDocumentsValid($application, $admin);
+
+        return $documents->count();
+    }
+
+    /**
      * Periksa apakah seluruh berkas persyaratan telah berstatus valid.
      * Jika ya, otomatis loloskan tahapan verifikasi berkas / seleksi administrasi.
      */

@@ -204,8 +204,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // Manajemen Seluruh Lamaran & Verifikasi Berkas
     Route::get('/applications', [AdminApplicationController::class, 'index'])->name('applications.index');
+    Route::get('/applications/export-biodata', [AdminApplicationController::class, 'exportBiodata'])->name('applications.export-biodata');
     Route::get('/applications/{application}', [AdminApplicationController::class, 'show'])->name('applications.show');
     Route::get('/applications/{application}/documents/download-all', [AdminApplicationController::class, 'downloadAllDocuments'])->name('applications.documents.download-all');
+    Route::post('/applications/{application}/documents/verify-all', [AdminApplicationController::class, 'verifyAllDocuments'])->name('applications.documents.verify-all');
     Route::post('/applications/{application}/verify', [AdminApplicationController::class, 'verify'])->name('applications.verify');
     Route::get('/applications/{application}/verify', fn (JobApplication $application) => redirect()->route('admin.applications.show', $application));
     Route::post('/applications/documents/{document}/verify', [AdminApplicationController::class, 'verifyDocument'])->name('applications.documents.verify');

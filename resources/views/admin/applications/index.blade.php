@@ -6,6 +6,24 @@
                 <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Daftar Lamaran & Verifikasi Berkas</h1>
                 <p class="text-sm text-slate-500 mt-0.5">Monitoring berkas pendaftaran dan validasi kualifikasi calon karyawan RSI Fatimah</p>
             </div>
+
+            <div class="flex items-center gap-2.5 shrink-0">
+                @if($metrics['total'] > 0)
+                    <a href="{{ route('admin.applications.export-biodata', request()->only(['search', 'vacancy_id', 'status'])) }}" 
+                       class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-sm hover:shadow-md transition-all flex items-center gap-2 cursor-pointer group"
+                       title="Unduh seluruh biodata pelamar yang terdaftar dalam format Excel (.xlsx)">
+                        <svg class="w-4 h-4 text-emerald-100 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <span>Unduh Biodata Pelamar (.xlsx)</span>
+                    </a>
+                @else
+                    <button type="button" disabled class="px-4 py-2.5 bg-slate-100 text-slate-400 border border-slate-200 text-xs font-semibold rounded-xl flex items-center gap-2 cursor-not-allowed" title="Belum ada data pelamar untuk diunduh">
+                        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        <span>Unduh Biodata Pelamar (.xlsx)</span>
+                    </button>
+                @endif
+            </div>
         </div>
 
         <!-- Metric Badges -->

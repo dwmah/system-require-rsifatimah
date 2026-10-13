@@ -8,6 +8,7 @@ use App\Models\ApplicationDocument;
 use App\Models\JobApplication;
 use App\Models\JobVacancy;
 use App\Models\VacancySelectionStage;
+use App\Services\Export\BiodataExcelExportService;
 use App\Services\Recruitment\ApplicationVerificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -80,6 +81,42 @@ class AdminApplicationController extends Controller
             'vacancies' => $vacancies,
             'metrics' => $metrics,
         ]);
+    }
+
+    /**
+     * Unduh seluruh data biodata pelamar yang terdaftar dalam format Excel (.xlsx).
+     */
+    public function exportBiodata(Request $request, BiodataExcelExportService $exportService): BinaryFileResponse|RedirectResponse
+    {
+        $vacancyId = $request->filled('vacancy_id') ? (int) $request->vacancy_id : null;
+        $status = $request->filled('status') ? $request->status : null;
+        $search = $request->filled('search') ? $request->search : null;
+
+        $hasApplications = JobApplication::query()
+            ->when($search, function ($q) use ($search) {
+                $q->where(function ($sub) use ($search) {
+                    $sub->where('application_number', 'like', "%{$search}%")
+                        ->orWhereHas('user', function ($uq) use ($search) {
+                            $uq->where('name', 'like', "%{$search}%")
+                                ->orWhere('email', 'like', "%{$search}%")
+                                ->orWhere('registration_number', 'like', "%{$search}%")
+                                ->orWhere('phone', 'like', "%{$search}%");
+                        });
+                });
+            })
+            ->when($vacancyId, fn ($q) => $q->where('job_vacancy_id', $vacancyId))
+            ->when($status, fn ($q) => $q->where('status', $status), fn ($q) => $q->where('status', '!=', JobApplicationStatus::DRAFT))
+            ->exists();
+
+        if (! $hasApplications) {
+            return back()->with('error', 'Belum ada data pelamar yang sesuai dengan kriteria untuk diekspor ke Excel.');
+        }
+
+        return $exportService->exportApplicants(
+            vacancyId: $vacancyId,
+            status: $status,
+            search: $search
+        );
     }
 
     /**
@@ -201,6 +238,29 @@ class AdminApplicationController extends Controller
 
         return redirect()->to(route('admin.applications.show', ['application' => $document->jobApplication, 'tab' => 'berkas']).'#doc-row-'.$document->id)
             ->with('success', "Status dokumen '{$document->documentRequirement->document_name}' berhasil diperbarui ({$request->verification_status}).");
+    }
+
+    /**
+     * Memvalidkan sekaligus seluruh berkas dokumen yang telah diunggah oleh pelamar.
+     */
+    public function verifyAllDocuments(JobApplication $application): RedirectResponse
+    {
+        $count = $this->verificationService->verifyAllDocuments($application, Auth::user());
+
+        if ($count === 0) {
+            return redirect()->to(route('admin.applications.show', ['application' => $application, 'tab' => 'berkas']))
+                ->with('warning', 'Pelamar belum mengunggah dokumen apa pun untuk divalidasi.');
+        }
+
+        $application->refresh();
+
+        $message = "Seluruh berkas terunggah ({$count} berkas) berhasil divalidkan sekaligus.";
+        if ($application->status === JobApplicationStatus::PASSED_ADMINISTRATION) {
+            $message .= ' Pelamar otomatis dinyatakan lolos verifikasi berkas / administrasi.';
+        }
+
+        return redirect()->to(route('admin.applications.show', ['application' => $application, 'tab' => 'berkas']))
+            ->with('success', $message);
     }
 
     /**

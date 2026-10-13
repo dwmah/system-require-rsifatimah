@@ -109,24 +109,6 @@
                         </div>
                         <p class="text-xs text-slate-500 mt-0.5">Arsip data kepegawaian calon karyawan baru yang telah lolos seleksi.</p>
                     </div>
-
-                    <div class="flex items-center gap-2.5 shrink-0">
-                        @if($acceptedCount > 0)
-                            <a href="{{ route('admin.lifecycle.export-accepted-biodata', request()->only(['vacancy_id'])) }}" 
-                               class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-sm hover:shadow-md transition-all flex items-center gap-2 cursor-pointer group"
-                               title="Unduh seluruh biodata pelamar yang diterima dalam format Excel (.xlsx)">
-                                <svg class="w-4 h-4 text-emerald-100 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                </svg>
-                                <span>Unduh Biodata Diterima (.xlsx)</span>
-                            </a>
-                        @else
-                            <button type="button" disabled class="px-3.5 py-2 bg-slate-100 text-slate-400 border border-slate-200 text-xs font-semibold rounded-xl flex items-center gap-2 cursor-not-allowed" title="Belum ada pelamar dengan status diterima">
-                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                                <span>Unduh Biodata (.xlsx)</span>
-                            </button>
-                        @endif
-                    </div>
                 </div>
 
                 <div class="overflow-x-auto">
