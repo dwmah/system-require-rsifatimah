@@ -266,8 +266,14 @@
             </div>
         </div>
 
-        {{-- Final Declaration & Submission Card --}}
-        <div class="p-6 bg-white rounded-2xl border-2 {{ $canSubmit ? 'border-rsi-600' : 'border-slate-200' }} shadow-2xs space-y-5">
+        {{-- Final Declaration & Submission Card with Custom Modal --}}
+        <div
+            x-data="{
+                showConfirmModal: false,
+                isSubmitting: false
+            }"
+            class="p-6 bg-white rounded-2xl border-2 {{ $canSubmit ? 'border-rsi-600' : 'border-slate-200' }} shadow-2xs space-y-5"
+        >
             <div class="space-y-1">
                 <h2 class="text-base font-bold text-slate-900">
                     Pernyataan Integritas & Final Submit
@@ -290,9 +296,10 @@
             </div>
 
             <form
+                x-ref="submitForm"
                 action="{{ route('portal.applications.submit', $jobApplication) }}"
                 method="POST"
-                onsubmit="return confirm('Apakah Anda yakin seluruh data dan berkas sudah benar? Lamaran yang telah dikirim tidak dapat dibatalkan atau diubah.');"
+                @submit="isSubmitting = true"
                 class="space-y-4"
             >
                 @csrf
@@ -304,6 +311,7 @@
                         id="agreement"
                         name="declaration"
                         value="1"
+                        x-ref="declarationInput"
                         class="w-4 h-4 rounded text-rsi-700 focus:ring-rsi-500 border-slate-300 mt-0.5"
                     >
                     <span class="text-xs text-slate-700 leading-relaxed">
@@ -322,18 +330,142 @@
                         &larr; Kembali ke Berkas Persyaratan
                     </a>
 
-                    <button
-                        type="submit"
-                        @disabled(! $canSubmit)
-                        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3 rounded-xl text-xs font-bold text-white {{ $canSubmit ? 'bg-rsi-700 hover:bg-rsi-800 shadow-sm cursor-pointer' : 'bg-slate-400 cursor-not-allowed' }} transition-colors"
-                    >
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                        </svg>
-                        <span>Kirim Lamaran Sekarang (Final Submit)</span>
-                    </button>
+                    @if ($canSubmit)
+                        <button
+                            type="button"
+                            @click="if ($refs.declarationInput && $refs.declarationInput.checked) { showConfirmModal = true; } else { $refs.declarationInput.reportValidity(); }"
+                            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3 rounded-xl text-xs font-bold text-white bg-rsi-700 hover:bg-rsi-800 shadow-sm cursor-pointer transition-colors"
+                        >
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>Kirim Lamaran Sekarang (Final Submit)</span>
+                        </button>
+                    @else
+                        <button
+                            type="button"
+                            disabled
+                            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3 rounded-xl text-xs font-bold text-white bg-slate-400 cursor-not-allowed select-none"
+                        >
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>Kirim Lamaran Sekarang (Final Submit)</span>
+                        </button>
+                    @endif
                 </div>
             </form>
+
+            {{-- Custom Modal Popup Konfirmasi Pengiriman Lamaran khas RSI Fatimah --}}
+            <template x-teleport="body">
+                <div
+                    x-show="showConfirmModal"
+                    x-cloak
+                    class="fixed inset-0 z-50 overflow-y-auto"
+                    role="dialog"
+                    aria-modal="true"
+                    @keydown.escape.window="if (!isSubmitting) showConfirmModal = false"
+                >
+                    {{-- Backdrop --}}
+                    <div
+                        x-show="showConfirmModal"
+                        x-transition:enter="ease-out duration-200"
+                        x-transition:enter-start="opacity-0"
+                        x-transition:enter-end="opacity-100"
+                        x-transition:leave="ease-in duration-150"
+                        x-transition:leave-start="opacity-100"
+                        x-transition:leave-end="opacity-0"
+                        class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs transition-opacity"
+                        @click="if (!isSubmitting) showConfirmModal = false"
+                        aria-hidden="true"
+                    ></div>
+
+                    {{-- Dialog Content --}}
+                    <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0 relative z-10 pointer-events-none">
+                        <div
+                            x-show="showConfirmModal"
+                            x-transition:enter="ease-out duration-200"
+                            x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                            x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                            x-transition:leave="ease-in duration-150"
+                            x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                            x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                            class="relative w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-2xl rounded-2xl border border-slate-200 pointer-events-auto space-y-4"
+                        >
+                            {{-- Header --}}
+                            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-xl bg-rsi-50 border border-rsi-100 text-rsi-700 flex items-center justify-center shrink-0">
+                                        <svg class="w-5 h-5 text-rsi-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-sm sm:text-base font-bold text-slate-900 leading-snug">Konfirmasi Kirim Lamaran</h3>
+                                        <p class="text-[11px] text-slate-500 font-medium">Formasi: {{ $jobApplication->jobVacancy->title }}</p>
+                                    </div>
+                                </div>
+                                <button
+                                    type="button"
+                                    @click="showConfirmModal = false"
+                                    :disabled="isSubmitting"
+                                    class="text-slate-400 hover:text-slate-600 focus:outline-hidden cursor-pointer p-1 rounded-lg hover:bg-slate-50"
+                                >
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            {{-- Message Content --}}
+                            <div class="space-y-3 text-xs">
+                                <p class="text-slate-700 leading-relaxed font-medium">
+                                    Apakah Anda yakin seluruh data diri dan berkas persyaratan sudah benar?
+                                </p>
+
+                                <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 text-amber-900 leading-relaxed space-y-1">
+                                    <p class="font-bold text-amber-950 flex items-center gap-1.5 text-[11px]">
+                                        <svg class="w-3.5 h-3.5 text-amber-700 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                        </svg>
+                                        <span>Perhatian: Berkas Terkunci Permanen</span>
+                                    </p>
+                                    <p class="text-[11px] text-amber-900/90">
+                                        Lamaran yang telah dikirim <strong>tidak dapat dibatalkan, diedit, atau diubah</strong> kembali demi menjaga objektivitas seleksi.
+                                    </p>
+                                </div>
+                            </div>
+
+                            {{-- Action Buttons --}}
+                            <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+                                <button
+                                    type="button"
+                                    @click="showConfirmModal = false"
+                                    :disabled="isSubmitting"
+                                    class="px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                                >
+                                    Batal
+                                </button>
+                                <button
+                                    type="button"
+                                    @click="isSubmitting = true; $refs.submitForm.submit()"
+                                    :disabled="isSubmitting"
+                                    class="inline-flex items-center gap-1.5 px-5 py-2 text-xs font-bold text-white bg-rsi-700 hover:bg-rsi-800 rounded-lg shadow-xs transition-colors cursor-pointer disabled:opacity-70"
+                                >
+                                    <svg x-show="!isSubmitting" class="w-3.5 h-3.5 text-white shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    <svg x-show="isSubmitting" x-cloak class="animate-spin w-3.5 h-3.5 text-white shrink-0" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                                    </svg>
+                                    <span x-text="isSubmitting ? 'Mengirim Lamaran...' : 'Ya, Kirim Lamaran'"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
         </div>
     </div>
 </x-layouts.applicant>

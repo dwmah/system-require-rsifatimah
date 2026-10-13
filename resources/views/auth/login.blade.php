@@ -20,8 +20,8 @@
             <svg class="w-4 h-4 text-red-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <div>
-                @foreach ($errors->all() as $error)
+            <div class="space-y-0.5">
+                @foreach (array_unique($errors->all()) as $error)
                     <p>{{ $error }}</p>
                 @endforeach
             </div>
@@ -48,7 +48,9 @@
                 class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $errors->has('email') || $errors->has('login') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100' }} focus:outline-hidden focus:ring-2"
             >
             <x-form.error name="email" />
-            <x-form.error name="login" />
+            @if (!$errors->has('email'))
+                <x-form.error name="login" />
+            @endif
         </div>
 
         {{-- Password dengan Show/Hide Alpine.js --}}

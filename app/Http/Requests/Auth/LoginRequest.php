@@ -80,12 +80,13 @@ class LoginRequest extends FormRequest
 
         $user = User::where('email', $emailInput)->first();
 
+        $primaryKey = $this->has('email') ? 'email' : 'login';
+
         if (! $user || ! Hash::check($this->input('password'), $user->password)) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
-                'login' => trans('auth.failed'),
+                $primaryKey => trans('auth.failed'),
             ]);
         }
 
@@ -93,8 +94,7 @@ class LoginRequest extends FormRequest
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'email' => 'Akun pelamar Anda sudah tidak aktif. Silakan hubungi panitia rekrutmen.',
-                'login' => 'Akun pelamar Anda sudah tidak aktif. Silakan hubungi panitia rekrutmen.',
+                $primaryKey => 'Akun pelamar Anda sudah tidak aktif. Silakan hubungi panitia rekrutmen.',
             ]);
         }
 
@@ -117,13 +117,10 @@ class LoginRequest extends FormRequest
         event(new Lockout($this));
 
         $seconds = RateLimiter::availableIn($this->throttleKey());
+        $primaryKey = $this->has('email') ? 'email' : 'login';
 
         throw ValidationException::withMessages([
-            'login' => trans('auth.throttle', [
-                'seconds' => $seconds,
-                'minutes' => ceil($seconds / 60),
-            ]),
-            'email' => trans('auth.throttle', [
+            $primaryKey => trans('auth.throttle', [
                 'seconds' => $seconds,
                 'minutes' => ceil($seconds / 60),
             ]),

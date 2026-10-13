@@ -167,11 +167,12 @@ class ProfileController extends Controller
                 $profileData
             );
 
-            // Simpan / perbarui riwayat pendidikan terakhir jika diisi
-            if (! empty($validated['institution_name']) || ! empty($validated['study_program']) || ! empty($validated['education_level'])) {
+            // Simpan / perbarui riwayat pendidikan terakhir jika institusi diisi
+            $hasInstitution = ! empty(trim((string) ($validated['institution_name'] ?? '')));
+            if ($hasInstitution) {
                 $educationData = [
-                    'education_level' => $validated['education_level'] ?: 'D3',
-                    'institution_name' => $validated['institution_name'] ?? '',
+                    'education_level' => ! empty($validated['education_level']) ? $validated['education_level'] : 'D3',
+                    'institution_name' => trim((string) $validated['institution_name']),
                     'study_program' => $validated['study_program'] ?? '',
                     'graduation_year' => ! empty($validated['graduation_year']) ? (int) $validated['graduation_year'] : null,
                     'gpa' => ! empty($validated['gpa']) ? $validated['gpa'] : null,
@@ -184,6 +185,14 @@ class ProfileController extends Controller
                 } else {
                     $profile->educations()->create($educationData);
                 }
+            } else {
+                // Bersihkan record pendidikan jika sebelumnya sempat tersimpan tanpa nama institusi
+                $profile->educations()
+                    ->where(function ($query) {
+                        $query->whereNull('institution_name')
+                            ->orWhere('institution_name', '');
+                    })
+                    ->delete();
             }
         });
 

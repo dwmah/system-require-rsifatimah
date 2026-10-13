@@ -73,14 +73,21 @@ class RegisterRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'name.required' => 'Nama lengkap wajib diisi.',
+            'nik.required' => 'NIK wajib diisi.',
             'nik.digits' => 'NIK harus berjumlah tepat 16 digit angka.',
             'nik.unique' => 'NIK ini sudah terdaftar dalam sistem.',
+            'phone.required' => 'Nomor WhatsApp / HP wajib diisi.',
             'phone.regex' => 'Format nomor WhatsApp / HP tidak valid. Gunakan format nomor Indonesia (contoh: 081234567890).',
             'phone.unique' => 'Nomor WhatsApp / HP ini sudah terdaftar.',
+            'email.required' => 'Alamat email wajib diisi.',
+            'email.email' => 'Format alamat email tidak valid.',
             'email.unique' => 'Alamat email ini sudah terdaftar.',
+            'password.required' => 'Password wajib diisi.',
             'password.min' => 'Password minimal terdiri dari 8 karakter.',
             'password.regex' => 'Password harus mengandung kombinasi huruf dan angka.',
             'password.confirmed' => 'Konfirmasi password tidak sesuai.',
+            'terms.required' => 'Persetujuan Syarat & Ketentuan wajib dicentang.',
             'terms.accepted' => 'Anda harus menyetujui Syarat & Ketentuan serta Kebijakan Privasi.',
         ];
     }

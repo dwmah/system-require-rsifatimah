@@ -13,7 +13,7 @@
              const file = event.target.files[0];
              if (file) {
                  if (file.size > 5 * 1024 * 1024) {
-                     alert('Ukuran berkas melebihi 5 MB. Silakan pilih foto dengan ukuran maksimal 5 MB.');
+                     window.rsiAlert('Ukuran berkas melebihi 5 MB. Silakan pilih foto dengan ukuran maksimal 5 MB.', 'Ukuran Foto Terlalu Besar', 'warning');
                      event.target.value = '';
                      return;
                  }
@@ -116,7 +116,13 @@
                     @if($profile?->photo_url)
                         <button
                             type="button"
-                            onclick="if(confirm('Apakah Anda yakin ingin menghapus pas foto?')) { document.getElementById('delete_photo_form').submit(); }"
+                            onclick="window.rsiConfirm({
+                                title: 'Hapus Pas Foto',
+                                message: 'Apakah Anda yakin ingin menghapus pas foto profil ini?',
+                                confirmText: 'Ya, Hapus Foto',
+                                variant: 'danger',
+                                targetForm: document.getElementById('delete_photo_form')
+                            })"
                             class="inline-flex items-center gap-1.5 px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-semibold rounded-xl border border-rose-200 transition-colors cursor-pointer"
                         >
                             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

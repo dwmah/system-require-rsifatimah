@@ -183,7 +183,14 @@
 
                     <form method="POST" action="{{ route('portal.applications.acknowledge', $application) }}" class="shrink-0 w-full md:w-auto">
                         @csrf
-                        <button type="submit" onclick="return confirm('Apakah Anda yakin telah membaca pengumuman ini? Sesuai ketentuan, akun dan berkas lamaran Anda akan dibersihkan dari sistem dan sesi login akan diakhiri.')" class="w-full md:w-auto px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer">
+                        <button
+                            type="button"
+                            data-confirm="Apakah Anda yakin telah membaca pengumuman ini? Sesuai ketentuan, akun dan berkas lamaran Anda akan dibersihkan dari sistem dan sesi login akan diakhiri."
+                            data-confirm-title="Konfirmasi Pengumuman & Akhiri Akun"
+                            data-confirm-btn="Ya, Konfirmasi & Akhiri Akun"
+                            data-confirm-variant="danger"
+                            class="w-full md:w-auto px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                        >
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                             <span>Konfirmasi &amp; Akhiri Akun</span>
                         </button>

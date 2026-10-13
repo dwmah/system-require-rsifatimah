@@ -696,4 +696,56 @@ class ApplicantProfileTest extends TestCase
         $this->assertCount(1, $user->applicantProfile->educations);
         $this->assertEquals('3.95', $user->applicantProfile->educations->first()->gpa);
     }
+
+    public function test_saving_profile_without_institution_does_not_create_education_and_is_not_100_percent(): void
+    {
+        $user = $this->createApplicantUser();
+        $completenessService = app(ProfileCompletenessService::class);
+
+        // Submit profile with personal info and photo, but empty institution_name and empty study_program
+        $response = $this->actingAs($user)->patch(route('profile.update'), [
+            'name' => 'Fatimah Pelamar',
+            'birth_place' => 'Banyuwangi',
+            'birth_date' => '1998-05-14',
+            'gender' => 'Perempuan',
+            'email' => $user->email,
+            'phone' => '081234567899',
+            'address_ktp' => 'Jl. Kalirejo No. 10 Banyuwangi',
+            'same_as_ktp' => '1',
+            'photo' => UploadedFile::fake()->image('pas_foto.jpg'),
+            'education_level' => '',
+            'institution_name' => '',
+            'study_program' => '',
+        ]);
+
+        $response->assertRedirect(route('profile.show'));
+        $response->assertSessionHas('success');
+
+        $user->refresh();
+        $this->assertCount(0, $user->applicantProfile->educations);
+        $this->assertFalse($completenessService->isComplete($user));
+        $this->assertContains('Minimal 1 Riwayat Pendidikan', $completenessService->missingItems($user));
+        $this->assertLessThan(100, $completenessService->percentage($user));
+
+        // When institution_name is provided, education is created and profile becomes 100% complete
+        $response2 = $this->actingAs($user)->patch(route('profile.update'), [
+            'name' => 'Fatimah Pelamar',
+            'birth_place' => 'Banyuwangi',
+            'birth_date' => '1998-05-14',
+            'gender' => 'Perempuan',
+            'email' => $user->email,
+            'phone' => '081234567899',
+            'address_ktp' => 'Jl. Kalirejo No. 10 Banyuwangi',
+            'same_as_ktp' => '1',
+            'education_level' => 'S1',
+            'institution_name' => 'Universitas Airlangga',
+            'study_program' => 'Ilmu Keperawatan',
+        ]);
+
+        $response2->assertRedirect(route('profile.show'));
+        $user->refresh();
+        $this->assertCount(1, $user->applicantProfile->educations);
+        $this->assertTrue($completenessService->isComplete($user));
+        $this->assertEquals(100, $completenessService->percentage($user));
+    }
 }

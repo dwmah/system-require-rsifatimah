@@ -106,11 +106,15 @@
                         >
                             Edit
                         </button>
-                        <form method="POST" action="{{ route('profile.licenses.destroy', $lic) }}" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data lisensi ini?')">
+                        <form method="POST" action="{{ route('profile.licenses.destroy', $lic) }}">
                             @csrf
                             @method('DELETE')
                             <button
-                                type="submit"
+                                type="button"
+                                data-confirm="Apakah Anda yakin ingin menghapus data lisensi {{ $lic->license_type }} (No: {{ $lic->license_number }})?"
+                                data-confirm-title="Hapus Lisensi / STR"
+                                data-confirm-btn="Ya, Hapus Data"
+                                data-confirm-variant="danger"
                                 class="px-2.5 py-1 text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
                             >
                                 Hapus

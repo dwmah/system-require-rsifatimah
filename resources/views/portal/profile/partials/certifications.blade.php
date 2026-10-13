@@ -108,11 +108,15 @@
                         >
                             Edit
                         </button>
-                        <form method="POST" action="{{ route('profile.certifications.destroy', $cert) }}" onsubmit="return confirm('Apakah Anda yakin ingin menghapus sertifikasi ini?')">
+                        <form method="POST" action="{{ route('profile.certifications.destroy', $cert) }}">
                             @csrf
                             @method('DELETE')
                             <button
-                                type="submit"
+                                type="button"
+                                data-confirm="Apakah Anda yakin ingin menghapus sertifikasi / pelatihan {{ $cert->name }}?"
+                                data-confirm-title="Hapus Sertifikasi"
+                                data-confirm-btn="Ya, Hapus Data"
+                                data-confirm-variant="danger"
                                 class="px-2.5 py-1 text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
                             >
                                 Hapus
