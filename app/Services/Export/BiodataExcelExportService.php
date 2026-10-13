@@ -12,26 +12,58 @@ use ZipArchive;
 class BiodataExcelExportService
 {
     /**
-     * Generate and download an .xlsx file of all accepted applicants' complete biodata.
+     * Generate and download an .xlsx file of all applicants' complete biodata who have applied.
      */
-    public function exportAcceptedApplicants(?int $vacancyId = null): BinaryFileResponse
-    {
-        $query = JobApplication::where('status', JobApplicationStatus::ACCEPTED)
-            ->with([
-                'user.applicantProfile.educations' => function ($q) {
-                    $q->orderBy('graduation_year', 'desc');
-                },
-                'jobVacancy',
-            ])
-            ->latest('accepted_at');
+    public function exportApplicants(
+        ?int $vacancyId = null,
+        ?string $status = null,
+        ?string $search = null
+    ): BinaryFileResponse {
+        $query = JobApplication::with([
+            'user.applicantProfile.educations' => function ($q) {
+                $q->orderBy('graduation_year', 'desc');
+            },
+            'jobVacancy',
+            'recruitmentPeriod',
+        ]);
+
+        if (! empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('application_number', 'like', "%{$search}%")
+                    ->orWhereHas('user', function ($uq) use ($search) {
+                        $uq->where('name', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%")
+                            ->orWhere('registration_number', 'like', "%{$search}%")
+                            ->orWhere('phone', 'like', "%{$search}%");
+                    });
+            });
+        }
 
         if ($vacancyId) {
             $query->where('job_vacancy_id', $vacancyId);
         }
 
-        $applications = $query->get();
+        if (! empty($status)) {
+            $query->where('status', $status);
+        } else {
+            // Ambil semua yang sudah melamar (bukan draft)
+            $query->where('status', '!=', JobApplicationStatus::DRAFT);
+        }
+
+        $applications = $query->latest('submitted_at')->get();
 
         return $this->generateXlsx($applications);
+    }
+
+    /**
+     * Generate and download an .xlsx file of all accepted applicants' complete biodata.
+     */
+    public function exportAcceptedApplicants(?int $vacancyId = null): BinaryFileResponse
+    {
+        return $this->exportApplicants(
+            vacancyId: $vacancyId,
+            status: JobApplicationStatus::ACCEPTED->value
+        );
     }
 
     /**
@@ -41,7 +73,7 @@ class BiodataExcelExportService
      */
     public function generateXlsx(Collection $applications): BinaryFileResponse
     {
-        $filename = 'Biodata_Pelamar_Diterima_RSI_Fatimah_'.date('Ymd_His').'.xlsx';
+        $filename = 'Biodata_Pelamar_RSI_Fatimah_'.date('Ymd_His').'.xlsx';
         $tempDir = storage_path('app/temp');
 
         if (! file_exists($tempDir)) {
@@ -85,7 +117,7 @@ class BiodataExcelExportService
         $workbook = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'."\n"
             .'<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'
             .'<sheets>'
-            .'<sheet name="Biodata Pelamar Diterima" sheetId="1" r:id="rId1"/>'
+            .'<sheet name="Biodata Pelamar" sheetId="1" r:id="rId1"/>'
             .'</sheets>'
             .'</workbook>';
         $zip->addFromString('xl/workbook.xml', $workbook);
@@ -127,7 +159,7 @@ class BiodataExcelExportService
             .'<fill><patternFill patternType="none"/></fill>'
             .'<fill><patternFill patternType="gray125"/></fill>'
             // 2: Header Fill #0179B5 (RSI Fatimah Blue)
-            .'<fill><patternFill patternType="solid"><fgColor rgb="FF0179B 5"/></patternFill></fill>'
+            .'<fill><patternFill patternType="solid"><fgColor rgb="FF0179B5"/></patternFill></fill>'
             // 3: Zebra Row Fill #F8FAFC
             .'<fill><patternFill patternType="solid"><fgColor rgb="FFF8FAFC"/></patternFill></fill>'
             // 4: Highlight Success #D1FAE5
@@ -192,7 +224,8 @@ class BiodataExcelExportService
             'Tahun Lulus',
             'IPK / Nilai',
             'Akreditasi',
-            'Tanggal Diterima',
+            'Tanggal Melamar',
+            'Status Lamaran',
             'Status Akun',
         ];
 
@@ -219,8 +252,9 @@ class BiodataExcelExportService
             20 => 12, // Tahun Lulus
             21 => 12, // IPK
             22 => 12, // Akreditasi
-            23 => 18, // Tanggal Diterima
-            24 => 16, // Status Akun
+            23 => 18, // Tanggal Melamar
+            24 => 20, // Status Lamaran
+            25 => 16, // Status Akun
         ];
 
         $xml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'."\n";
@@ -237,13 +271,13 @@ class BiodataExcelExportService
 
         // Row 1: Title
         $xml .= '<row r="1" ht="26" customHeight="1">'."\n";
-        $xml .= '<c r="A1" t="inlineStr" s="1"><is><t>RSI FATIMAH BANYUWANGI - REKAPITULASI DATA PELAMAR DITERIMA (CALON KARYAWAN)</t></is></c>'."\n";
+        $xml .= '<c r="A1" t="inlineStr" s="1"><is><t>RSI FATIMAH BANYUWANGI - REKAPITULASI DATA BIODATA PELAMAR</t></is></c>'."\n";
         $xml .= '</row>'."\n";
 
         // Row 2: Subtitle
         $exportTime = Carbon::now()->locale('id')->translatedFormat('d F Y, H:i').' WIB';
         $xml .= '<row r="2" ht="18" customHeight="1">'."\n";
-        $xml .= '<c r="A2" t="inlineStr" s="2"><is><t>Diekspor pada: '.$this->escapeXml($exportTime).' | Total Kandidat Diterima: '.$applications->count().' Orang</t></is></c>'."\n";
+        $xml .= '<c r="A2" t="inlineStr" s="2"><is><t>Diekspor pada: '.$this->escapeXml($exportTime).' | Total Pelamar: '.$applications->count().' Orang</t></is></c>'."\n";
         $xml .= '</row>'."\n";
 
         // Row 3: Blank Row
@@ -274,8 +308,9 @@ class BiodataExcelExportService
 
             $birthDateFormatted = $profile?->birth_date ? Carbon::parse($profile->birth_date)->format('d/m/Y') : '-';
             $age = $profile?->birth_date ? Carbon::parse($profile->birth_date)->age.' Thn' : '-';
-            $acceptedAtFormatted = $app->accepted_at ? Carbon::parse($app->accepted_at)->locale('id')->translatedFormat('d M Y') : '-';
-            $accountStatus = ($user && $user->is_active) ? 'Aktif' : 'Dinonaktifkan (Arsip)';
+            $submittedAtFormatted = $app->submitted_at ? Carbon::parse($app->submitted_at)->locale('id')->translatedFormat('d M Y, H:i') : '-';
+            $statusLabel = $app->status instanceof JobApplicationStatus ? $app->status->label() : (string) ($app->status ?? '-');
+            $accountStatus = ($user && $user->is_active) ? 'Aktif' : 'Nonaktif';
             $domicileStatus = ($profile && $profile->same_as_ktp) ? 'Sesuai KTP' : 'Domisili Berbeda';
             $addressDomicile = ($profile && $profile->same_as_ktp) ? ($profile->address_ktp ?? '-') : ($profile->address_domicile ?? '-');
 
@@ -302,7 +337,8 @@ class BiodataExcelExportService
                 $edu?->graduation_year ?? '-',
                 $edu?->gpa ?? '-',
                 $edu?->accreditation ?? '-',
-                $acceptedAtFormatted,
+                $submittedAtFormatted,
+                $statusLabel,
                 $accountStatus,
             ];
 

@@ -102,13 +102,12 @@ class AdminLifecycleExcelExportTest extends TestCase
         ]);
     }
 
-    public function test_admin_can_see_export_excel_button_in_lifecycle_page(): void
+    public function test_export_button_is_moved_from_lifecycle_page(): void
     {
         $response = $this->actingAs($this->admin)->get(route('admin.lifecycle.index', ['tab' => 'lolos']));
 
         $response->assertStatus(200);
-        $response->assertSee('Unduh Biodata Diterima (.xlsx)');
-        $response->assertSee(route('admin.lifecycle.export-accepted-biodata'));
+        $response->assertDontSee('Unduh Biodata Diterima (.xlsx)');
     }
 
     public function test_admin_can_download_accepted_applicants_biodata_excel(): void

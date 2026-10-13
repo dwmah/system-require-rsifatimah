@@ -486,4 +486,64 @@ class AdminDocumentAutoApprovalAndBiodataTabTest extends TestCase
         $response->assertSee('Preview &amp; Unduh Semua Berkas', false);
         $response->assertSee('Unduh Semua (.ZIP)');
     }
+
+    public function test_admin_can_see_verify_all_documents_button_when_documents_are_unverified(): void
+    {
+        ApplicationDocument::create([
+            'job_application_id' => $this->application->id,
+            'vacancy_document_requirement_id' => $this->reqKtp->id,
+            'original_name' => 'ktp.pdf',
+            'stored_path' => 'documents/ktp.pdf',
+            'file_size' => 100 * 1024,
+            'mime_type' => 'application/pdf',
+            'verification_status' => 'pending',
+        ]);
+
+        $response = $this->actingAs($this->admin)->get(route('admin.applications.show', [
+            'application' => $this->application,
+            'tab' => 'berkas',
+        ]));
+
+        $response->assertStatus(200);
+        $response->assertSee('Validkan Semua Berkas');
+        $response->assertSee(route('admin.applications.documents.verify-all', $this->application));
+    }
+
+    public function test_admin_can_verify_all_documents_in_one_click_and_auto_approve_administration(): void
+    {
+        $doc1 = ApplicationDocument::create([
+            'job_application_id' => $this->application->id,
+            'vacancy_document_requirement_id' => $this->reqKtp->id,
+            'original_name' => 'ktp.pdf',
+            'stored_path' => 'documents/ktp.pdf',
+            'file_size' => 100 * 1024,
+            'mime_type' => 'application/pdf',
+            'verification_status' => 'pending',
+        ]);
+
+        $doc2 = ApplicationDocument::create([
+            'job_application_id' => $this->application->id,
+            'vacancy_document_requirement_id' => $this->reqIjazah->id,
+            'original_name' => 'ijazah.pdf',
+            'stored_path' => 'documents/ijazah.pdf',
+            'file_size' => 200 * 1024,
+            'mime_type' => 'application/pdf',
+            'verification_status' => 'pending',
+        ]);
+
+        $this->assertEquals(JobApplicationStatus::SUBMITTED, $this->application->status);
+
+        $response = $this->actingAs($this->admin)->post(route('admin.applications.documents.verify-all', $this->application));
+
+        $response->assertRedirect(route('admin.applications.show', ['application' => $this->application, 'tab' => 'berkas']));
+        $response->assertSessionHas('success');
+
+        $doc1->refresh();
+        $doc2->refresh();
+        $this->assertEquals('valid', $doc1->verification_status);
+        $this->assertEquals('valid', $doc2->verification_status);
+
+        $this->application->refresh();
+        $this->assertEquals(JobApplicationStatus::PASSED_ADMINISTRATION, $this->application->status);
+    }
 }
