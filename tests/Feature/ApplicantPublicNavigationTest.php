@@ -95,6 +95,38 @@ class ApplicantPublicNavigationTest extends TestCase
         $this->actingAs($admin)->get(route('recruitment.closed'))->assertRedirect(route('admin.dashboard'));
     }
 
+    public function test_authenticated_admin_visiting_portal_or_applications_is_redirected_to_admin_dashboard(): void
+    {
+        $admin = User::factory()->create([
+            'email' => 'admin-portal@rsifatimah.com',
+            'role' => User::ROLE_ADMIN,
+            'is_active' => true,
+        ]);
+
+        $this->actingAs($admin)->get(route('portal.home'))->assertRedirect(route('admin.dashboard'));
+        $this->actingAs($admin)->get(route('portal.applications.index'))->assertRedirect(route('admin.dashboard'));
+    }
+
+    public function test_admin_logging_in_with_intended_portal_url_redirects_to_admin_dashboard(): void
+    {
+        $admin = User::factory()->create([
+            'email' => 'admin-login@rsifatimah.com',
+            'role' => User::ROLE_ADMIN,
+            'password' => bcrypt('password'),
+            'is_active' => true,
+        ]);
+
+        $loginUrl = route('login', ['intended' => route('portal.applications.index')]);
+        $this->get($loginUrl)->assertStatus(200);
+
+        $response = $this->post(route('login.store'), [
+            'login' => $admin->email,
+            'password' => 'password',
+        ]);
+
+        $response->assertRedirect(route('admin.dashboard'));
+    }
+
     public function test_authenticated_admin_can_preview_vacancies_page(): void
     {
         $admin = User::factory()->create([
