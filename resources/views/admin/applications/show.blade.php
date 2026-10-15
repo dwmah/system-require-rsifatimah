@@ -110,7 +110,7 @@
                 <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl text-sm space-y-1 min-w-[240px]">
                     <div class="text-xs uppercase font-bold text-slate-400">Posisi Formasi Dilamar</div>
                     <div class="font-bold text-slate-900 text-base">{{ $application->jobVacancy->title }}</div>
-                    <div class="text-slate-500 text-xs">{{ $application->jobVacancy->department }} &bull; Kuota: {{ $application->jobVacancy->quota }}</div>
+                    <div class="text-slate-500 text-xs">{{ $application->jobVacancy->department }} &bull; Kuota: {{ $application->jobVacancy->quota_label }}</div>
                 </div>
             </div>
 
@@ -715,11 +715,13 @@
         <!-- TAB 3: TAHAPAN SELEKSI & LOG -->
         <div x-show="activeTab === 'tahapan'" class="space-y-6">
             @php
-                $vacQuota = $application->jobVacancy->quota;
+                $vacancy = $application->jobVacancy;
+                $hasQuotaLimit = $vacancy->hasQuotaLimit();
+                $vacQuota = $vacancy->quota;
                 $vacAcceptedCount = \App\Models\JobApplication::where('job_vacancy_id', $application->job_vacancy_id)
                     ->where('status', \App\Enums\JobApplicationStatus::ACCEPTED)
                     ->count();
-                $isVacQuotaFull = $vacAcceptedCount >= $vacQuota;
+                $isVacQuotaFull = $hasQuotaLimit && ($vacAcceptedCount >= $vacQuota);
                 $isCurrentAppAccepted = $application->status === \App\Enums\JobApplicationStatus::ACCEPTED;
             @endphp
 
@@ -732,14 +734,20 @@
                     <div>
                         <div class="flex items-center gap-2">
                             <span class="text-xs font-bold uppercase tracking-wider {{ $isVacQuotaFull ? 'text-amber-800' : 'text-[#0179B5]' }}">Kapasitas Kuota Formasi</span>
-                            @if($isVacQuotaFull)
+                            @if(! $hasQuotaLimit)
+                                <span class="px-2 py-0.5 text-[10px] font-extrabold bg-sky-200 text-sky-900 rounded-md">TIDAK DIBATASI (UNLIMITED)</span>
+                            @elseif($isVacQuotaFull)
                                 <span class="px-2 py-0.5 text-[10px] font-extrabold bg-amber-200 text-amber-900 rounded-md">KUOTA PENUH</span>
                             @else
                                 <span class="px-2 py-0.5 text-[10px] font-extrabold bg-emerald-100 text-emerald-800 rounded-md">TERSEDIA</span>
                             @endif
                         </div>
                         <p class="text-xs mt-0.5 {{ $isVacQuotaFull ? 'text-amber-800' : 'text-slate-600' }}">
-                            Kuota Dibutuhkan: <strong>{{ $vacQuota }} Orang</strong> &bull; Kandidat Diterima: <strong>{{ $vacAcceptedCount }} Orang</strong> &bull; Sisa Kuota: <strong>{{ max(0, $vacQuota - $vacAcceptedCount) }} Orang</strong>
+                            @if($hasQuotaLimit)
+                                Kuota Dibutuhkan: <strong>{{ $vacQuota }} Orang</strong> &bull; Kandidat Diterima: <strong>{{ $vacAcceptedCount }} Orang</strong> &bull; Sisa Kuota: <strong>{{ max(0, $vacQuota - $vacAcceptedCount) }} Orang</strong>
+                            @else
+                                Kuota Formasi: <strong>Tidak Dibatasi / Sesuai Kebutuhan</strong> &bull; Kandidat Diterima Saat Ini: <strong>{{ $vacAcceptedCount }} Orang</strong>
+                            @endif
                         </p>
                     </div>
                 </div>
@@ -949,7 +957,7 @@
                 <div class="p-3 mb-4 rounded-lg bg-slate-50 border border-slate-200 text-xs flex items-center justify-between">
                     <div>
                         <span class="text-slate-500">Kuota Formasi:</span>
-                        <strong class="text-slate-800">{{ $vacQuota }} Orang</strong>
+                        <strong class="text-slate-800">{{ $hasQuotaLimit ? $vacQuota . ' Orang' : 'Tidak Dibatasi' }}</strong>
                     </div>
                     <div>
                         <span class="text-slate-500">Telah Diterima:</span>

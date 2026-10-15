@@ -79,7 +79,8 @@ class AdminVacancyController extends Controller
             'title' => 'required|string|max:255',
             'department' => 'nullable|string|max:255',
             'formation_type' => 'required|string|max:100',
-            'quota' => 'required|integer|min:1',
+            'has_quota' => 'nullable|boolean',
+            'quota' => 'nullable|required_if:has_quota,1,true|integer|min:1',
             'open_at' => 'nullable|date',
             'close_at' => 'nullable|date|after_or_equal:open_at',
             'summary' => 'nullable|string',
@@ -113,6 +114,9 @@ class AdminVacancyController extends Controller
                 ? (strlen($request->close_at) === 10 ? Carbon::parse($request->close_at)->endOfDay() : Carbon::parse($request->close_at))
                 : now()->addMonth()->endOfDay();
 
+            $hasQuota = $request->has('has_quota') ? $request->boolean('has_quota') : $request->filled('quota');
+            $quota = $hasQuota && $request->filled('quota') ? (int) $request->quota : null;
+
             $vacancy = JobVacancy::create([
                 'recruitment_period_id' => $validated['recruitment_period_id'],
                 'code' => $code,
@@ -120,7 +124,7 @@ class AdminVacancyController extends Controller
                 'unit' => $validated['department'] ?? 'Pelayanan Medis',
                 'employment_type' => $validated['formation_type'],
                 'location' => 'RSI Fatimah Banyuwangi',
-                'quota' => $validated['quota'],
+                'quota' => $quota,
                 'description' => $validated['description'],
                 'open_at' => $openAt,
                 'close_at' => $closeAt,
@@ -162,8 +166,8 @@ class AdminVacancyController extends Controller
                         $hasValidCustomDocs = true;
                         $isMandatory = isset($docMandatories[$idx]) && ($docMandatories[$idx] === '1' || $docMandatories[$idx] === 1 || $docMandatories[$idx] === true || $docMandatories[$idx] === 'true');
                         $desc = $docDescriptions[$idx] ?? null;
-                        $mimes = !empty($docMimes[$idx]) ? $docMimes[$idx] : 'application/pdf,image/jpeg,image/png';
-                        $maxSize = !empty($docMaxSizes[$idx]) ? (int) $docMaxSizes[$idx] : 5120;
+                        $mimes = ! empty($docMimes[$idx]) ? $docMimes[$idx] : 'application/pdf,image/jpeg,image/png';
+                        $maxSize = ! empty($docMaxSizes[$idx]) ? (int) $docMaxSizes[$idx] : 5120;
 
                         VacancyDocumentRequirement::create([
                             'job_vacancy_id' => $vacancy->id,
@@ -292,7 +296,8 @@ class AdminVacancyController extends Controller
             'title' => 'required|string|max:255',
             'department' => 'nullable|string|max:255',
             'formation_type' => 'required|string|max:100',
-            'quota' => 'required|integer|min:1',
+            'has_quota' => 'nullable|boolean',
+            'quota' => 'nullable|required_if:has_quota,1,true|integer|min:1',
             'open_at' => 'nullable|date',
             'close_at' => 'nullable|date|after_or_equal:open_at',
             'description' => 'required|string',
@@ -316,12 +321,15 @@ class AdminVacancyController extends Controller
             'stage_ids' => 'nullable|array',
         ]);
 
+        $hasQuota = $request->has('has_quota') ? $request->boolean('has_quota') : $request->filled('quota');
+        $quota = $hasQuota && $request->filled('quota') ? (int) $request->quota : null;
+
         $updateData = [
             'recruitment_period_id' => $validated['recruitment_period_id'],
             'title' => $validated['title'],
             'unit' => $validated['department'] ?? 'Pelayanan Medis',
             'employment_type' => $validated['formation_type'],
-            'quota' => $validated['quota'],
+            'quota' => $quota,
             'description' => $validated['description'],
             'status' => $request->has('is_published') ? JobVacancyStatus::OPEN : JobVacancyStatus::DRAFT,
         ];
@@ -390,8 +398,8 @@ class AdminVacancyController extends Controller
                     $docId = ! empty($docIds[$idx]) ? (int) $docIds[$idx] : null;
                     $isMandatory = isset($docMandatories[$idx]) && ($docMandatories[$idx] === '1' || $docMandatories[$idx] === 1 || $docMandatories[$idx] === true || $docMandatories[$idx] === 'true');
                     $desc = $docDescriptions[$idx] ?? null;
-                    $mimes = !empty($docMimes[$idx]) ? $docMimes[$idx] : 'application/pdf,image/jpeg,image/png';
-                    $maxSize = !empty($docMaxSizes[$idx]) ? (int) $docMaxSizes[$idx] : 5120;
+                    $mimes = ! empty($docMimes[$idx]) ? $docMimes[$idx] : 'application/pdf,image/jpeg,image/png';
+                    $maxSize = ! empty($docMaxSizes[$idx]) ? (int) $docMaxSizes[$idx] : 5120;
 
                     // Jika docId tidak ada, cari requirement lama yang belum terproses dengan nama yang sama
                     if (! $docId && $existingDoc = $existingDocReqs->whereNotIn('id', $processedIds)->firstWhere('name', trim($docName))) {

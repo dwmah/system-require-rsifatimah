@@ -77,7 +77,11 @@
                                     <div class="text-xs text-slate-400 mt-0.5">Batas: <span class="font-medium text-slate-600">{{ $vac->close_at?->translatedFormat('d M Y') ?? '-' }}</span></div>
                                 </td>
                                 <td class="py-3.5 px-4 text-center font-bold text-slate-800">
-                                    {{ $vac->quota }}
+                                    @if($vac->hasQuotaLimit())
+                                        {{ $vac->quota }}
+                                    @else
+                                        <span class="inline-block px-2 py-0.5 text-xs font-semibold bg-sky-50 text-[#0179B5] rounded-md">Unlimited</span>
+                                    @endif
                                 </td>
                                 <td class="py-3.5 px-4 text-center">
                                     <a href="{{ route('admin.applications.index', ['vacancy_id' => $vac->id]) }}" class="inline-flex items-center gap-1 font-bold text-[#0179B5] hover:underline">

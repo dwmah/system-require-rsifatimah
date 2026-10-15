@@ -421,7 +421,7 @@ class ApplicationVerificationService
                         ->where('id', '!=', $application->id)
                         ->count();
 
-                    if ($acceptedCount >= $vacancy->quota) {
+                    if ($vacancy->hasQuotaLimit() && $acceptedCount >= $vacancy->quota) {
                         throw ValidationException::withMessages([
                             'quota' => "Kuota kelulusan untuk formasi '{$vacancy->title}' telah terpenuhi (Kuota: {$vacancy->quota}, Sudah Diterima: {$acceptedCount}). Silakan tambah kuota formasi lowongan atau ubah status kelulusan kandidat lain terlebih dahulu.",
                         ]);
