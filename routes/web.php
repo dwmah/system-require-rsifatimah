@@ -77,47 +77,6 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/dokumen/preview/{document}', [ApplicantDocumentController::class, 'preview'])->name('documents.preview');
     Route::get('/dokumen/download/{document}', [ApplicantDocumentController::class, 'download'])->name('documents.download');
-
-    Route::get('/portal', [PortalHomeController::class, 'index'])->name('portal.home');
-
-    // Alur Lamaran Pekerjaan (Fase 8A & 8B)
-    Route::get('/portal/lamaran', [ApplicationController::class, 'index'])->name('portal.applications.index');
-    Route::get('/portal/lamaran/mulai/{jobVacancy}', [ApplicationController::class, 'start'])->name('portal.applications.start');
-    Route::post('/portal/lamaran/mulai/{jobVacancy?}', [ApplicationController::class, 'store'])->name('portal.applications.store');
-    Route::get('/portal/lamaran/{jobApplication}', [ApplicationController::class, 'show'])
-        ->whereNumber('jobApplication')
-        ->name('portal.applications.show');
-    Route::match(['delete', 'post'], '/portal/lamaran/{jobApplication}/batal', [ApplicationController::class, 'cancelDraft'])
-        ->whereNumber('jobApplication')
-        ->name('portal.applications.cancel-draft');
-
-    // Berkas Persyaratan & Final Submit (Fase 8B)
-    Route::get('/portal/lamaran/{jobApplication}/berkas', [ApplicationDocumentController::class, 'index'])
-        ->whereNumber('jobApplication')
-        ->name('portal.applications.documents.index');
-    Route::post('/portal/lamaran/{jobApplication}/berkas/{requirement?}', [ApplicationDocumentController::class, 'store'])
-        ->whereNumber('jobApplication')
-        ->name('portal.applications.documents.store');
-    Route::delete('/portal/lamaran/{jobApplication}/berkas/{document}', [ApplicationDocumentController::class, 'destroy'])
-        ->whereNumber('jobApplication')
-        ->whereNumber('document')
-        ->name('portal.applications.documents.destroy');
-    Route::get('/portal/lamaran/{jobApplication}/berkas/{document}/download', [ApplicationDocumentController::class, 'download'])
-        ->whereNumber('jobApplication')
-        ->whereNumber('document')
-        ->name('portal.applications.documents.download');
-
-    Route::get('/portal/lamaran/{jobApplication}/review', [ApplicationSubmissionController::class, 'review'])
-        ->whereNumber('jobApplication')
-        ->name('portal.applications.review');
-    Route::post('/portal/lamaran/{jobApplication}/submit', [ApplicationSubmissionController::class, 'submit'])
-        ->whereNumber('jobApplication')
-        ->name('portal.applications.submit');
-
-    // Tracking Proses Seleksi Pelamar (Fase 9)
-    Route::get('/portal/lamaran/{jobApplication}/tracking', [ApplicationTrackingController::class, 'show'])
-        ->whereNumber('jobApplication')
-        ->name('portal.applications.tracking');
 });
 
 // =========================================================================
@@ -125,6 +84,45 @@ Route::middleware('auth')->group(function () {
 // =========================================================================
 Route::middleware(['auth', 'applicant'])->prefix('portal')->name('portal.')->group(function () {
     Route::get('/', [PortalHomeController::class, 'index'])->name('home');
+
+    // Alur Lamaran Pekerjaan (Fase 8A & 8B)
+    Route::get('/lamaran', [ApplicationController::class, 'index'])->name('applications.index');
+    Route::get('/lamaran/mulai/{jobVacancy}', [ApplicationController::class, 'start'])->name('applications.start');
+    Route::post('/lamaran/mulai/{jobVacancy?}', [ApplicationController::class, 'store'])->name('applications.store');
+    Route::get('/lamaran/{jobApplication}', [ApplicationController::class, 'show'])
+        ->whereNumber('jobApplication')
+        ->name('applications.show');
+    Route::match(['delete', 'post'], '/lamaran/{jobApplication}/batal', [ApplicationController::class, 'cancelDraft'])
+        ->whereNumber('jobApplication')
+        ->name('applications.cancel-draft');
+
+    // Berkas Persyaratan & Final Submit (Fase 8B)
+    Route::get('/lamaran/{jobApplication}/berkas', [ApplicationDocumentController::class, 'index'])
+        ->whereNumber('jobApplication')
+        ->name('applications.documents.index');
+    Route::post('/lamaran/{jobApplication}/berkas/{requirement?}', [ApplicationDocumentController::class, 'store'])
+        ->whereNumber('jobApplication')
+        ->name('applications.documents.store');
+    Route::delete('/lamaran/{jobApplication}/berkas/{document}', [ApplicationDocumentController::class, 'destroy'])
+        ->whereNumber('jobApplication')
+        ->whereNumber('document')
+        ->name('applications.documents.destroy');
+    Route::get('/lamaran/{jobApplication}/berkas/{document}/download', [ApplicationDocumentController::class, 'download'])
+        ->whereNumber('jobApplication')
+        ->whereNumber('document')
+        ->name('applications.documents.download');
+
+    Route::get('/lamaran/{jobApplication}/review', [ApplicationSubmissionController::class, 'review'])
+        ->whereNumber('jobApplication')
+        ->name('applications.review');
+    Route::post('/lamaran/{jobApplication}/submit', [ApplicationSubmissionController::class, 'submit'])
+        ->whereNumber('jobApplication')
+        ->name('applications.submit');
+
+    // Tracking Proses Seleksi Pelamar (Fase 9)
+    Route::get('/lamaran/{jobApplication}/tracking', [ApplicationTrackingController::class, 'show'])
+        ->whereNumber('jobApplication')
+        ->name('applications.tracking');
 
     // Acknowledge Announcement
     Route::post('/lamaran/{application}/konfirmasi-pengumuman', [ApplicantApplicationController::class, 'acknowledgeAnnouncement'])->name('applications.acknowledge');

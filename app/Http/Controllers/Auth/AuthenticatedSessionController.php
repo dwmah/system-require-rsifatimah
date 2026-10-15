@@ -35,6 +35,11 @@ class AuthenticatedSessionController extends Controller
         $user = $request->user();
 
         if ($user->isAdmin()) {
+            $intended = session()->get('url.intended');
+            if ($intended && str_contains($intended, '/portal')) {
+                session()->forget('url.intended');
+            }
+
             return redirect()->intended(route('admin.dashboard'));
         }
 
