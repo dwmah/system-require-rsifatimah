@@ -81,6 +81,9 @@ flowchart TD
 3. Klik tombol **Masuk**.
 4. Sistem akan secara otomatis mengenali peran (*role*) Anda sebagai `admin` dan mengarahkan Anda langsung ke **Dashboard SDI** (`/admin/dashboard`).
 
+![Gambar 1.1: Tampilan Halaman Masuk (Login) Portal Rekrutmen SDI](storage/app/guide_screenshots/admin/01_login.png)
+*Gambar 1.1: Tampilan Halaman Masuk (Login) Portal Rekrutmen SDI RSI Fatimah Banyuwangi*
+
 > **Catatan Keamanan**:
 > - Jangan pernah membagikan kata sandi admin kepada pihak yang tidak berkepentingan.
 > - Jika meninggalkan komputer kerja, pastikan untuk selalu menekan tombol **Keluar** pada pojok kanan atas sidebar.
@@ -110,6 +113,9 @@ Dashboard SDI merupakan pusat kendali pemantauan seluruh aktivitas rekrutmen yan
    - Dilengkapi filter cepat berdasarkan formasi tertentu.
    - Menampilkan nama pelamar, posisi formasi, tanggal submit, badge status, dan tombol aksi cepat **Periksa**.
 
+![Gambar 2.1: Tampilan Dashboard Rekrutmen SDI](storage/app/guide_screenshots/admin/02_dashboard.png)
+*Gambar 2.1: Tampilan Dashboard Rekrutmen SDI dengan Ringkasan Metrik & Berkas Masuk*
+
 ---
 
 ## Modul 3: Manajemen Lowongan Kerja & Formasi SDM
@@ -122,6 +128,9 @@ Akses menu **Lowongan SDM** (`/admin/jobs`). Pada halaman ini Anda dapat:
 - Memfilter formasi berdasarkan status publikasi: **Aktif / Dipublikasikan** atau **Nonaktif / Ditutup**.
 - Melihat kuota penerimaan dan jumlah pelamar yang telah masuk pada setiap formasi.
 - Mengakses tombol aksi: **Detail Formasi**, **Ubah (Edit)**, **Toggle Publikasi (Buka/Tutup)**, dan **Hapus**.
+
+![Gambar 3.1: Halaman Daftar Lowongan SDM](storage/app/guide_screenshots/admin/03_vacancies_index.png)
+*Gambar 3.1: Halaman Daftar Lowongan SDM & Manajemen Formasi Jabatan*
 
 ### 3.2 Membuka Formasi Lowongan Baru
 Klik tombol **Tambah Lowongan Baru** (`/admin/jobs/create`). Formulir terdiri dari 4 bagian utama:
@@ -147,6 +156,9 @@ Klik tombol **Tambah Lowongan Baru** (`/admin/jobs/create`). Formulir terdiri da
 #### Bagian 2: Kualifikasi Khusus
 - Daftar poin persyaratan kualifikasi pelamar (contoh: *Pendidikan minimal D3/S1*, *Memiliki STR aktif*, *IPK minimal 3.00*, *Usia maksimal 30 tahun*).
 - Anda dapat menekan tombol **+ Tambah Kualifikasi** untuk menambah poin kualifikasi baru atau tombol tempat sampah untuk menghapus poin.
+
+![Gambar 3.2: Formulir Pembukaan Formasi Baru](storage/app/guide_screenshots/admin/04_vacancy_create_part1.png)
+*Gambar 3.2: Formulir Pembukaan Formasi Baru — Data Posisi, Kuota, & Kualifikasi Khusus*
 
 #### Bagian 3: Persyaratan Dokumen yang Wajib Diunggah
 Setiap posisi membutuhkan kelengkapan berkas yang berbeda. Anda dapat memanfaatkan fitur **Preset Cepat**:
@@ -179,6 +191,9 @@ Secara bawaan (*default*), sistem menyusun alur standar rumah sakit:
 - Centang opsi **Publikasikan Lowongan Langsung** jika formasi ingin langsung tayang di portal publik, atau hilangkan centang jika ingin menyimpannya sebagai draf terlebih dahulu.
 - Klik **Simpan & Publikasikan Lowongan**.
 
+![Gambar 3.3: Konfigurasi Preset Dokumen & Tahapan](storage/app/guide_screenshots/admin/05_vacancy_create_part2.png)
+*Gambar 3.3: Konfigurasi Preset Dokumen Persyaratan & Pengaturan Tahapan Seleksi Formasi*
+
 ---
 
 ## Modul 4: Manajemen Lamaran & Verifikasi Berkas
@@ -199,6 +214,9 @@ Gunakan form pencarian interaktif untuk:
 - Memfilter berkas berdasarkan **Posisi Formasi**.
 - Memfilter berkas berdasarkan **Status Lamaran**.
 - Halaman akan memfilter secara otomatis seketika (*auto-filter*) tanpa memuat ulang seluruh halaman.
+
+![Gambar 4.1: Daftar Lamaran Pelamar](storage/app/guide_screenshots/admin/06_applications_index.png)
+*Gambar 4.1: Daftar Lamaran Pelamar Dilengkapi Multi-Filter & Status Rekrutmen*
 
 ### 4.2 Ekspor Biodata Pelamar ke Excel (.xlsx)
 Untuk mempermudah rekapitulasi, rapat pleno panitia, atau pelaporan direksi:
@@ -226,6 +244,9 @@ Halaman verifikasi dibagi menjadi 3 tab utama:
   - **Pengalaman Kerja**: Riwayat pekerjaan di rumah sakit atau institusi sebelumnya, posisi jabatan, masa kerja, dan deskripsi tanggung jawab.
   - **Panel Verifikasi Biodata**: Tombol tindakan cepat untuk **Menyetujui Biodata** atau **Menolak Biodata** (wajib mengisi catatan penolakan jika ditolak).
 
+![Gambar 4.2: Pemeriksaan Tab 1 Biodata & Riwayat](storage/app/guide_screenshots/admin/07_application_detail_biodata.png)
+*Gambar 4.2: Pemeriksaan Tab 1 — Biodata, Riwayat Pendidikan, STR, & Panel Verifikasi Biodata*
+
 ### 4.4 Verifikasi Berkas Dokumen Persyaratan (Tab 2)
 Pilih **Tab 2: Verifikasi Berkas Dokumen**. Di tab ini tim SDI dapat:
 - Melihat ringkasan berkas yang diunggah kandidat terhadap total syarat (contoh: *6/6 Dokumen Lengkap*).
@@ -235,6 +256,9 @@ Pilih **Tab 2: Verifikasi Berkas Dokumen**. Di tab ini tim SDI dapat:
   - **Status Validasi**: Berstatus *Valid* (Centang Hijau), *Tidak Valid* (Silang Merah), atau *Menunggu Review* (Kuning).
   - **Formulir Validasi per Dokumen**: Verifikator dapat memilih opsi *Valid*, *Tidak Valid*, atau *Pending* serta memberikan catatan khusus (misal: *"Scan STR buram, mohon perbaiki"*).
 - **Tombol Pintas "Validkan Semua Berkas"**: Jika setelah diperiksa seluruh berkas telah memenuhi standar dan terbaca jelas, klik tombol hijau **Validkan Semua Berkas**. Sistem akan secara otomatis mengubah seluruh status dokumen menjadi valid dan meloloskan tahap seleksi administrasi.
+
+![Gambar 4.3: Pemeriksaan Tab 2 Verifikasi Berkas](storage/app/guide_screenshots/admin/08_application_detail_documents.png)
+*Gambar 4.3: Pemeriksaan Tab 2 — Verifikasi Kelengkapan & Validitas Berkas Dokumen Persyaratan*
 
 ### 4.5 Fitur Unggulan: Modal Previewer & Download Paket ZIP
 1. **Modal Dokumen Previewer (Inline Document Viewer)**:
@@ -247,6 +271,9 @@ Pilih **Tab 2: Verifikasi Berkas Dokumen**. Di tab ini tim SDI dapat:
      `01_surat_lamaran_kerja.pdf`, `02_ijazah_terakhir.pdf`, dst.
    - Berkas siap dibuka atau diarsipkan secara luring (*offline*).
 
+![Gambar 4.4: Modal Previewer Dokumen](storage/app/guide_screenshots/admin/09_document_modal_previewer.png)
+*Gambar 4.4: Jendela Modal Previewer Dokumen Pelamar (Inline Document Viewer) & Paket Unduhan ZIP*
+
 ### 4.6 Keputusan Verifikasi Administrasi (Lolos / Tolak)
 Setelah pemeriksaan selesai, tim SDI mengambil keputusan final administrasi:
 1. **Jika Memenuhi Syarat (Lolos Seleksi Berkas)**:
@@ -258,6 +285,9 @@ Setelah pemeriksaan selesai, tim SDI mengambil keputusan final administrasi:
    - **Wajib mengisi Alasan Penolakan** (contoh: *"IPK di bawah 3.00"*, *"STR sudah kedaluwarsa dan tidak melampirkan bukti perpanjangan"*, atau *"Kualifikasi pendidikan tidak linier"*).
    - Status lamaran berubah menjadi **Tidak Lolos** (`rejected`).
    - Sistem secara otomatis mengirimkan notifikasi resmi ke portal pelamar sehingga kandidat mengetahui transparansi alasan penolakan secara jelas.
+
+![Gambar 4.5: Dialog Konfirmasi Persetujuan / Penolakan](storage/app/guide_screenshots/admin/10_decision_modal.png)
+*Gambar 4.5: Dialog Konfirmasi Persetujuan / Penolakan Seleksi Administrasi Berkas Lamaran*
 
 ---
 
@@ -282,6 +312,9 @@ Buka **Tab 3: Tahapan Seleksi & Timeline** pada halaman detail lamaran:
      - *Contoh jika dijadwalkan wawancara*: *"Jadwal wawancara pada Kamis, 20 Maret 2026 pukul 09.00 WIB di Ruang Rapat Lt. 2 RSI Fatimah. Harap mengenakan pakaian rapi hitam-putih."*
      - *Contoh jika lolos akhir*: *"Selamat! Anda dinyatakan Lolos Seleksi Akhir Formasi Perawat IGD. Harap hadir untuk penandatanganan kontrak kerja pada Senin depan."*
 2. Klik tombol **Simpan & Perbarui Tahapan**.
+
+![Gambar 5.1: Tab 3 Stepper & Form Pembaruan Tahapan](storage/app/guide_screenshots/admin/11_selection_stages.png)
+*Gambar 5.1: Tab 3 — Stepper Alur Seleksi & Form Pembaruan Status Tahapan serta Jadwal Tes*
 
 ### 5.3 Validasi Batas Kuota Penerimaan Karyawan
 Sistem dilengkapi fitur proteksi cerdas:
@@ -326,6 +359,9 @@ Pada halaman ini, administrator dapat:
    - Mengaktifkan periode baru secara otomatis akan mengarsipkan periode lama.
 3. Klik tombol **Simpan Jadwal Periode**.
 
+![Gambar 6.1: Manajemen Timeline Rekrutmen](storage/app/guide_screenshots/admin/12_timelines.png)
+*Gambar 6.1: Manajemen Timeline Rekrutmen & Konfigurasi Kunci Tanggal Seleksi Otomatis*
+
 ---
 
 ## Modul 7: Pengelolaan Siklus Akun Pengguna (User Lifecycle)
@@ -346,6 +382,9 @@ Kandidat yang telah dinyatakan lolos seleksi berkas hingga **Diterima** merupaka
 - Pada Tab 1, terdapat tombol **Unduh Biodata Calon Karyawan (.xlsx)**.
 - Fitur ini khusus menyaring kandidat berstatus **Diterima** untuk diserahkan ke bagian Penggajian, Diklat, atau Sub-Bagian Kepegawaian sebagai berkas induk karyawan baru.
 
+![Gambar 7.1: Siklus Akun Tab 1 Pelamar Lolos](storage/app/guide_screenshots/admin/13_lifecycle_tab1.png)
+*Gambar 7.1: Pengelolaan Siklus Akun — Tab 1: Arsip & Ekspor Calon Karyawan Diterima*
+
 ### 7.3 Kebijakan Pembersihan Data Pelamar Tidak Lolos — Tab 2
 Untuk melindungi kerahasiaan data pribadi (*privacy protection*) kandidat yang tidak diterima serta menghemat kapasitas penyimpanan server dari berkas digital yang sudah tidak terpakai:
 - Pelamar yang tidak lolos diberikan kesempatan untuk melihat pengumuman resmi di portal pelamar mereka dan mengonfirmasi bahwa mereka telah membaca hasil tersebut (`announcement_seen_at`).
@@ -359,6 +398,9 @@ Untuk melindungi kerahasiaan data pribadi (*privacy protection*) kandidat yang t
 2. Klik tombol merah **Pembersihan Massal Berkas Terkonfirmasi**.
 3. Sistem secara otomatis menghapus tuntas data dan berkas fisik dari seluruh kandidat gagal yang telah membaca pengumuman, tanpa mengganggu berkas kandidat yang lolos atau yang belum membaca pengumuman.
 4. Anda juga dapat melakukan pembersihan individual dengan menekan tombol **Bersihkan Berkas Sekarang** pada baris kandidat tertentu.
+
+![Gambar 7.2: Siklus Akun Tab 2 Pembersihan Berkas](storage/app/guide_screenshots/admin/14_lifecycle_tab2.png)
+*Gambar 7.2: Pengelolaan Siklus Akun — Tab 2: Pembersihan Massal Berkas Pelamar Gugur (Cleanup)*
 
 ---
 

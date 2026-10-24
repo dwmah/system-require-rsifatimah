@@ -125,4 +125,74 @@ class AdminLifecycleExcelExportTest extends TestCase
 
         $response->assertStatus(403);
     }
+
+    public function test_deactivate_button_is_only_visible_for_accepted_applicants(): void
+    {
+        $passedUser = User::create([
+            'name' => 'Nidha',
+            'email' => 'nidha@example.com',
+            'phone' => '082145761826',
+            'registration_number' => 'PLM-2026-000004',
+            'password' => 'Password123',
+            'role' => User::ROLE_APPLICANT,
+            'is_active' => true,
+        ]);
+
+        JobApplication::create([
+            'user_id' => $passedUser->id,
+            'job_vacancy_id' => $this->vacancy->id,
+            'recruitment_period_id' => $this->vacancy->recruitment_period_id,
+            'application_number' => 'APP-2026-00002',
+            'status' => JobApplicationStatus::PASSED_ADMINISTRATION,
+            'submitted_at' => now()->subDays(3),
+        ]);
+
+        $response = $this->actingAs($this->admin)->get(route('admin.lifecycle.index', ['tab' => 'lolos']));
+
+        $response->assertStatus(200);
+        // Accepted applicant has deactivation form
+        $response->assertSee(route('admin.lifecycle.deactivate', $this->acceptedUser));
+        // Applicant who is not accepted does NOT have deactivation form
+        $response->assertDontSee(route('admin.lifecycle.deactivate', $passedUser));
+    }
+
+    public function test_admin_cannot_deactivate_applicant_who_is_not_accepted(): void
+    {
+        $passedUser = User::create([
+            'name' => 'Nidha Unaccepted',
+            'email' => 'nidha.unaccepted@example.com',
+            'phone' => '082145761827',
+            'registration_number' => 'PLM-2026-000005',
+            'password' => 'Password123',
+            'role' => User::ROLE_APPLICANT,
+            'is_active' => true,
+        ]);
+
+        JobApplication::create([
+            'user_id' => $passedUser->id,
+            'job_vacancy_id' => $this->vacancy->id,
+            'recruitment_period_id' => $this->vacancy->recruitment_period_id,
+            'application_number' => 'APP-2026-00003',
+            'status' => JobApplicationStatus::PASSED_ADMINISTRATION,
+            'submitted_at' => now()->subDays(3),
+        ]);
+
+        $response = $this->actingAs($this->admin)->post(route('admin.lifecycle.deactivate', $passedUser));
+
+        $response->assertSessionHas('error', 'Hanya akun pelamar dengan status Diterima yang dapat dinonaktifkan.');
+        $this->assertTrue($passedUser->fresh()->is_active);
+    }
+
+    public function test_admin_can_deactivate_and_reactivate_accepted_applicant(): void
+    {
+        $response = $this->actingAs($this->admin)->post(route('admin.lifecycle.deactivate', $this->acceptedUser));
+
+        $response->assertSessionHas('success');
+        $this->assertFalse($this->acceptedUser->fresh()->is_active);
+
+        $response = $this->actingAs($this->admin)->post(route('admin.lifecycle.reactivate', $this->acceptedUser));
+
+        $response->assertSessionHas('success');
+        $this->assertTrue($this->acceptedUser->fresh()->is_active);
+    }
 }
