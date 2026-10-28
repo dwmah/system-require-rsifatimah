@@ -93,6 +93,22 @@ class JobVacancy extends Model
     }
 
     /**
+     * Memeriksa apakah lowongan ini memiliki batasan kuota.
+     */
+    public function hasQuotaLimit(): bool
+    {
+        return ! is_null($this->quota) && $this->quota > 0;
+    }
+
+    /**
+     * Label kuota untuk tampilan (misal: "5 Orang" atau "Tidak Dibatasi").
+     */
+    public function getQuotaLabelAttribute(): string
+    {
+        return $this->hasQuotaLimit() ? "{$this->quota} Orang" : 'Tidak Dibatasi';
+    }
+
+    /**
      * Scope query untuk lowongan yang benar-benar aktif dibuka:
      * 1. Status lowongan OPEN
      * 2. Berada dalam rentang tanggal open_at s/d close_at

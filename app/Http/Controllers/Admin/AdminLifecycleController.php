@@ -114,10 +114,18 @@ class AdminLifecycleController extends Controller
     }
 
     /**
-     * Nonaktifkan akun pelamar yang lolos (Arsip data tetap tersimpan).
+     * Nonaktifkan akun pelamar yang diterima (Arsip data tetap tersimpan).
      */
     public function deactivate(User $user): RedirectResponse
     {
+        $hasAccepted = $user->jobApplications()
+            ->where('status', JobApplicationStatus::ACCEPTED)
+            ->exists();
+
+        if (! $hasAccepted) {
+            return back()->with('error', 'Hanya akun pelamar dengan status Diterima yang dapat dinonaktifkan.');
+        }
+
         $this->lifecycleService->deactivatePassedApplicant($user);
 
         return back()->with('success', "Akun pelamar {$user->name} berhasil dinonaktifkan. Seluruh berkas dan riwayat data tetap tersimpan sebagai arsip kepegawaian.");

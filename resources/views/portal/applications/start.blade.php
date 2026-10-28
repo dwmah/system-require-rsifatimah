@@ -54,7 +54,7 @@
                         </div>
                         <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
                             <span class="block text-[11px] text-slate-400 mb-0.5">Kebutuhan Kuota</span>
-                            <span class="text-xs font-bold text-slate-800">{{ $jobVacancy->quota }} Orang</span>
+                            <span class="text-xs font-bold text-slate-800">{{ $jobVacancy->hasQuotaLimit() ? $jobVacancy->quota . ' Orang' : 'Sesuai Kebutuhan' }}</span>
                         </div>
                         <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
                             <span class="block text-[11px] text-slate-400 mb-0.5">Penempatan</span>

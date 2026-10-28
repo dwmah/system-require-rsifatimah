@@ -226,7 +226,7 @@
                                     </div>
                                 </div>
                                 <div class="mt-2.5 pt-2 border-t {{ $isSelected ? 'border-sky-200' : 'border-slate-200' }} flex items-center justify-between text-xs text-slate-600">
-                                    <span>Kuota: <strong>{{ $vac->quota }}</strong></span>
+                                    <span>Kuota: <strong>{{ $vac->hasQuotaLimit() ? $vac->quota : 'Unlimited' }}</strong></span>
                                     <span>Pelamar: <strong>{{ $vac->total_applicants }}</strong> ({{ $vac->pending_count }} review)</span>
                                 </div>
                             </a>

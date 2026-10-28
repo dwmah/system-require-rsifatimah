@@ -165,10 +165,37 @@
                                     @endif
                                 </select>
                             </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-slate-700 mb-1">Kuota <span class="text-rose-500">*</span></label>
-                                <input type="number" name="quota" value="{{ old('quota', $vacancy->quota) }}" min="1" required
-                                       class="w-full h-11 px-3 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:border-[#0179B5] focus:bg-white">
+                            <div x-data="{ hasQuota: {{ old('has_quota', $vacancy->hasQuotaLimit()) ? 'true' : 'false' }} }" class="space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <label class="block text-sm font-semibold text-slate-700">
+                                        Batas Kuota Formasi
+                                    </label>
+                                    <label class="relative inline-flex items-center cursor-pointer select-none">
+                                        <input type="checkbox" name="has_quota" value="1" x-model="hasQuota" class="sr-only peer">
+                                        <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0179B5]"></div>
+                                        <span class="ml-2 text-xs font-semibold" :class="hasQuota ? 'text-[#0179B5]' : 'text-slate-500'" x-text="hasQuota ? 'Dibatasi' : 'Unlimited'"></span>
+                                    </label>
+                                </div>
+
+                                <div x-show="hasQuota" style="display: {{ old('has_quota', $vacancy->hasQuotaLimit()) ? 'block' : 'none' }};">
+                                    <div class="relative">
+                                        <input type="number" name="quota" x-bind:required="hasQuota" x-bind:disabled="!hasQuota"
+                                               value="{{ old('quota', $vacancy->quota ?? 1) }}" min="1"
+                                               placeholder="Masukkan jumlah kuota orang"
+                                               class="w-full h-11 px-3 pr-16 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:border-[#0179B5] focus:bg-white">
+                                        <span class="absolute right-3 top-3 text-xs font-semibold text-slate-400">Orang</span>
+                                    </div>
+                                    <p class="text-[11px] text-slate-500 mt-1">Kandidat lolos final dibatasi maksimal sesuai angka kuota ini.</p>
+                                </div>
+
+                                <div x-show="!hasQuota" style="display: {{ old('has_quota', $vacancy->hasQuotaLimit()) ? 'none' : 'flex' }};" class="p-2.5 rounded-lg bg-sky-50/70 border border-sky-100 flex items-center gap-2 text-sky-800 text-xs">
+                                    <svg class="w-4 h-4 shrink-0 text-[#0179B5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    <span><strong>Unlimited:</strong> Kuota tidak dibatasi / sesuai kebutuhan rekrutmen.</span>
+                                </div>
+
+                                @error('quota')
+                                    <p class="text-xs text-rose-500 mt-1">{{ $message }}</p>
+                                @enderror
                             </div>
                         </div>
 

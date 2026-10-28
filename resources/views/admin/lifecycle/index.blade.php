@@ -158,27 +158,29 @@
                                                 Lihat Berkas
                                             </a>
 
-                                            @if($app->user->is_active)
-                                                <form method="POST" action="{{ route('admin.lifecycle.deactivate', $app->user) }}">
-                                                    @csrf
-                                                    <button
-                                                        type="button"
-                                                        data-confirm="Nonaktifkan akun pelamar {{ $app->user->name }}? Data dan berkas lamaran tetap tersimpan utuh di arsip."
-                                                        data-confirm-title="Konfirmasi Nonaktifkan Akun"
-                                                        data-confirm-btn="Ya, Nonaktifkan Akun"
-                                                        data-confirm-variant="warning"
-                                                        class="px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 font-semibold rounded-lg text-xs transition-colors cursor-pointer"
-                                                    >
-                                                        Nonaktifkan Akun
-                                                    </button>
-                                                </form>
-                                            @else
-                                                <form method="POST" action="{{ route('admin.lifecycle.reactivate', $app->user) }}">
-                                                    @csrf
-                                                    <button type="submit" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg text-xs transition-colors">
-                                                        Aktifkan Lagi
-                                                    </button>
-                                                </form>
+                                            @if($app->isAccepted())
+                                                @if($app->user->is_active)
+                                                    <form method="POST" action="{{ route('admin.lifecycle.deactivate', $app->user) }}">
+                                                        @csrf
+                                                        <button
+                                                            type="button"
+                                                            data-confirm="Nonaktifkan akun pelamar {{ $app->user->name }}? Data dan berkas lamaran tetap tersimpan utuh di arsip."
+                                                            data-confirm-title="Konfirmasi Nonaktifkan Akun"
+                                                            data-confirm-btn="Ya, Nonaktifkan Akun"
+                                                            data-confirm-variant="warning"
+                                                            class="px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 font-semibold rounded-lg text-xs transition-colors cursor-pointer"
+                                                        >
+                                                            Nonaktifkan Akun
+                                                        </button>
+                                                    </form>
+                                                @else
+                                                    <form method="POST" action="{{ route('admin.lifecycle.reactivate', $app->user) }}">
+                                                        @csrf
+                                                        <button type="submit" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg text-xs transition-colors">
+                                                            Aktifkan Lagi
+                                                        </button>
+                                                    </form>
+                                                @endif
                                             @endif
                                         </div>
                                     </td>
