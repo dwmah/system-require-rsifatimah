@@ -126,6 +126,9 @@
                         <a href="{{ route('admin.timelines.index') }}" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.timelines*') ? 'bg-[#E6F2F8] text-[#0179B5]' : 'text-slate-700 hover:bg-slate-100' }}">
                             Timeline Seleksi
                         </a>
+                        <a href="{{ route('admin.guides.index') }}" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.guides*') ? 'bg-[#E6F2F8] text-[#0179B5]' : 'text-slate-700 hover:bg-slate-100' }}">
+                            Kelola Panduan
+                        </a>
                         <a href="{{ route('admin.lifecycle.index') }}" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.lifecycle*') ? 'bg-[#E6F2F8] text-[#0179B5]' : 'text-slate-700 hover:bg-slate-100' }}">
                             Siklus Akun / Arsip
                         </a>

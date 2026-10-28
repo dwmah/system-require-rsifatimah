@@ -37,13 +37,14 @@ class ApplicationDocumentService
             'application/pdf' => 'pdf',
             'image/jpeg', 'image/jpg' => 'jpg',
             'image/png' => 'png',
+            'video/mp4' => 'mp4',
             default => null,
         };
     }
 
     /**
      * Menormalisasi token format menjadi canonical MIME type standar.
-     * Mendukung token format ekstensi ('pdf', 'jpg', 'png') maupun MIME ('application/pdf').
+     * Mendukung token format ekstensi ('pdf', 'jpg', 'png', 'mp4') maupun MIME ('application/pdf', 'video/mp4').
      */
     public static function canonicalizeMimeToken(string $token): ?string
     {
@@ -53,6 +54,7 @@ class ApplicationDocumentService
             'pdf', 'application/pdf' => 'application/pdf',
             'jpg', 'jpeg', 'image/jpeg', 'image/jpg' => 'image/jpeg',
             'png', 'image/png' => 'image/png',
+            'mp4', 'video/mp4' => 'video/mp4',
             default => null,
         };
     }
@@ -168,6 +170,11 @@ class ApplicationDocumentService
         // 2. Verifikasi Status Draft & Unlocked
         if ($application->status !== JobApplicationStatus::DRAFT || $application->locked_at !== null) {
             throw new DomainException('Tidak dapat mengunggah berkas pada lamaran yang telah dikirim atau dikunci.');
+        }
+
+        // 2.1 Verifikasi Batas Waktu Pengumpulan Berkas (Deadline Check)
+        if ($application->isSubmissionDeadlinePassed()) {
+            throw new DomainException('Batas waktu pengumpulan berkas telah berakhir.');
         }
 
         // 3. Validasi Berkas Server-side

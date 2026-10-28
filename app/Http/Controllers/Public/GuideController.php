@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
+use App\Models\RecruitmentGuide;
 use Illuminate\View\View;
 
 class GuideController extends Controller
@@ -12,7 +13,15 @@ class GuideController extends Controller
      */
     public function flow(): View
     {
-        return view('public.guides.flow');
+        $guide = RecruitmentGuide::query()
+            ->flow()
+            ->active()
+            ->orderBy('sort_order')
+            ->first();
+
+        return view('public.guides.flow', [
+            'guide' => $guide,
+        ]);
     }
 
     /**
@@ -20,6 +29,14 @@ class GuideController extends Controller
      */
     public function requirements(): View
     {
-        return view('public.guides.requirements');
+        $guide = RecruitmentGuide::query()
+            ->requirements()
+            ->active()
+            ->orderBy('sort_order')
+            ->first();
+
+        return view('public.guides.requirements', [
+            'guide' => $guide,
+        ]);
     }
 }

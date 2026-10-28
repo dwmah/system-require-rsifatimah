@@ -18,6 +18,8 @@ class DatabaseSeeder extends Seeder
             AdminUserSeeder::class,
             RecruitmentPeriodSeeder::class,
             JobVacancySeeder::class,
+            RecruitmentGuideSeeder::class,
+            SelectionStageTemplateSeeder::class,
         ]);
     }
 }

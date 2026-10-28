@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Enums\JobApplicationStatus;
 use App\Http\Controllers\Controller;
 use App\Models\ApplicationDocument;
+use App\Models\ApplicationStageHistory;
 use App\Models\JobApplication;
 use App\Models\JobVacancy;
 use App\Models\VacancySelectionStage;
@@ -18,6 +19,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use ZipArchive;
 
 class AdminApplicationController extends Controller
@@ -272,6 +274,7 @@ class AdminApplicationController extends Controller
             'stage_id' => 'required|exists:vacancy_selection_stages,id',
             'status' => 'required|in:passed,rejected,failed,in_progress,pending',
             'stage_note' => 'nullable|string|max:1000',
+            'stage_attachment' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
         ]);
 
         $stage = VacancySelectionStage::findOrFail($request->stage_id);
@@ -286,10 +289,11 @@ class AdminApplicationController extends Controller
                 $application,
                 $stage,
                 $request->status,
-                $request->stage_note
+                $request->stage_note,
+                $request->file('stage_attachment')
             );
         } catch (ValidationException $e) {
-            $errorMessage = $e->errors()['quota'][0] ?? $e->getMessage();
+            $errorMessage = $e->errors()['quota'][0] ?? $e->errors()['stage_attachment'][0] ?? $e->getMessage();
 
             return redirect()->to(route('admin.applications.show', ['application' => $application, 'tab' => 'tahapan']).'#tahapan-timeline')
                 ->with('error', $errorMessage);
@@ -297,6 +301,34 @@ class AdminApplicationController extends Controller
 
         return redirect()->to(route('admin.applications.show', ['application' => $application, 'tab' => 'tahapan']).'#stage-item-'.$stage->id)
             ->with('success', "Tahapan seleksi '{$stage->stage_name}' berhasil diperbarui.");
+    }
+
+    /**
+     * Download berkas lampiran hasil tes pada tahapan seleksi tertentu.
+     */
+    public function downloadStageAttachment(JobApplication $application, ApplicationStageHistory $history): StreamedResponse|BinaryFileResponse|RedirectResponse
+    {
+        if ((int) $history->job_application_id !== (int) $application->id) {
+            abort(404, 'Data riwayat tahapan seleksi tidak sesuai dengan lamaran ini.');
+        }
+
+        if (! $history->attachment_path || ! Storage::disk('local')->exists($history->attachment_path)) {
+            abort(404, 'Berkas lampiran tidak ditemukan di penyimpanan server.');
+        }
+
+        $filename = $history->attachment_original_name ?: basename($history->attachment_path);
+        $mime = $history->attachment_mime ?: 'application/octet-stream';
+
+        if (request()->boolean('preview')) {
+            return Storage::disk('local')->response($history->attachment_path, $filename, [
+                'Content-Type' => $mime,
+                'Content-Disposition' => 'inline; filename="'.$filename.'"',
+            ]);
+        }
+
+        return Storage::disk('local')->download($history->attachment_path, $filename, [
+            'Content-Type' => $mime,
+        ]);
     }
 
     /**

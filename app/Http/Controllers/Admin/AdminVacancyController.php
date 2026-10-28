@@ -6,6 +6,7 @@ use App\Enums\JobVacancyStatus;
 use App\Http\Controllers\Controller;
 use App\Models\JobVacancy;
 use App\Models\RecruitmentPeriod;
+use App\Models\SelectionStageTemplate;
 use App\Models\VacancyDocumentRequirement;
 use App\Models\VacancyQualification;
 use App\Models\VacancySelectionStage;
@@ -63,9 +64,11 @@ class AdminVacancyController extends Controller
     public function create(): View
     {
         $periods = RecruitmentPeriod::latest()->get();
+        $stageTemplates = SelectionStageTemplate::orderByDesc('is_default')->latest()->get();
 
         return view('admin.vacancies.create', [
             'periods' => $periods,
+            'stageTemplates' => $stageTemplates,
         ]);
     }
 
@@ -279,10 +282,12 @@ class AdminVacancyController extends Controller
     {
         $vacancy->load(['qualifications', 'documentRequirements', 'selectionStages']);
         $periods = RecruitmentPeriod::latest()->get();
+        $stageTemplates = SelectionStageTemplate::orderByDesc('is_default')->latest()->get();
 
         return view('admin.vacancies.edit', [
             'vacancy' => $vacancy,
             'periods' => $periods,
+            'stageTemplates' => $stageTemplates,
         ]);
     }
 

@@ -98,7 +98,20 @@
                       },
 
                       // Section 4: Tahapan Seleksi & Batas Waktu
+                      stageTemplates: {{ Js::from($stageTemplates) }},
                       stages: {{ Js::from($stageData) }},
+                      applyStageTemplate(templateId) {
+                          const tpl = this.stageTemplates.find(t => t.id == templateId);
+                          if (tpl && tpl.stages_data && Array.isArray(tpl.stages_data)) {
+                              this.stages = tpl.stages_data.map(s => ({
+                                  id: null,
+                                  name: s.name || '',
+                                  desc: s.description || '',
+                                  start_at: s.start_date ? s.start_date.substring(0, 10) : '',
+                                  end_at: s.end_date ? s.end_date.substring(0, 10) : ''
+                              }));
+                          }
+                      },
                       addStage() {
                           this.stages.push({ id: null, name: '', desc: '', start_at: '', end_at: '' });
                       },
@@ -317,16 +330,31 @@
                                     </div>
                                 </div>
 
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                                    <div>
+                                <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 text-sm">
+                                    <div class="sm:col-span-5">
                                         <input type="text" :name="'document_descriptions[' + index + ']'" x-model="doc.desc"
                                                placeholder="Petunjuk / keterangan khusus dokumen (opsional)"
                                                class="w-full h-9 px-3 text-sm bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-[#0179B5]">
                                     </div>
-                                    <div class="flex items-center gap-2">
-                                        <input type="hidden" :name="'document_mimes[' + index + ']'" :value="doc.mimes || 'application/pdf'">
-                                        <input type="hidden" :name="'document_max_sizes[' + index + ']'" :value="doc.max_size || 5120">
-                                        <span class="text-xs text-slate-500 font-mono">Format: PDF &bull; Maks 5 MB</span>
+                                    <div class="sm:col-span-4">
+                                        <select :name="'document_mimes[' + index + ']'" x-model="doc.mimes"
+                                                @change="if (doc.mimes === 'video/mp4' && (!doc.max_size || doc.max_size < 20480)) { doc.max_size = 20480; } else if (doc.mimes !== 'video/mp4' && doc.max_size > 10240) { doc.max_size = 5120; }"
+                                                class="w-full h-9 px-2 text-xs bg-white border border-slate-300 rounded-lg focus:outline-none focus:border-[#0179B5]">
+                                            <option value="application/pdf">Dokumen PDF (.pdf)</option>
+                                            <option value="image/jpeg,image/png">Gambar (.jpg, .png)</option>
+                                            <option value="application/pdf,image/jpeg,image/png">Dokumen/Gambar (.pdf, .jpg, .png)</option>
+                                            <option value="video/mp4">Video MP4 (.mp4)</option>
+                                        </select>
+                                    </div>
+                                    <div class="sm:col-span-3">
+                                        <select :name="'document_max_sizes[' + index + ']'" x-model.number="doc.max_size"
+                                                class="w-full h-9 px-2 text-xs bg-white border border-slate-300 rounded-lg focus:outline-none focus:border-[#0179B5]">
+                                            <option value="2048">Maks 2 MB</option>
+                                            <option value="5120">Maks 5 MB</option>
+                                            <option value="10240">Maks 10 MB</option>
+                                            <option value="20480">Maks 20 MB</option>
+                                            <option value="51200">Maks 50 MB</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -350,9 +378,23 @@
                             <p class="text-sm text-slate-500 mt-0.5">Edit tahapan seleksi beserta tanggal mulai dan batas waktu (deadline) terakhir</p>
                         </div>
 
-                        <button type="button" @click="addStage()" class="text-sm text-[#0179B5] hover:underline font-semibold flex items-center gap-1">
-                            + Tambah Tahapan
-                        </button>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            @if(count($stageTemplates) > 0)
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-xs text-slate-500 font-medium">Gunakan Template:</span>
+                                    <select @change="if ($event.target.value) applyStageTemplate($event.target.value)" class="h-9 px-2 text-xs bg-sky-50 border border-sky-300 text-[#0179B5] font-semibold rounded-lg focus:outline-none">
+                                        <option value="">-- Pilih Template --</option>
+                                        @foreach($stageTemplates as $tpl)
+                                            <option value="{{ $tpl->id }}">{{ $tpl->name }} {{ $tpl->is_default ? '(Default)' : '' }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            @endif
+
+                            <button type="button" @click="addStage()" class="text-sm text-[#0179B5] hover:underline font-semibold flex items-center gap-1">
+                                + Tambah Tahapan
+                            </button>
+                        </div>
                     </div>
 
                     <div class="space-y-3">
