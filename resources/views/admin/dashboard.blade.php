@@ -7,17 +7,6 @@
                 <p class="text-sm text-slate-500 mt-0.5">Ringkasan aktivitas seleksi dan status penerimaan karyawan RSI Fatimah Banyuwangi</p>
             </div>
             <div class="flex items-center gap-3">
-                @if($activePeriod)
-                    <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-50 border border-emerald-200 rounded-lg text-xs font-semibold text-emerald-800">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <span>Periode Aktif: {{ $activePeriod->name }}</span>
-                    </div>
-                @else
-                    <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-50 border border-amber-200 rounded-lg text-xs font-semibold text-amber-800">
-                        <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-                        <span>Tidak Ada Periode Aktif</span>
-                    </div>
-                @endif
                 <a href="{{ route('admin.vacancies.create') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-[#0179B5] hover:bg-[#016293] text-white text-xs font-semibold rounded-lg shadow-sm transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                     <span>Buat Lowongan Baru</span>

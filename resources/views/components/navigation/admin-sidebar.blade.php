@@ -91,15 +91,4 @@
             </nav>
         </div>
     </div>
-
-    <!-- Sisi Bawah: Info Server & Mode -->
-    <div class="px-5">
-        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl">
-            <div class="flex items-center gap-2">
-                <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                <span class="text-sm font-semibold text-slate-800">Sistem Rekrutmen SDI</span>
-            </div>
-            <p class="text-xs text-slate-500 mt-1">RSI Fatimah Banyuwangi</p>
-        </div>
-    </div>
 </aside>

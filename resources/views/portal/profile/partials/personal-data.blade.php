@@ -109,22 +109,6 @@
                     <div>
                         <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 mb-1">
                             <h4 class="text-sm font-bold text-slate-900">Pas Foto Formal (3x4)</h4>
-
-                            <template x-if="hasNewPhoto">
-                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-sky-50 text-sky-700 border border-sky-200">
-                                    FOTO BARU DIPILIH
-                                </span>
-                            </template>
-                            <template x-if="removePhoto && !hasNewPhoto">
-                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">
-                                    AKAN DIHAPUS
-                                </span>
-                            </template>
-                            <template x-if="!hasNewPhoto && !removePhoto">
-                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold {{ $profile?->photo_url ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200' }}">
-                                    {{ $profile?->photo_url ? 'DIUNGGAH' : 'WAJIB PROFIL LENGKAP' }}
-                                </span>
-                            </template>
                         </div>
                         <p class="text-xs text-slate-500 leading-relaxed">
                             Pas foto formal berlatar belakang polos untuk identitas resmi dan kartu seleksi penerimaan karyawan. Format JPG, PNG, atau WEBP (maks. 5 MB).

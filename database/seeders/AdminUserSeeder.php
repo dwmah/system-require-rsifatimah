@@ -16,7 +16,7 @@ class AdminUserSeeder extends Seeder
         User::updateOrCreate(
             ['email' => 'admin@rsifatimah.com'],
             [
-                'name' => 'Tim SDI RSI Fatimah Banyuwangi',
+                'name' => 'Admin',
                 'role' => User::ROLE_ADMIN,
                 'password' => Hash::make('password123'),
                 'phone' => '081234567890',
