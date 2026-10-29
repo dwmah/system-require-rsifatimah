@@ -265,7 +265,7 @@ class RecruitmentFullWorkflowTest extends TestCase
         $response = $this->actingAs($this->applicant)->post(route('portal.applications.acknowledge', $application));
         $response->assertRedirect(route('login'));
         $this->assertGuest();
-        $this->assertDatabaseMissing('users', ['id' => $this->applicant->id]);
+        $this->assertSoftDeleted('users', ['id' => $this->applicant->id]);
     }
 
     public function test_user_lifecycle_service_handles_deactivation_and_cleanup(): void
@@ -283,9 +283,9 @@ class RecruitmentFullWorkflowTest extends TestCase
         $this->applicant->refresh();
         $this->assertTrue($this->applicant->is_active);
 
-        // 3. Cleanup rejected candidate
+        // 3. Cleanup rejected candidate (Soft deleted so CV/portfolio remain in talent pool)
         $lifecycleService->cleanupRejectedApplicant($this->applicant);
-        $this->assertDatabaseMissing('users', ['id' => $this->applicant->id]);
+        $this->assertSoftDeleted('users', ['id' => $this->applicant->id]);
     }
 
     public function test_admin_dashboard_can_be_accessed(): void

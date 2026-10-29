@@ -240,11 +240,11 @@ class AdminVacancyController extends Controller
 
             if (! $hasValidStages && empty($stageNames)) {
                 $defaultStages = [
-                    'Pendaftaran Online & Review Portofolio',
+                    'Pendaftaran Peserta Rekrutmen',
                     'Seleksi Administrasi',
-                    'Ujian Tulis & Kompetensi Bidang',
-                    'Wawancara SDI & Direksi',
-                    'Medical Check-Up (MCU)',
+                    'Seleksi test tulis, test skill, Test Wawancara',
+                    'Seleksi test psikologi dan test kesehatan',
+                    'Masa Orientasi Magang Dokter Umum Baru (atau Karyawan Baru)',
                 ];
 
                 foreach ($defaultStages as $idx => $sName) {

@@ -47,11 +47,11 @@
                 ])->values();
                 if ($stageData->isEmpty()) {
                     $stageData = collect([
-                        ['id' => null, 'name' => 'Pendaftaran Online & Review Portofolio', 'desc' => 'Pemeriksaan kelengkapan berkas biodata dan portofolio pelamar', 'start_at' => now()->format('Y-m-d'), 'end_at' => now()->addDays(7)->format('Y-m-d')],
-                        ['id' => null, 'name' => 'Seleksi Administrasi', 'desc' => 'Verifikasi kelengkapan dan keabsahan berkas lamaran', 'start_at' => now()->addDays(8)->format('Y-m-d'), 'end_at' => now()->addDays(12)->format('Y-m-d')],
-                        ['id' => null, 'name' => 'Ujian Tulis & Kompetensi Bidang', 'desc' => 'Tes kemampuan teknis dan pengetahuan umum keislaman/kesehatan', 'start_at' => now()->addDays(13)->format('Y-m-d'), 'end_at' => now()->addDays(17)->format('Y-m-d')],
-                        ['id' => null, 'name' => 'Wawancara SDI & Direksi', 'desc' => 'Wawancara kompetensi kerja, kepribadian, dan komitmen', 'start_at' => now()->addDays(18)->format('Y-m-d'), 'end_at' => now()->addDays(22)->format('Y-m-d')],
-                        ['id' => null, 'name' => 'Medical Check-Up (MCU)', 'desc' => 'Pemeriksaan kesehatan fisik bebas narkoba dan penyakit menular', 'start_at' => now()->addDays(23)->format('Y-m-d'), 'end_at' => now()->addDays(25)->format('Y-m-d')],
+                        ['id' => null, 'name' => 'Pendaftaran Peserta Rekrutmen', 'desc' => 'Pendaftaran akun peserta rekrutmen dan verifikasi kelayakan biodata data diri pelamar', 'start_at' => now()->format('Y-m-d'), 'end_at' => now()->addDays(5)->format('Y-m-d')],
+                        ['id' => null, 'name' => 'Seleksi Administrasi', 'desc' => 'Pemeriksaan dan verifikasi keabsahan seluruh berkas dokumen persyaratan (CV, Portofolio, Ijazah, dll) serta pengumuman hasil seleksi berkas', 'start_at' => now()->addDays(6)->format('Y-m-d'), 'end_at' => now()->addDays(10)->format('Y-m-d')],
+                        ['id' => null, 'name' => 'Seleksi test tulis, test skill, Test Wawancara', 'desc' => 'Tes kemampuan teknis, skill tindakan medis/teknis, wawancara direksi dan pengumuman lolos tahap 3', 'start_at' => now()->addDays(11)->format('Y-m-d'), 'end_at' => now()->addDays(16)->format('Y-m-d')],
+                        ['id' => null, 'name' => 'Seleksi test psikologi dan test kesehatan', 'desc' => 'Psikotes dan tes kesehatan/MCU fisik di RS serta pengumuman lolos tahap 4', 'start_at' => now()->addDays(17)->format('Y-m-d'), 'end_at' => now()->addDays(22)->format('Y-m-d')],
+                        ['id' => null, 'name' => 'Masa Orientasi Magang Dokter Umum Baru (atau Karyawan Baru)', 'desc' => 'Pembekalan nilai Al-Islam, orientasi mutu dan keselamatan pasien serta penugasan orientasi kerja', 'start_at' => now()->addDays(23)->format('Y-m-d'), 'end_at' => now()->addDays(30)->format('Y-m-d')],
                     ]);
                 }
             @endphp
