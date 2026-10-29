@@ -186,20 +186,23 @@ class AdminVacancyController extends Controller
             }
 
             if (! $hasValidCustomDocs && empty($docNames)) {
-                // Default persyaratan sesuai standar RSI Fatimah
+                // Default persyaratan sesuai standar RSI Fatimah (mencakup CV & Portofolio)
                 $defaultDocs = [
-                    ['name' => 'Surat Lamaran Kerja', 'required' => true],
-                    ['name' => 'Ijazah Terakhir Legalisir', 'required' => true],
-                    ['name' => 'STR / Sertifikat Keahlian Aktif', 'required' => true],
-                    ['name' => 'SKCK (Kepolisian)', 'required' => false],
-                    ['name' => 'Rekomendasi Profesi / Ormas', 'required' => false],
-                    ['name' => 'Dokumen Pendukung Lainnya', 'required' => false],
+                    ['name' => 'Surat Lamaran Kerja', 'description' => 'Ditujukan kepada Direktur RSI Fatimah Banyuwangi', 'required' => true],
+                    ['name' => 'Curriculum Vitae (CV)', 'description' => 'Daftar riwayat hidup lengkap dan nomor kontak aktif', 'required' => true],
+                    ['name' => 'Portofolio / Berkas Karya', 'description' => 'Portofolio karya, pengalaman kerja, atau sertifikat kompetensi', 'required' => true],
+                    ['name' => 'Ijazah Terakhir Legalisir', 'description' => 'Scan ijazah asli / legalisir perguruan tinggi', 'required' => true],
+                    ['name' => 'Transkrip Nilai Akademik', 'description' => 'Scan transkrip nilai akademik legalisir', 'required' => true],
+                    ['name' => 'STR / Sertifikat Keahlian Aktif', 'description' => 'Wajib bagi tenaga medis/kesehatan yang disyaratkan', 'required' => false],
+                    ['name' => 'SKCK (Kepolisian)', 'description' => 'Surat catatan kepolisian yang masih berlaku', 'required' => false],
+                    ['name' => 'Dokumen Pendukung Lainnya', 'description' => 'Sertifikat pelatihan atau berkas pendukung lainnya', 'required' => false],
                 ];
 
                 foreach ($defaultDocs as $idx => $doc) {
                     VacancyDocumentRequirement::create([
                         'job_vacancy_id' => $vacancy->id,
                         'name' => $doc['name'],
+                        'description' => $doc['description'] ?? null,
                         'is_required' => $doc['required'],
                         'allowed_mimes' => 'application/pdf',
                         'max_size_kb' => 5120,

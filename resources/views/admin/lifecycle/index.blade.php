@@ -242,40 +242,73 @@
                                 <th class="py-3 px-4">Nama Pelamar</th>
                                 <th class="py-3 px-4">Formasi</th>
                                 <th class="py-3 px-4">Alasan Penolakan</th>
-                                <th class="py-3 px-4 text-center">Status Pengumuman</th>
+                                <th class="py-3 px-4">Berkas Talent Pool (CV / Portofolio)</th>
                                 <th class="py-3 px-4 text-center">Status Akun</th>
                                 <th class="py-3 px-4 text-right">Aksi Manajemen</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 text-sm">
                             @forelse ($rejectedApplications as $app)
-                                <tr class="hover:bg-slate-50 transition-colors">
+                                @php
+                                    $isArchived = $app->user?->trashed();
+                                    $cvDoc = $app->documents->first(fn($d) => str_contains(strtolower($d->documentRequirement?->name ?? ''), 'cv') || str_contains(strtolower($d->documentRequirement?->name ?? ''), 'curriculum vitae'));
+                                    $portoDoc = $app->documents->first(fn($d) => str_contains(strtolower($d->documentRequirement?->name ?? ''), 'portofolio') || str_contains(strtolower($d->documentRequirement?->name ?? ''), 'karya'));
+                                    $otherDocs = $app->documents->filter(fn($d) => $d->id !== $cvDoc?->id && $d->id !== $portoDoc?->id);
+                                @endphp
+                                <tr class="hover:bg-slate-50 transition-colors {{ $isArchived ? 'bg-amber-50/20' : '' }}">
                                     <td class="py-3.5 px-4">
                                         <div class="font-bold text-slate-900">{{ $app->user->name ?? 'User Telah Dihapus' }}</div>
                                         <div class="text-xs text-slate-500 mt-0.5">{{ $app->user->email ?? '-' }}</div>
+                                        @if($app->announcement_seen_at)
+                                            <span class="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-700 mt-1">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                                Dibuka pelamar: {{ $app->announcement_seen_at->format('d/m/y H:i') }}
+                                            </span>
+                                        @else
+                                            <span class="inline-block text-[11px] text-slate-400 mt-1">Belum dibuka</span>
+                                        @endif
                                     </td>
                                     <td class="py-3.5 px-4 font-medium text-slate-700">
                                         {{ $app->jobVacancy->title }}
                                     </td>
-                                    <td class="py-3.5 px-4 text-slate-600 max-w-[250px] truncate" title="{{ $app->rejection_reason }}">
+                                    <td class="py-3.5 px-4 text-slate-600 max-w-[200px] truncate" title="{{ $app->rejection_reason }}">
                                         {{ $app->rejection_reason ?? 'Berkas tidak lengkap' }}
                                     </td>
-                                    <td class="py-3.5 px-4 text-center">
-                                        @if($app->announcement_seen_at)
-                                            <span class="inline-block px-2.5 py-0.5 text-xs font-semibold bg-emerald-100 text-emerald-800 rounded-full">
-                                                ✓ Dibuka ({{ $app->announcement_seen_at->format('d/m/y H:i') }})
-                                            </span>
-                                        @else
-                                            <span class="inline-block px-2.5 py-0.5 text-xs font-semibold bg-slate-100 text-slate-600 rounded-full">
-                                                Belum Dibuka Pelamar
-                                            </span>
-                                        @endif
+                                    <td class="py-3.5 px-4">
+                                        <div class="flex flex-col gap-1.5">
+                                            @if($cvDoc)
+                                                <a href="{{ route('documents.preview', $cvDoc) }}" target="_blank"
+                                                   class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-sky-50 text-[#0179B5] hover:bg-sky-100 text-xs font-semibold border border-sky-200 transition-colors w-fit">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                                    <span>CV Pelamar</span>
+                                                </a>
+                                            @endif
+
+                                            @if($portoDoc)
+                                                <a href="{{ route('documents.preview', $portoDoc) }}" target="_blank"
+                                                   class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-indigo-50 text-indigo-700 hover:bg-indigo-100 text-xs font-semibold border border-indigo-200 transition-colors w-fit">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                                                    <span>Portofolio Karya</span>
+                                                </a>
+                                            @endif
+
+                                            @if(!$cvDoc && !$portoDoc)
+                                                <span class="text-xs text-slate-400 italic">Tidak ada lampiran khusus</span>
+                                            @endif
+
+                                            @if($otherDocs->isNotEmpty())
+                                                <span class="text-[11px] text-slate-500">
+                                                    + {{ $otherDocs->count() }} berkas lainnya
+                                                </span>
+                                            @endif
+                                        </div>
                                     </td>
                                     <td class="py-3.5 px-4 text-center">
-                                        @if($app->user?->trashed())
+                                        @if($isArchived)
                                             <span class="inline-block px-2.5 py-0.5 text-xs font-bold bg-amber-100 text-amber-800 rounded-full border border-amber-200">
                                                 Akun Diarsipkan / Soft Deleted
                                             </span>
+                                            <span class="text-[11px] text-slate-400 block mt-0.5">Berkas Utuh Tersimpan</span>
                                         @else
                                             <span class="inline-block px-2.5 py-0.5 text-xs font-bold bg-emerald-100 text-emerald-800 rounded-full">
                                                 Akun Aktif
@@ -283,12 +316,12 @@
                                         @endif
                                     </td>
                                     <td class="py-3.5 px-4 text-right">
-                                        <div class="flex items-center justify-end gap-2">
+                                        <div class="flex items-center justify-end gap-2 flex-wrap">
                                             <a href="{{ route('admin.applications.show', $app) }}" class="px-3 py-1.5 bg-sky-50 text-[#0179B5] hover:bg-sky-100 font-semibold rounded-lg text-xs transition-colors">
-                                                Lihat Berkas
+                                                Semua Berkas
                                             </a>
 
-                                            @if($app->user && ! $app->user->trashed())
+                                            @if($app->user && ! $isArchived)
                                                 <form method="POST" action="{{ route('admin.lifecycle.cleanup', $app->user) }}" class="inline">
                                                     @csrf
                                                     @method('DELETE')
@@ -301,6 +334,21 @@
                                                         class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold rounded-lg text-xs transition-colors cursor-pointer"
                                                     >
                                                         Arsipkan Akun
+                                                    </button>
+                                                </form>
+                                            @elseif($app->user && $isArchived)
+                                                <form method="POST" action="{{ route('admin.lifecycle.force-delete', $app->user->id) }}" class="inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button
+                                                        type="button"
+                                                        data-confirm="PERINGATAN: Anda akan menghapus akun pelamar {{ $app->user->name }} SECARA PERMANEN beserta seluruh berkas dokumen fisik di server. Tindakan ini TIDAK BISA DIBATALKAN. Lanjutkan?"
+                                                        data-confirm-title="Hapus Permanen Akun &amp; Berkas"
+                                                        data-confirm-btn="Ya, Hapus Permanen"
+                                                        data-confirm-variant="danger"
+                                                        class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg text-xs shadow-xs transition-colors cursor-pointer"
+                                                    >
+                                                        Hapus Permanen
                                                     </button>
                                                 </form>
                                             @endif

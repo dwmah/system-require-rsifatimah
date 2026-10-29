@@ -29,10 +29,12 @@
                       // Section 3: Persyaratan Dokumen
                       documents: [
                           { name: 'Surat Lamaran Kerja', desc: 'Ditujukan kepada Direktur RSI Fatimah', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
+                          { name: 'Curriculum Vitae (CV)', desc: 'Riwayat hidup lengkap dan nomor kontak aktif', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
+                          { name: 'Portofolio / Berkas Karya', desc: 'Portofolio pengalaman kerja atau sertifikat kompetensi', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
                           { name: 'Ijazah Terakhir Legalisir', desc: 'Scan asli ijazah pendidikan formal', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
-                          { name: 'STR / Sertifikat Keahlian Aktif', desc: 'Wajib masih berlaku aktif', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
+                          { name: 'Transkrip Nilai Akademik', desc: 'Scan transkrip nilai akademik legalisir', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
+                          { name: 'STR / Sertifikat Keahlian Aktif', desc: 'Wajib masih berlaku aktif bagi tenaga medis/kesehatan', mandatory: 0, mimes: 'application/pdf', max_size: 5120 },
                           { name: 'SKCK (Kepolisian)', desc: 'Surat Keterangan Catatan Kepolisian', mandatory: 0, mimes: 'application/pdf', max_size: 5120 },
-                          { name: 'Rekomendasi Profesi / Ormas', desc: 'Surat rekomendasi bila ada', mandatory: 0, mimes: 'application/pdf', max_size: 5120 },
                           { name: 'Dokumen Pendukung Lainnya', desc: 'Sertifikat pelatihan / seminar terkait', mandatory: 0, mimes: 'application/pdf', max_size: 5120 }
                       ],
                       addDoc() {
@@ -45,6 +47,8 @@
                           if (type === 'medis') {
                               this.documents = [
                                   { name: 'Surat Lamaran Kerja', desc: 'Ditujukan kepada Direktur RSI Fatimah', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
+                                  { name: 'Curriculum Vitae (CV)', desc: 'Riwayat hidup lengkap dan nomor kontak aktif', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
+                                  { name: 'Portofolio Klinis / Berkas Pengalaman', desc: 'Portofolio kasus / pengalaman praktik klinis', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
                                   { name: 'Ijazah Profesi / Terakhir', desc: 'Scan ijazah asli legalisir', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
                                   { name: 'Transkrip Nilai Akademik', desc: 'Scan transkrip nilai akademik legalisir', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
                                   { name: 'STR (Surat Tanda Registrasi) Aktif', desc: 'Wajib masih aktif dari MTKI / KKI', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
