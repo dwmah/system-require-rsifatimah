@@ -10,8 +10,11 @@ use App\Models\JobApplication;
 use App\Models\User;
 use App\Models\VacancySelectionStage;
 use App\Services\Notification\RecruitmentNotificationService;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class ApplicationVerificationService
@@ -363,7 +366,8 @@ class ApplicationVerificationService
         JobApplication $application,
         VacancySelectionStage $stage,
         string $status, // passed, rejected/failed, pending, in_progress
-        ?string $note = null
+        ?string $note = null,
+        ?UploadedFile $attachment = null
     ): JobApplication {
         $stageStatus = match ($status) {
             'passed' => ApplicationStageStatus::PASSED,
@@ -372,19 +376,51 @@ class ApplicationVerificationService
             default => ApplicationStageStatus::PENDING,
         };
 
-        return DB::transaction(function () use ($application, $stage, $stageStatus, $note) {
+        if ($attachment !== null) {
+            $allowedMimes = ['application/pdf', 'image/jpeg', 'image/png'];
+            $mime = $attachment->getMimeType();
+            $size = $attachment->getSize();
+
+            if (! in_array($mime, $allowedMimes, true) || $size > 10 * 1024 * 1024) {
+                throw ValidationException::withMessages([
+                    'stage_attachment' => 'Lampiran harus berupa file PDF, JPG, atau PNG maksimal 10 MB.',
+                ]);
+            }
+        }
+
+        return DB::transaction(function () use ($application, $stage, $stageStatus, $note, $attachment) {
+            $historyData = [
+                'status' => $stageStatus,
+                'decided_at' => in_array($stageStatus, [ApplicationStageStatus::PASSED, ApplicationStageStatus::FAILED]) ? now() : null,
+                'note' => $note,
+                'published_at' => now(),
+                'applicant_message' => $note,
+            ];
+
+            if ($attachment !== null) {
+                $existingHistory = ApplicationStageHistory::where('job_application_id', $application->id)
+                    ->where('vacancy_selection_stage_id', $stage->id)
+                    ->first();
+
+                if ($existingHistory && $existingHistory->attachment_path && Storage::disk('local')->exists($existingHistory->attachment_path)) {
+                    Storage::disk('local')->delete($existingHistory->attachment_path);
+                }
+
+                $extension = $attachment->getClientOriginalExtension() ?: 'bin';
+                $storedName = Str::uuid()->toString().'.'.$extension;
+                $path = $attachment->storeAs("stage_attachments/{$application->id}", $storedName, 'local');
+
+                $historyData['attachment_path'] = $path;
+                $historyData['attachment_original_name'] = $attachment->getClientOriginalName();
+                $historyData['attachment_mime'] = $attachment->getMimeType();
+            }
+
             ApplicationStageHistory::updateOrCreate(
                 [
                     'job_application_id' => $application->id,
                     'vacancy_selection_stage_id' => $stage->id,
                 ],
-                [
-                    'status' => $stageStatus,
-                    'decided_at' => in_array($stageStatus, [ApplicationStageStatus::PASSED, ApplicationStageStatus::FAILED]) ? now() : null,
-                    'note' => $note,
-                    'published_at' => now(),
-                    'applicant_message' => $note,
-                ]
+                $historyData
             );
 
             if ($stageStatus === ApplicationStageStatus::PASSED) {

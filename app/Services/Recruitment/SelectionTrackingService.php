@@ -142,7 +142,7 @@ class SelectionTrackingService
         }
 
         $snapshot = $application->snapshot;
-        if (! $snapshot || empty($snapshot->vacancy_data['selection_stages'])) {
+        if (! $snapshot) {
             return [
                 'has_snapshot' => false,
                 'is_draft' => false,
@@ -150,7 +150,41 @@ class SelectionTrackingService
             ];
         }
 
-        $stages = $snapshot->vacancy_data['selection_stages'];
+        $stages = $snapshot->vacancy_data['selection_stages'] ?? [];
+
+        $liveStages = $application->jobVacancy
+            ? $application->jobVacancy->selectionStages()->orderBy('sort_order')->get()
+            : collect();
+        $liveStagesById = $liveStages->keyBy('id');
+
+        // Merge / reconcile: sertakan setiap tahapan live yang belum ada di snapshot
+        $snapshotStageIds = [];
+        foreach ($stages as $stage) {
+            if (isset($stage['id'])) {
+                $snapshotStageIds[] = (int) $stage['id'];
+            }
+        }
+
+        foreach ($liveStages as $liveStage) {
+            if (! in_array((int) $liveStage->id, $snapshotStageIds, true)) {
+                $stages[] = [
+                    'id' => (int) $liveStage->id,
+                    'name' => (string) ($liveStage->name ?? 'Tahapan Seleksi'),
+                    'description' => $liveStage->description,
+                    'sort_order' => (int) ($liveStage->sort_order ?? (count($stages) + 1)),
+                    'start_at' => $liveStage->start_at?->toIso8601String(),
+                    'end_at' => $liveStage->end_at?->toIso8601String(),
+                ];
+            }
+        }
+
+        if (empty($stages)) {
+            return [
+                'has_snapshot' => true,
+                'is_draft' => false,
+                'stages' => [],
+            ];
+        }
 
         usort($stages, fn ($a, $b) => ($a['sort_order'] ?? 0) <=> ($b['sort_order'] ?? 0));
 
@@ -161,11 +195,9 @@ class SelectionTrackingService
         $hasFailedBefore = false;
         $currentStageIdentified = false;
 
-        $liveStages = $application->jobVacancy?->selectionStages?->keyBy('id') ?? collect();
-
         foreach ($stages as $stage) {
             $stageId = (int) ($stage['id'] ?? 0);
-            $liveStage = $liveStages->get($stageId);
+            $liveStage = $liveStagesById->get($stageId);
             $history = $histories->get($stageId);
             $isPublished = $this->isStagePublished($history);
 
@@ -246,6 +278,21 @@ class SelectionTrackingService
             $requiresAction = ($publicState === 'in_progress' && $hasActionKeyword)
                 || (! empty($applicantMessage) && in_array($publicState, ['in_progress', 'pending'], true));
 
+            $hasAttachment = false;
+            $attachmentName = null;
+            $attachmentUrl = null;
+            $attachmentMime = null;
+
+            if ($isPublished && $history && $history->attachment_path) {
+                $hasAttachment = true;
+                $attachmentName = $history->attachment_original_name ?: basename($history->attachment_path);
+                $attachmentUrl = route('portal.applications.stages.download-attachment', [
+                    'jobApplication' => $application->id,
+                    'history' => $history->id,
+                ]);
+                $attachmentMime = $history->attachment_mime;
+            }
+
             $stagesOutput[] = [
                 'id' => $stageId,
                 'name' => $stageName,
@@ -262,6 +309,10 @@ class SelectionTrackingService
                 'is_deadline_approaching' => $isDeadlineApproaching,
                 'is_past_deadline' => $isPastDeadline,
                 'requires_action' => $requiresAction,
+                'has_attachment' => $hasAttachment,
+                'attachment_name' => $attachmentName,
+                'attachment_url' => $attachmentUrl,
+                'attachment_mime' => $attachmentMime,
                 'is_current' => false,
             ];
         }

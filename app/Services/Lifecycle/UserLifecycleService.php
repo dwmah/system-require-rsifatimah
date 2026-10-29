@@ -5,9 +5,9 @@ namespace App\Services\Lifecycle;
 use App\Enums\JobApplicationStatus;
 use App\Models\JobApplication;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 
 class UserLifecycleService
 {
@@ -39,8 +39,8 @@ class UserLifecycleService
     }
 
     /**
-     * Hapus permanen data dan berkas fisik pelamar yang tidak lolos seleksi
-     * setelah pelamar melihat pengumuman (announcement_seen_at) atau dipicu oleh admin.
+     * Lakukan pengarsipan (soft delete) pada akun pelamar yang tidak lolos seleksi.
+     * Berkas fisik dokumen CV, portofolio, dan foto tetap dipertahankan untuk talent pool.
      */
     public function cleanupRejectedApplicant(User $user): bool
     {
@@ -49,51 +49,53 @@ class UserLifecycleService
         }
 
         return DB::transaction(function () use ($user) {
-            // 1. Hapus seluruh berkas dokumen fisik dari storage privat
-            foreach ($user->jobApplications as $application) {
-                foreach ($application->documents as $document) {
-                    if ($document->stored_path && Storage::exists($document->stored_path)) {
-                        Storage::delete($document->stored_path);
-                    }
-                }
-            }
-
-            // 2. Hapus profile photo jika ada
-            if ($user->applicantProfile && $user->applicantProfile->photo_path) {
-                if (Storage::disk('public')->exists($user->applicantProfile->photo_path)) {
-                    Storage::disk('public')->delete($user->applicantProfile->photo_path);
-                } elseif (Storage::exists($user->applicantProfile->photo_path)) {
-                    Storage::delete($user->applicantProfile->photo_path);
-                }
-            }
-
-            // 3. Hapus record user (cascade delete akan menghapus profile, educations, applications, dll.)
+            // Berkas fisik CV/Portofolio dan dokumen TIDAK dihapus (dipertahankan untuk talent pool).
+            // Lakukan soft delete pada user (mengisi deleted_at).
             $user->delete();
 
-            Log::info("User lifecycle cleanup executed successfully for user ID: {$user->id}");
+            Log::info("User lifecycle soft delete executed successfully for user ID: {$user->id}");
 
             return true;
         });
     }
 
     /**
-     * Batch cleanup untuk seluruh pelamar tidak lolos yang telah mengonfirmasi melihat pengumuman.
+     * Batch pengarsipan (soft delete) untuk seluruh pelamar tidak lolos yang telah mengonfirmasi melihat pengumuman.
      */
     public function cleanupAllSeenRejectedApplicants(): int
     {
         $rejectedApplications = JobApplication::where('status', JobApplicationStatus::REJECTED)
             ->whereNotNull('announcement_seen_at')
+            ->whereHas('user', fn ($q) => $q->whereNull('deleted_at'))
             ->with(['user', 'documents'])
             ->get();
 
         $count = 0;
         foreach ($rejectedApplications as $application) {
-            if ($application->user) {
+            if ($application->user && ! $application->user->trashed()) {
                 $this->cleanupRejectedApplicant($application->user);
                 $count++;
             }
         }
 
         return $count;
+    }
+
+    /**
+     * Cek apakah akun pelamar telah diarsipkan (soft delete).
+     */
+    public function isApplicantArchived(User $user): bool
+    {
+        return $user->trashed();
+    }
+
+    /**
+     * Dapatkan query pelamar tidak lolos yang telah diarsipkan (soft deleted) sebagai talent pool.
+     */
+    public function getArchivedTalentPoolQuery(): Builder
+    {
+        return JobApplication::where('status', JobApplicationStatus::REJECTED)
+            ->whereHas('user', fn ($q) => $q->onlyTrashed())
+            ->with(['user' => fn ($q) => $q->withTrashed(), 'jobVacancy', 'documents']);
     }
 }

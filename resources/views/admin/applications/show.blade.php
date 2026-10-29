@@ -24,6 +24,7 @@
                 'download_url' => route('documents.download', $doc),
                 'is_pdf' => str_contains(strtolower($doc->mime_type ?? ''), 'pdf') || str_ends_with(strtolower($doc->original_name ?? ''), '.pdf'),
                 'is_image' => str_contains(strtolower($doc->mime_type ?? ''), 'image') || in_array(strtolower(pathinfo($doc->original_name ?? '', PATHINFO_EXTENSION)), ['jpg', 'jpeg', 'png', 'webp']),
+                'is_video' => str_contains(strtolower($doc->mime_type ?? ''), 'video') || str_ends_with(strtolower($doc->original_name ?? ''), '.mp4'),
             ];
         })->filter()->values();
     @endphp
@@ -594,6 +595,17 @@
                                                                     <div class="w-full h-full bg-slate-900 rounded-xl border border-slate-300 overflow-auto flex items-center justify-center p-4">
                                                                         <img src="{{ route('documents.preview', $doc) }}" alt="{{ $doc->original_name }}" class="max-h-full max-w-full object-contain rounded shadow-lg">
                                                                     </div>
+                                                                @elseif(str_contains(strtolower($doc->mime_type ?? ''), 'video') || str_ends_with(strtolower($doc->original_name ?? ''), '.mp4'))
+                                                                    <div class="w-full h-full bg-slate-900 rounded-xl border border-slate-300 overflow-auto flex flex-col items-center justify-center p-4 gap-3">
+                                                                        <video controls class="w-full max-h-[70vh] rounded-lg">
+                                                                            <source src="{{ route('documents.preview', $doc) }}" type="video/mp4">
+                                                                            Browser tidak mendukung video preview.
+                                                                        </video>
+                                                                        <a href="{{ route('documents.download', $doc) }}" class="px-3.5 py-1.5 bg-[#0179B5] hover:bg-[#016293] text-white text-xs font-semibold rounded-lg transition-colors inline-flex items-center gap-1.5">
+                                                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                                                            <span>Download Video</span>
+                                                                        </a>
+                                                                    </div>
                                                                 @else
                                                                     <div class="w-full h-full bg-white rounded-xl border border-slate-300 flex flex-col items-center justify-center p-8 text-center">
                                                                         <svg class="w-16 h-16 text-slate-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
@@ -795,6 +807,14 @@
                                     @if($hist && $hist->decided_at)
                                         <span class="text-xs text-slate-400 block mt-0.5">Keputusan pada: {{ $hist->decided_at->format('d M Y, H:i') }} WIB</span>
                                     @endif
+                                    @if($hist && $hist->attachment_path)
+                                        <div class="mt-2">
+                                            <a href="{{ route('admin.applications.stages.download-attachment', ['application' => $application, 'history' => $hist]) }}" target="_blank" class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium bg-sky-50 text-[#0179B5] hover:bg-sky-100 border border-sky-200 rounded-md transition-colors">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
+                                                <span>📎 Lihat Lampiran Hasil / Dokumen ({{ $hist->attachment_original_name ?: basename($hist->attachment_path) }})</span>
+                                            </a>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
 
@@ -968,7 +988,7 @@
                     </div>
                 </div>
 
-                <form method="POST" action="{{ route('admin.applications.update-stage', $application) }}" class="space-y-4">
+                <form method="POST" action="{{ route('admin.applications.update-stage', $application) }}" enctype="multipart/form-data" class="space-y-4">
                     @csrf
 
                     <div>
@@ -995,6 +1015,13 @@
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Catatan / Instruksi Jadwal (Opsional)</label>
                         <textarea name="stage_note" rows="3" placeholder="Contoh: Ujian Tulis dilaksanakan pada Senin, 20 September 2026 pukul 08.00 WIB di Aula RSI Fatimah..."
                                   class="w-full p-3 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:border-[#0179B5]"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Lampiran Hasil Tes / Dokumen Pengumuman (Opsional)</label>
+                        <input type="file" name="stage_attachment" accept=".pdf,.jpg,.jpeg,.png"
+                               class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-sky-50 file:text-[#0179B5] hover:file:bg-sky-100 border border-slate-300 rounded-lg bg-slate-50 p-2 focus:outline-none">
+                        <p class="text-[11px] text-slate-500 mt-1">Format: PDF, JPG, PNG (Maks 10 MB)</p>
                     </div>
 
                     <div class="pt-3 border-t border-slate-200 flex items-center justify-end gap-2">
@@ -1158,7 +1185,20 @@
                                 </div>
                             </template>
 
-                            <template x-if="!docsBundle[selectedDocIdx]?.is_pdf && !docsBundle[selectedDocIdx]?.is_image">
+                            <template x-if="docsBundle[selectedDocIdx]?.is_video">
+                                <div class="w-full h-full bg-slate-900 rounded-xl border border-slate-300 overflow-auto flex flex-col items-center justify-center p-4 gap-3">
+                                    <video controls class="w-full max-h-[70vh] rounded-lg">
+                                        <source :src="docsBundle[selectedDocIdx]?.preview_url" type="video/mp4">
+                                        Browser tidak mendukung video preview.
+                                    </video>
+                                    <a :href="docsBundle[selectedDocIdx]?.download_url" class="px-3.5 py-1.5 bg-[#0179B5] hover:bg-[#016293] text-white text-xs font-semibold rounded-lg transition-colors inline-flex items-center gap-1.5">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                        <span>Download Video</span>
+                                    </a>
+                                </div>
+                            </template>
+
+                            <template x-if="!docsBundle[selectedDocIdx]?.is_pdf && !docsBundle[selectedDocIdx]?.is_image && !docsBundle[selectedDocIdx]?.is_video">
                                 <div class="w-full h-full bg-white rounded-xl border border-slate-300 flex flex-col items-center justify-center p-8 text-center">
                                     <svg class="w-16 h-16 text-slate-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                                     <p class="font-bold text-slate-800 text-base mb-1" x-text="docsBundle[selectedDocIdx]?.file_name"></p>

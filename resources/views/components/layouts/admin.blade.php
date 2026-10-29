@@ -36,6 +36,11 @@
 
             <!-- Sisi Kanan: Profile & Logout Dropdown -->
             <div class="flex items-center gap-4">
+                <div class="hidden sm:flex items-center gap-2 px-3 py-1 bg-white/10 border border-white/20 rounded-full text-xs text-white">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>Admin SDI Terverifikasi</span>
+                </div>
+
                 <div class="relative" x-data="{ open: false }" @click.outside="open = false">
                     <button @click="open = !open" class="flex items-center gap-2.5 pl-1 py-1 cursor-pointer rounded-lg hover:bg-white/10 px-2 transition-colors focus:outline-none">
                         <div class="w-8 h-8 rounded-full bg-white text-[#0179B5] font-bold text-xs flex items-center justify-center shadow-xs">
@@ -43,7 +48,7 @@
                         </div>
                         <div class="hidden md:flex flex-col text-left leading-tight">
                             <span class="text-sm font-semibold text-white">{{ auth()->user()->name }}</span>
-                            <span class="text-xs text-sky-100">Super User</span>
+                            <span class="text-xs text-sky-100">Super User / SDI</span>
                         </div>
                         <svg class="w-3.5 h-3.5 text-sky-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
@@ -62,7 +67,7 @@
                         <div class="px-4 py-2.5">
                             <p class="text-sm font-semibold text-slate-900 truncate">{{ auth()->user()->name }}</p>
                             <p class="text-xs text-slate-500 truncate mt-0.5">{{ auth()->user()->email }}</p>
-                            <span class="inline-block mt-1.5 px-2 py-0.5 text-xs font-medium bg-sky-50 text-[#0179B5] rounded border border-sky-100">Super User</span>
+                            <span class="inline-block mt-1.5 px-2 py-0.5 text-xs font-medium bg-sky-50 text-[#0179B5] rounded border border-sky-100">Super User SDI</span>
                         </div>
                         <div class="py-1">
                             <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2.5 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
@@ -120,6 +125,9 @@
                         </a>
                         <a href="{{ route('admin.timelines.index') }}" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.timelines*') ? 'bg-[#E6F2F8] text-[#0179B5]' : 'text-slate-700 hover:bg-slate-100' }}">
                             Timeline Seleksi
+                        </a>
+                        <a href="{{ route('admin.guides.index') }}" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.guides*') ? 'bg-[#E6F2F8] text-[#0179B5]' : 'text-slate-700 hover:bg-slate-100' }}">
+                            Kelola Panduan
                         </a>
                         <a href="{{ route('admin.lifecycle.index') }}" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.lifecycle*') ? 'bg-[#E6F2F8] text-[#0179B5]' : 'text-slate-700 hover:bg-slate-100' }}">
                             Siklus Akun / Arsip

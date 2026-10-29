@@ -66,7 +66,7 @@ class JobApplication extends Model
      */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class)->withTrashed();
     }
 
     /**
@@ -152,6 +152,32 @@ class JobApplication extends Model
     public function isLocked(): bool
     {
         return ! is_null($this->locked_at) || ! $this->isDraft();
+    }
+
+    /**
+     * Memeriksa apakah batas waktu pengumpulan/unggah berkas telah berakhir.
+     */
+    public function isSubmissionDeadlinePassed(): bool
+    {
+        // 1. Cek dari tanggal batas tahapan seleksi administrasi pertama jika ada
+        $stage1 = $this->jobVacancy?->selectionStages()->orderBy('sort_order')->first();
+        if ($stage1 && $stage1->end_at) {
+            if ($stage1->end_at->endOfDay()->isPast()) {
+                return true;
+            }
+        }
+
+        // 2. Cek dari close_at lowongan
+        if ($this->jobVacancy?->close_at && $this->jobVacancy->close_at->endOfDay()->isPast()) {
+            return true;
+        }
+
+        // 3. Cek dari registration_end_at periode rekrutmen
+        if ($this->recruitmentPeriod?->registration_end_at && $this->recruitmentPeriod->registration_end_at->endOfDay()->isPast()) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

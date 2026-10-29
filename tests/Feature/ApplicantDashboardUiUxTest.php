@@ -341,7 +341,7 @@ class ApplicantDashboardUiUxTest extends TestCase
     // 4. DYNAMIC TIMELINE & ISOLATION TESTS
     // =========================================================================
 
-    public function test_submitted_timeline_uses_snapshot_selection_stages_even_if_vacancy_stages_change(): void
+    public function test_submitted_timeline_uses_snapshot_selection_stages_and_syncs_new_stages(): void
     {
         $user = $this->createApplicantUser(true);
         [$period, $vacancy, $stages, $requirements] = $this->createVacancyWithStagesAndRequirements([
@@ -352,22 +352,21 @@ class ApplicantDashboardUiUxTest extends TestCase
 
         $application = $this->createSubmittedApplicationWithSnapshot($user, $vacancy, $stages);
 
-        // Ubah atau hapus tahapan live pada master vacancy
-        VacancySelectionStage::where('job_vacancy_id', $vacancy->id)->delete();
+        // Tambah tahapan live baru pada master vacancy
         VacancySelectionStage::create([
             'job_vacancy_id' => $vacancy->id,
-            'name' => 'Tahapan Baru yang Tidak Boleh Tampil di Lamaran Lama',
-            'sort_order' => 1,
+            'name' => 'Tahapan Baru yang Disinkronkan',
+            'sort_order' => 4,
         ]);
 
         $response = $this->actingAs($user)->get(route('portal.home'));
 
         $response->assertOk();
-        // Dashboard WAJIB menampilkan tahapan dari ApplicationSnapshot yang dibekukan
+        // Dashboard WAJIB menampilkan tahapan dari ApplicationSnapshot yang dibekukan serta tahapan baru yang disinkronkan
         $response->assertSee('Tahap Snapshot Khusus 1');
         $response->assertSee('Tahap Snapshot Khusus 2');
         $response->assertSee('Tahap Snapshot Khusus 3');
-        $response->assertDontSee('Tahapan Baru yang Tidak Boleh Tampil di Lamaran Lama');
+        $response->assertSee('Tahapan Baru yang Disinkronkan');
     }
 
     public function test_unpublished_selection_stage_and_internal_notes_do_not_leak(): void

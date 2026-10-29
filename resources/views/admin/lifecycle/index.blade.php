@@ -25,10 +25,10 @@
             <div class="bg-rose-50/80 border border-rose-200 rounded-xl p-4 text-sm text-rose-950 space-y-1.5">
                 <div class="font-bold flex items-center gap-2 text-base text-rose-900">
                     <span class="w-2.5 h-2.5 rounded-full bg-rose-600"></span>
-                    <span>Kebijakan Pelamar Tidak Lolos (Pembersihan Data)</span>
+                    <span>Kebijakan Pelamar Tidak Lolos (Pengarsipan &amp; Soft Delete)</span>
                 </div>
                 <p class="text-rose-800 leading-relaxed text-sm">
-                    Data dan berkas fisik pelamar yang tidak lolos dapat dibersihkan secara aman (hard delete) setelah pelamar membaca dan mengonfirmasi pengumuman, guna melindungi privasi kandidat dan menghemat kapasitas server.
+                    Akun pelamar yang tidak lolos seleksi dapat diarsipkan melalui mekanisme <strong>soft delete</strong> setelah pelamar membaca pengumuman. <strong>Seluruh berkas dokumen CV dan portofolio tetap tersimpan utuh</strong> sebagai arsip talent pool.
                 </p>
             </div>
         </div>
@@ -72,7 +72,8 @@
                     <select name="account_status" onchange="this.form.submit()" class="w-full h-11 px-3 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:border-[#0179B5] cursor-pointer">
                         <option value="">Semua Status Akun</option>
                         <option value="active" {{ request('account_status') === 'active' ? 'selected' : '' }}>Akun Aktif</option>
-                        <option value="inactive" {{ request('account_status') === 'inactive' ? 'selected' : '' }}>Dinonaktifkan (Arsip)</option>
+                        <option value="inactive" {{ request('account_status') === 'inactive' ? 'selected' : '' }}>Dinonaktifkan (Arsip Lolos)</option>
+                        <option value="archived" {{ request('account_status') === 'archived' ? 'selected' : '' }}>Diarsipkan (Soft Deleted)</option>
                     </select>
                 </div>
 
@@ -93,7 +94,7 @@
             </button>
 
             <button @click="tab = 'tidak_lolos'" :class="tab === 'tidak_lolos' ? 'border-[#0179B5] text-[#0179B5] border-b-2 font-bold' : 'text-slate-500 hover:text-slate-800'" class="pb-3 px-1 transition-colors flex items-center gap-2 cursor-pointer">
-                <span>2. Pembersihan Data Pelamar Tidak Lolos</span>
+                <span>2. Pengarsipan &amp; Talent Pool Pelamar Tidak Lolos</span>
                 <span class="px-2 py-0.5 bg-rose-100 text-rose-800 rounded-full text-xs font-bold">{{ $rejectedApplications->total() }}</span>
             </button>
         </div>
@@ -204,14 +205,14 @@
             </div>
         </div>
 
-        <!-- TAB 2: PEMBERSIHAN DATA PELAMAR TIDAK LOLOS -->
+        <!-- TAB 2: PEMBERSIHAN & PENGARSIPAN DATA PELAMAR TIDAK LOLOS -->
         <div x-show="tab === 'tidak_lolos'" class="space-y-4">
             <!-- Bulk Action Header -->
             <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div>
-                    <span class="font-bold text-sm text-slate-800">Antrean Pembersihan Data Pelamar Tidak Lolos</span>
+                    <span class="font-bold text-sm text-slate-800">Antrean Pengarsipan Pelamar Tidak Lolos (Talent Pool)</span>
                     <p class="text-xs text-slate-500 mt-1">
-                        Terdapat <strong>{{ $seenCount }}</strong> pelamar yang telah membuka & mengonfirmasi pengumuman penolakannya.
+                        Terdapat <strong>{{ $seenCount }}</strong> pelamar yang telah membuka &amp; mengonfirmasi pengumuman penolakannya dan belum diarsipkan.
                     </p>
                 </div>
 
@@ -220,14 +221,14 @@
                         @csrf
                         <button
                             type="button"
-                            data-confirm="PERINGATAN: Apakah Anda yakin ingin membersihkan data & file fisik seluruh {{ $seenCount }} pelamar tidak lolos yang telah membuka pengumuman?"
-                            data-confirm-title="Pembersihan Massal Berkas & Data"
-                            data-confirm-btn="Ya, Bersihkan Seluruh Data"
-                            data-confirm-variant="danger"
+                            data-confirm="Apakah Anda yakin ingin mengarsipkan (soft delete) seluruh {{ $seenCount }} pelamar tidak lolos yang telah membuka pengumuman? Seluruh berkas CV &amp; portofolio tetap tersimpan utuh."
+                            data-confirm-title="Pengarsipan Massal Akun (Soft Delete)"
+                            data-confirm-btn="Ya, Arsipkan Seluruh Akun"
+                            data-confirm-variant="warning"
                             class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold rounded-lg shadow-sm transition-colors flex items-center gap-1.5 cursor-pointer"
                         >
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                            <span>Bersihkan {{ $seenCount }} Data Terkonfirmasi</span>
+                            <span>Arsipkan {{ $seenCount }} Akun Terkonfirmasi</span>
                         </button>
                     </form>
                 @endif
@@ -242,7 +243,8 @@
                                 <th class="py-3 px-4">Formasi</th>
                                 <th class="py-3 px-4">Alasan Penolakan</th>
                                 <th class="py-3 px-4 text-center">Status Pengumuman</th>
-                                <th class="py-3 px-4 text-right">Aksi</th>
+                                <th class="py-3 px-4 text-center">Status Akun</th>
+                                <th class="py-3 px-4 text-right">Aksi Manajemen</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 text-sm">
@@ -269,28 +271,45 @@
                                             </span>
                                         @endif
                                     </td>
-                                    <td class="py-3.5 px-4 text-right">
-                                        @if($app->user)
-                                            <form method="POST" action="{{ route('admin.lifecycle.cleanup', $app->user) }}" class="inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button
-                                                    type="button"
-                                                    data-confirm="Hapus permanen akun & seluruh berkas fisik {{ $app->user->name }}? Tindakan ini tidak dapat dibatalkan."
-                                                    data-confirm-title="Hapus Permanen Akun & Berkas"
-                                                    data-confirm-btn="Ya, Hapus Permanen"
-                                                    data-confirm-variant="danger"
-                                                    class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold rounded-lg text-xs transition-colors cursor-pointer"
-                                                >
-                                                    Hapus Permanen
-                                                </button>
-                                            </form>
+                                    <td class="py-3.5 px-4 text-center">
+                                        @if($app->user?->trashed())
+                                            <span class="inline-block px-2.5 py-0.5 text-xs font-bold bg-amber-100 text-amber-800 rounded-full border border-amber-200">
+                                                Akun Diarsipkan / Soft Deleted
+                                            </span>
+                                        @else
+                                            <span class="inline-block px-2.5 py-0.5 text-xs font-bold bg-emerald-100 text-emerald-800 rounded-full">
+                                                Akun Aktif
+                                            </span>
                                         @endif
+                                    </td>
+                                    <td class="py-3.5 px-4 text-right">
+                                        <div class="flex items-center justify-end gap-2">
+                                            <a href="{{ route('admin.applications.show', $app) }}" class="px-3 py-1.5 bg-sky-50 text-[#0179B5] hover:bg-sky-100 font-semibold rounded-lg text-xs transition-colors">
+                                                Lihat Berkas
+                                            </a>
+
+                                            @if($app->user && ! $app->user->trashed())
+                                                <form method="POST" action="{{ route('admin.lifecycle.cleanup', $app->user) }}" class="inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button
+                                                        type="button"
+                                                        data-confirm="Arsipkan akun pelamar {{ $app->user->name }} (soft delete)? Berkas dokumen CV &amp; portofolio tetap tersimpan utuh di sistem."
+                                                        data-confirm-title="Konfirmasi Pengarsipan Akun"
+                                                        data-confirm-btn="Ya, Arsipkan Akun"
+                                                        data-confirm-variant="warning"
+                                                        class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold rounded-lg text-xs transition-colors cursor-pointer"
+                                                    >
+                                                        Arsipkan Akun
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        </div>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="py-8 text-center text-slate-400">
+                                    <td colspan="6" class="py-8 text-center text-slate-400">
                                         Tidak ada pelamar dalam antrean penolakan.
                                     </td>
                                 </tr>

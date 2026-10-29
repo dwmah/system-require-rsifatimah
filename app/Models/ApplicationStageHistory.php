@@ -36,6 +36,9 @@ class ApplicationStageHistory extends Model
         'note',
         'published_at',
         'applicant_message',
+        'attachment_path',
+        'attachment_original_name',
+        'attachment_mime',
     ];
 
     /**
@@ -67,5 +70,35 @@ class ApplicationStageHistory extends Model
     public function selectionStage(): BelongsTo
     {
         return $this->belongsTo(VacancySelectionStage::class, 'vacancy_selection_stage_id');
+    }
+
+    /**
+     * Cek apakah riwayat tahapan memiliki file lampiran hasil.
+     */
+    public function hasAttachment(): bool
+    {
+        return ! empty($this->attachment_path);
+    }
+
+    /**
+     * URL aman untuk mengunduh lampiran hasil tes tahapan.
+     */
+    public function getAttachmentUrlAttribute(): ?string
+    {
+        if (! $this->attachment_path) {
+            return null;
+        }
+
+        if (auth()->check() && auth()->user()->isAdmin()) {
+            return route('admin.applications.stages.download-attachment', [
+                'application' => $this->job_application_id,
+                'history' => $this->id,
+            ]);
+        }
+
+        return route('portal.applications.stages.download-attachment', [
+            'jobApplication' => $this->job_application_id,
+            'history' => $this->id,
+        ]);
     }
 }

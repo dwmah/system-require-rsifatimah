@@ -51,9 +51,11 @@ class AdminLifecycleController extends Controller
 
             if ($request->filled('account_status')) {
                 if ($request->account_status === 'active') {
-                    $query->whereHas('user', fn ($uq) => $uq->where('is_active', true));
+                    $query->whereHas('user', fn ($uq) => $uq->where('is_active', true)->whereNull('deleted_at'));
                 } elseif ($request->account_status === 'inactive') {
-                    $query->whereHas('user', fn ($uq) => $uq->where('is_active', false));
+                    $query->whereHas('user', fn ($uq) => $uq->where('is_active', false)->whereNull('deleted_at'));
+                } elseif ($request->account_status === 'archived') {
+                    $query->whereHas('user', fn ($uq) => $uq->onlyTrashed());
                 }
             }
         };
@@ -64,16 +66,16 @@ class AdminLifecycleController extends Controller
             JobApplicationStatus::IN_SELECTION,
             JobApplicationStatus::ACCEPTED,
         ])
-            ->with(['user.applicantProfile', 'jobVacancy', 'documents']);
+            ->with(['user' => fn ($q) => $q->withTrashed()->with('applicantProfile'), 'jobVacancy', 'documents']);
 
         $applyFilters($passedQuery);
         $passedApplications = $passedQuery->latest('accepted_at')
             ->paginate(10, ['*'], 'passed_page')
             ->withQueryString();
 
-        // 2. Pelamar Tidak Lolos (Antrean Pembersihan Data)
+        // 2. Pelamar Tidak Lolos (Antrean Pembersihan & Pengarsipan Talent Pool)
         $rejectedQuery = JobApplication::where('status', JobApplicationStatus::REJECTED)
-            ->with(['user.applicantProfile', 'jobVacancy', 'documents']);
+            ->with(['user' => fn ($q) => $q->withTrashed()->with('applicantProfile'), 'jobVacancy', 'documents']);
 
         $applyFilters($rejectedQuery);
         $rejectedApplications = $rejectedQuery->latest('rejected_at')
@@ -82,6 +84,7 @@ class AdminLifecycleController extends Controller
 
         $seenCount = JobApplication::where('status', JobApplicationStatus::REJECTED)
             ->whereNotNull('announcement_seen_at')
+            ->whereHas('user', fn ($q) => $q->whereNull('deleted_at'))
             ->count();
 
         $acceptedCount = JobApplication::where('status', JobApplicationStatus::ACCEPTED)->count();
@@ -142,23 +145,23 @@ class AdminLifecycleController extends Controller
     }
 
     /**
-     * Hapus data dan berkas fisik pelamar yang tidak lolos secara permanen.
+     * Arsipkan akun pelamar yang tidak lolos secara soft delete (berkas fisik CV/Portofolio tetap tersimpan).
      */
     public function cleanup(User $user): RedirectResponse
     {
         $userName = $user->name;
         $this->lifecycleService->cleanupRejectedApplicant($user);
 
-        return back()->with('success', "Data dan berkas pelamar {$userName} berhasil dibersihkan dari server.");
+        return back()->with('success', "Akun pelamar {$userName} berhasil diarsipkan (soft delete). Berkas dokumen CV & portofolio tetap tersimpan.");
     }
 
     /**
-     * Bersihkan sekaligus seluruh pelamar tidak lolos yang telah mengonfirmasi melihat pengumuman.
+     * Arsipkan sekaligus seluruh pelamar tidak lolos yang telah mengonfirmasi melihat pengumuman (soft delete).
      */
     public function cleanupAllSeen(): RedirectResponse
     {
         $count = $this->lifecycleService->cleanupAllSeenRejectedApplicants();
 
-        return back()->with('success', "Pembersihan massal berhasil: {$count} data & berkas pelamar tidak lolos telah dibersihkan.");
+        return back()->with('success', "Pengarsipan massal berhasil: {$count} akun pelamar tidak lolos telah diarsipkan (soft delete). Berkas dokumen tetap dipertahankan.");
     }
 }

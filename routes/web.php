@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminApplicationController;
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AdminGuideController;
 use App\Http\Controllers\Admin\AdminLifecycleController;
 use App\Http\Controllers\Admin\AdminTimelineController;
 use App\Http\Controllers\Admin\AdminVacancyController;
@@ -123,6 +124,10 @@ Route::middleware(['auth', 'applicant'])->prefix('portal')->name('portal.')->gro
     Route::get('/lamaran/{jobApplication}/tracking', [ApplicationTrackingController::class, 'show'])
         ->whereNumber('jobApplication')
         ->name('applications.tracking');
+    Route::get('/lamaran/{jobApplication}/stages/{history}/attachment', [ApplicationTrackingController::class, 'downloadStageAttachment'])
+        ->whereNumber('jobApplication')
+        ->whereNumber('history')
+        ->name('applications.stages.download-attachment');
 
     // Acknowledge Announcement
     Route::post('/lamaran/{application}/konfirmasi-pengumuman', [ApplicantApplicationController::class, 'acknowledgeAnnouncement'])->name('applications.acknowledge');
@@ -213,18 +218,34 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/applications/documents/{document}/verify', [AdminApplicationController::class, 'verifyDocument'])->name('applications.documents.verify');
     Route::post('/applications/{application}/update-stage', [AdminApplicationController::class, 'updateStage'])->name('applications.update-stage');
     Route::get('/applications/{application}/update-stage', fn (JobApplication $application) => redirect()->route('admin.applications.show', $application));
+    Route::get('/applications/{application}/stages/{history}/attachment', [AdminApplicationController::class, 'downloadStageAttachment'])
+        ->whereNumber('application')
+        ->whereNumber('history')
+        ->name('applications.stages.download-attachment');
 
     // Manajemen Timeline & Kalender Seleksi
     Route::get('/timelines', [AdminTimelineController::class, 'index'])->name('timelines.index');
     Route::post('/timelines', [AdminTimelineController::class, 'store'])->name('timelines.store');
     Route::match(['put', 'patch'], '/timelines/{period}', [AdminTimelineController::class, 'update'])->name('timelines.update');
+    Route::post('/timelines/{period}/toggle-status', [AdminTimelineController::class, 'toggleStatus'])->name('timelines.toggle-status');
+    Route::post('/timelines/templates', [AdminTimelineController::class, 'storeTemplate'])->name('timelines.templates.store');
+    Route::match(['put', 'patch'], '/timelines/templates/{template}', [AdminTimelineController::class, 'updateTemplate'])->name('timelines.templates.update');
+    Route::delete('/timelines/templates/{template}', [AdminTimelineController::class, 'destroyTemplate'])->name('timelines.templates.destroy');
+    Route::post('/timelines/templates/{template}/apply-to-vacancies', [AdminTimelineController::class, 'applyTemplateToVacancies'])->name('timelines.templates.apply-to-vacancies');
+
+    // Manajemen Konten Panduan (CMS Panduan)
+    Route::get('/guides', [AdminGuideController::class, 'index'])->name('guides.index');
+    Route::post('/guides', [AdminGuideController::class, 'store'])->name('guides.store');
+    Route::get('/guides/{guide}/edit', [AdminGuideController::class, 'edit'])->name('guides.edit');
+    Route::match(['put', 'patch'], '/guides/{guide}', [AdminGuideController::class, 'update'])->name('guides.update');
+    Route::post('/guides/{guide}/toggle-active', [AdminGuideController::class, 'toggleActive'])->name('guides.toggle-active');
 
     // Manajemen Siklus Akun (User Lifecycle)
     Route::get('/lifecycle', [AdminLifecycleController::class, 'index'])->name('lifecycle.index');
     Route::get('/lifecycle/export-accepted-biodata', [AdminLifecycleController::class, 'exportAcceptedBiodata'])->name('lifecycle.export-accepted-biodata');
     Route::post('/lifecycle/{user}/deactivate', [AdminLifecycleController::class, 'deactivate'])->name('lifecycle.deactivate');
     Route::post('/lifecycle/{user}/reactivate', [AdminLifecycleController::class, 'reactivate'])->name('lifecycle.reactivate');
-    Route::delete('/lifecycle/{user}/cleanup', [AdminLifecycleController::class, 'cleanup'])->name('lifecycle.cleanup');
+    Route::delete('/lifecycle/{user}/cleanup', [AdminLifecycleController::class, 'cleanup'])->name('lifecycle.cleanup')->withTrashed();
     Route::post('/lifecycle/cleanup-all-seen', [AdminLifecycleController::class, 'cleanupAllSeen'])->name('lifecycle.cleanup-all-seen');
 });
 

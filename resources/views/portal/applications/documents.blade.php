@@ -81,8 +81,10 @@
 
             {{-- Compact Progress & Deadline Row --}}
             @php
-                $deadline = $jobApplication->jobVacancy->close_at ?? $jobApplication->recruitmentPeriod->registration_end_at;
-                $daysLeft = $deadline ? (int) ceil(now()->diffInDays($deadline->endOfDay(), false)) : null;
+                $stage1 = $jobApplication->jobVacancy?->selectionStages()->orderBy('sort_order')->first();
+                $deadline = $stage1?->end_at ?? ($jobApplication->jobVacancy->close_at ?? $jobApplication->recruitmentPeriod->registration_end_at);
+                $isDeadlineEnded = $jobApplication->isSubmissionDeadlinePassed();
+                $daysLeft = ($deadline && ! $isDeadlineEnded) ? (int) ceil(now()->diffInDays($deadline->endOfDay(), false)) : null;
                 $requiredCount = $requirements->where('is_required', true)->count();
                 $uploadedRequiredCount = $requirements->where('is_required', true)->filter(fn($r) => $uploadedDocuments->has($r->id))->count();
                 $progressPercent = $requiredCount > 0 ? round(($uploadedRequiredCount / $requiredCount) * 100) : 100;
@@ -97,13 +99,35 @@
                 </div>
 
                 @if ($deadline && $jobApplication->status->value === 'draft')
-                    <div class="flex items-center gap-1.5 text-[11px] {{ $daysLeft !== null && $daysLeft <= 3 ? 'text-amber-700 font-bold' : 'text-slate-500' }}">
+                    <div class="flex items-center gap-1.5 text-[11px] {{ $isDeadlineEnded ? 'text-rose-700 font-bold' : ($daysLeft !== null && $daysLeft <= 3 ? 'text-amber-700 font-bold' : 'text-slate-500') }}">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        <span>Batas Waktu Pengisian & Unggah Berkas: {{ $deadline->translatedFormat('d F Y') }} ({{ $daysLeft !== null && $daysLeft >= 0 ? ($daysLeft === 0 ? 'Hari terakhir!' : 'Sisa ' . $daysLeft . ' hari') : 'Berakhir' }})</span>
+                        <span>Batas Waktu Pengumpulan Berkas: {{ $deadline->translatedFormat('d F Y') }} ({{ $isDeadlineEnded ? 'Batas pengumpulan berakhir' : ($daysLeft === 0 ? 'Hari terakhir!' : 'Sisa ' . $daysLeft . ' hari') }})</span>
                     </div>
                 @endif
             </div>
         </div>
+
+        @if ($isDeadlineEnded)
+            {{-- Banner Batas Waktu Pengumpulan Berkas Berakhir --}}
+            <div class="bg-rose-50 border-2 border-rose-300 rounded-xl p-4 sm:p-5 flex items-start gap-3.5 text-rose-900 shadow-sm">
+                <div class="p-2 bg-rose-100 rounded-lg text-rose-600 shrink-0">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </div>
+                <div class="space-y-1">
+                    <div class="flex items-center gap-2">
+                        <h3 class="font-bold text-sm sm:text-base text-rose-900">Batas Pengumpulan Berkas Telah Berakhir</h3>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-rose-200 text-rose-800">
+                            Batas pengumpulan berakhir
+                        </span>
+                    </div>
+                    <p class="text-xs sm:text-sm text-rose-800">
+                        Batas pengumpulan berkas telah berakhir. Anda tidak dapat lagi mengunggah atau mengubah berkas persyaratan.
+                    </p>
+                </div>
+            </div>
+        @endif
 
         {{-- Requirements List Container --}}
         <div class="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
@@ -149,6 +173,13 @@
                                     </span>
                                 @endif
 
+                                @if (str_contains(strtolower($requirement->allowed_mimes), 'video/mp4') || str_contains(strtolower($requirement->allowed_mimes), 'mp4'))
+                                    <span class="inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
+                                        <svg class="w-3 h-3 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                                        MP4 Video
+                                    </span>
+                                @endif
+
                                 @if ($uploaded)
                                     <span class="inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                         <svg class="w-3 h-3 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
@@ -185,6 +216,93 @@
                                         </span>
                                     </div>
 
+                                    {{-- Preview button --}}
+                                    <div x-data="{ previewOpen: false }" class="inline">
+                                        <button
+                                            type="button"
+                                            @click="previewOpen = true"
+                                            class="p-1.5 rounded-lg text-slate-600 hover:text-rsi-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                                            title="Lihat preview berkas"
+                                        >
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                            </svg>
+                                        </button>
+
+                                        {{-- Preview Modal --}}
+                                        <div
+                                            x-show="previewOpen"
+                                            x-cloak
+                                            class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6"
+                                            @keydown.escape.window="previewOpen = false"
+                                        >
+                                            <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" @click="previewOpen = false"></div>
+
+                                            <div class="relative bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden z-10 border border-slate-200">
+                                                <div class="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 bg-slate-50/80">
+                                                    <div>
+                                                        <h4 class="text-sm font-bold text-slate-900">{{ $requirement->name }}</h4>
+                                                        <p class="text-[11px] text-slate-500 font-mono">{{ $uploaded->original_name }} &bull; {{ round($uploaded->file_size / 1024, 1) }} KB</p>
+                                                    </div>
+                                                    <div class="flex items-center gap-2">
+                                                        <a
+                                                            href="{{ route('portal.applications.documents.download', [$jobApplication, $uploaded]) }}"
+                                                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#0179B5] text-white hover:bg-[#016293] transition-colors"
+                                                            title="Unduh berkas"
+                                                        >
+                                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                                            </svg>
+                                                            <span>Unduh</span>
+                                                        </a>
+                                                        <button
+                                                            type="button"
+                                                            @click="previewOpen = false"
+                                                            class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+                                                            title="Tutup"
+                                                        >
+                                                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                <div class="flex-1 overflow-auto p-4 flex items-center justify-center bg-slate-100 min-h-[300px]">
+                                                    @php
+                                                        $previewUrl = route('documents.preview', $uploaded);
+                                                        $isMp4 = str_contains(strtolower($uploaded->mime_type ?? ''), 'video') || str_ends_with(strtolower($uploaded->original_name ?? ''), '.mp4');
+                                                        $isPdf = str_contains(strtolower($uploaded->mime_type ?? ''), 'pdf') || str_ends_with(strtolower($uploaded->original_name ?? ''), '.pdf');
+                                                        $isImg = str_contains(strtolower($uploaded->mime_type ?? ''), 'image') || in_array(strtolower(pathinfo($uploaded->original_name ?? '', PATHINFO_EXTENSION)), ['jpg', 'jpeg', 'png', 'webp']);
+                                                    @endphp
+
+                                                    @if ($isMp4)
+                                                        <div class="w-full flex flex-col items-center gap-3">
+                                                            <video controls class="w-full max-h-[70vh] rounded-lg">
+                                                                <source src="{{ $previewUrl }}" type="video/mp4">
+                                                                Browser tidak mendukung video preview.
+                                                            </video>
+                                                            <a href="{{ route('portal.applications.documents.download', [$jobApplication, $uploaded]) }}" class="px-4 py-2 bg-[#0179B5] text-white text-xs font-semibold rounded-lg shadow-sm hover:bg-[#016293] transition-colors inline-flex items-center gap-2">
+                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                                                <span>Download Video</span>
+                                                            </a>
+                                                        </div>
+                                                    @elseif ($isPdf)
+                                                        <iframe src="{{ $previewUrl }}" class="w-full h-[70vh] rounded-xl border border-slate-300 bg-white"></iframe>
+                                                    @elseif ($isImg)
+                                                        <img src="{{ $previewUrl }}" alt="{{ $uploaded->original_name }}" class="max-h-[70vh] max-w-full object-contain rounded-lg shadow-md">
+                                                    @else
+                                                        <div class="text-center p-6 bg-white rounded-xl border border-slate-200">
+                                                            <p class="text-xs text-slate-500 mb-3">Pratinjau langsung tidak tersedia untuk tipe berkas ini.</p>
+                                                            <a href="{{ route('portal.applications.documents.download', [$jobApplication, $uploaded]) }}" class="px-3 py-1.5 bg-[#0179B5] text-white text-xs font-semibold rounded-lg inline-flex items-center gap-1.5">
+                                                                Unduh Berkas
+                                                            </a>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     {{-- Download button --}}
                                     <a
                                         href="{{ route('portal.applications.documents.download', [$jobApplication, $uploaded]) }}"
@@ -196,7 +314,7 @@
                                         </svg>
                                     </a>
 
-                                    @if ($jobApplication->status->value === 'draft' && $jobApplication->locked_at === null)
+                                    @if ($jobApplication->status->value === 'draft' && $jobApplication->locked_at === null && ! $isDeadlineEnded)
                                         {{-- Ganti berkas: 1-klik buka file picker & langsung auto-unggah --}}
                                         <form
                                             action="{{ route('portal.applications.documents.store', [$jobApplication, $requirement]) }}"
@@ -276,7 +394,7 @@
                                 </div>
                             @else
                                 {{-- Auto-Pick & Auto-Upload CTA Button --}}
-                                @if ($jobApplication->status->value === 'draft' && $jobApplication->locked_at === null)
+                                @if ($jobApplication->status->value === 'draft' && $jobApplication->locked_at === null && ! $isDeadlineEnded)
                                     <form
                                         action="{{ route('portal.applications.documents.store', [$jobApplication, $requirement]) }}"
                                         method="POST"
@@ -324,7 +442,9 @@
                                         </button>
                                     </form>
                                 @else
-                                    <span class="text-xs text-slate-400 italic">Terkunci</span>
+                                    <span class="text-xs {{ $isDeadlineEnded ? 'text-rose-500 font-semibold' : 'text-slate-400 italic' }}">
+                                        {{ $isDeadlineEnded ? 'Batas Pengumpulan Berakhir' : 'Terkunci' }}
+                                    </span>
                                 @endif
                             @endif
                         </div>

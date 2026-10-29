@@ -45,8 +45,6 @@ flowchart TD
     H --> I[9. Konfirmasi Pengumuman Hasil]
 ```
 
-![Gambar 1 Bagan Alur Utama Pendaftaran Pelamar](docs_screenshots/gambar_01_alur_pendaftaran.png)
-
 ---
 
 ## Langkah 1: Eksplorasi Lowongan & Registrasi Akun
@@ -62,30 +60,19 @@ flowchart TD
    - Daftar dokumen wajib dan dokumen pendukung yang dipersyaratkan.
    - Tanggal batas akhir pengiriman berkas (*deadline*).
 
-![Gambar 2 Halaman Eksplorasi Formasi Lowongan](docs_screenshots/gambar_02_lowongan.png)
-
-![Gambar 3 Halaman Detail Formasi Lowongan](docs_screenshots/gambar_03_detail_lowongan.png)
-
 ### 1.2 Mendaftar Akun Baru
-> **Catatan Penting**: Pendaftaran akun baru di sistem RSI Fatimah terintegrasi langsung dengan posisi lowongan yang dipilih. Anda tidak dapat membuat akun kosong tanpa memilih lowongan.
+> **Catatan Penting**: Pendaftaran akun baru di sistem RSI Fatimah terintegrasi langsung dengan posisi yang dipilih.
 
 1. Pada halaman detail formasi lowongan, klik tombol **Lamar Posisi Ini**.
 2. Anda akan diarahkan ke formulir **Registrasi Akun Baru** (`/daftar`).
-3. Isi data registrasi dengan benar dan teliti:
-   - **Nama Lengkap**: Sesuai dengan yang tertera pada e-KTP dan ijazah asli.
-   - **Nomor Induk Kependudukan (NIK)**: 16 digit angka e-KTP yang valid (satu NIK hanya dapat didaftarkan satu kali).
-   - **Nomor WhatsApp / HP**: Nomor aktif dengan format Indonesia (contoh: `081234567890`) untuk menerima informasi seleksi.
-   - **Alamat Email**: Alamat email aktif Anda (digunakan untuk notifikasi dan pemulihan kata sandi).
+3. Isi data registrasi dengan benar:
+   - **Nama Lengkap**: Sesuai dengan yang tertera pada ijazah/KTP.
+   - **Alamat Email**: Gunakan email pribadi yang aktif (digunakan untuk notifikasi dan pemulihan kata sandi).
+   - **Nomor WhatsApp**: Nomor aktif yang dapat dihubungi panitia rekrutmen.
    - **Kata Sandi (Password)**: Minimal 8 karakter kombinasi huruf dan angka.
-   - **Konfirmasi Kata Sandi**: Masukkan kembali kata sandi yang sama persis.
-   - **Persetujuan Ketentuan**: Centang persetujuan Syarat & Ketentuan serta Kebijakan Privasi Rekrutmen RSI Fatimah Banyuwangi.
-4. Klik tombol **Daftar Akun & Mulai Lamaran**.
-5. Sistem akan:
-   - Membuat akun Anda secara aman.
-   - Menerbitkan **Nomor Registrasi Akun Pelamar** resmi dengan format `PLM-YYYY-XXXXXX` (contoh: `PLM-2026-000001`).
-   - Secara otomatis membuat **Draf Lamaran Pekerjaan** untuk posisi yang Anda pilih dan mengarahkan Anda ke menu **Lamaran Saya** (`/portal/lamaran`).
-
-![Gambar 4 Halaman Registrasi Akun Baru Terintegrasi Lowongan](docs_screenshots/gambar_04_registrasi_akun.png)
+   - **Konfirmasi Kata Sandi**: Masukkan kembali kata sandi yang sama.
+4. Klik tombol **Daftar Sekarang**.
+5. Sistem akan membuat akun Anda, menerbitkan **Nomor Registrasi Resmi** (misal: `REG-2026-XXXX`), dan secara otomatis menyiapkan draf lamaran untuk posisi yang telah Anda pilih.
 
 ---
 
@@ -96,24 +83,17 @@ flowchart TD
 2. Masukkan alamat email dan kata sandi yang telah Anda daftarkan.
 3. Klik tombol **Masuk**. Sistem akan secara otomatis mengarahkan Anda ke **Dashboard Portal Pelamar** (`/portal`).
 
-![Gambar 5 Halaman Masuk / Login Portal Pelamar](docs_screenshots/gambar_05_login.png)
-
 ### 2.2 Jika Lupa Kata Sandi
-1. Pada halaman login, klik tautan **Lupa Password?** (`/lupa-password`).
+1. Pada halaman login, klik tautan **Lupa Password?**.
 2. Masukkan alamat email Anda yang terdaftar, lalu klik **Kirim Tautan Reset Password**.
-3. Periksa kotak masuk (atau folder spam/junk) email Anda, buka tautan reset password, lalu buat kata sandi baru.
-
-![Gambar 6 Halaman Pemulihan Lupa Kata Sandi](docs_screenshots/gambar_06_lupa_password.png)
+3. Periksa kotak masuk (atau folder spam/junk) email Anda, buka tautan yang dikirimkan, lalu masukkan kata sandi baru Anda.
 
 ### 2.3 Mengenal Antarmuka Dashboard Pelamar
 Di halaman `/portal`, Anda akan melihat:
-- **Header Pelamar**: Menampilkan nama lengkap, pas foto, alamat email, dan **Nomor Registrasi Pelamar** (`PLM-YYYY-XXXXXX`).
+- **Header Pelamar**: Menampilkan nama lengkap, pas foto, alamat email, dan **Nomor Registrasi Pelamar**.
 - **Widget Kelengkapan Profil Dasar**: Menampilkan persentase kesiapan data Anda (0% - 100%).
 - **Timeline Alur Seleksi Karyawan**: Grafik dinamis tahapan seleksi aktif beserta batas waktu (*deadline*) pengiriman berkas.
 - **Kartu Lamaran Aktif**: Menampilkan formasi yang sedang Anda lamar, status saat ini (*Draft*, *Diajukan*, *Diproses*, dll.), serta tombol akses cepat menuju pengisian berkas.
-- **Menu Navigasi Sidebar**: Bilah samping kiri menyediakan akses ke menu **Beranda Portal** (`/portal`), menu **Lamaran Saya** (`/portal/lamaran`) untuk mengelola berkas & status seleksi, menu **Profil Saya** (`/portal/profil`), **Notifikasi** (`/portal/notifikasi`), serta menu bantuan **Panduan & Info** (*Alur Pendaftaran* dan *Persyaratan Berkas*).
-
-![Gambar 7 Halaman Dashboard Portal Pelamar](docs_screenshots/gambar_07_dashboard.png)
 
 ---
 
@@ -123,215 +103,188 @@ Akses halaman ini melalui menu navigasi **Profil Saya** atau buka tautan `/porta
 
 ### 💡 Mekanisme Penyimpanan Bertahap (*Incremental Auto-Save*)
 Sistem dirancang fleksibel agar pelamar **tidak harus menyelesaikan seluruh data sekaligus dalam satu sesi**:
-- **Pas Foto & Data Langsung Tersimpan**: Ketika Anda telah memilih pas foto dan mengisi beberapa data (misalnya nama, tempat/tanggal lahir, kontak), lalu menekan tombol **"Simpan Perubahan"** atau **tidak sengaja menekan tombol Enter** pada keyboard saat mengetik, **pas foto bersama isian data yang telah diinput akan langsung tersimpan secara aman ke server**.
-- **Progres Bertambah Sesuai Isian**: Meskipun formulir belum terisi lengkap (misalnya baru 30%, 55%, atau 73%), data yang berhasil disimpan tidak akan hilang. Anda dapat keluar (*logout*) dan melanjutkannya kapan saja.
-- **Kapan Profil Harus 100%?**: Tombol **"Menuju ke Pemberkasan"** serta tahapan **Review & Submit Lamaran** baru akan terbuka aktif setelah indikator profil mencapai **100% Selesai**. Periksa daftar kriteria yang belum lengkap di panel ringkasan atas untuk melengkapinya.
+- **Pas Foto & Data Langsung Tersimpan**: Ketika Anda telah memilih pas foto dan mengisi beberapa data (misalnya nama, NIK, tempat/tanggal lahir, kontak), lalu menekan tombol **"Simpan Data Profil"** atau **tidak sengaja menekan tombol Enter** pada keyboard saat mengetik, **pas foto bersama isian data yang telah diinput akan langsung tersimpan secara aman ke sistem**.
+- **Progres Bertambah Sesuai Isian**: Meskipun formulir belum terisi lengkap (misalnya baru 30%, 55%, atau 70%), data yang berhasil masuk tidak akan hilang. Anda dapat keluar (*logout*) dan melanjutkannya kapan saja.
+- **Kapan Profil Harus 100%?**: Walaupun data tersimpan secara bertahap, tombol **"Menuju ke Pemberkasan"** serta tahapan **Review & Submit Lamaran** baru akan terbuka aktif setelah indikator profil mencapai **100% Selesai**. Periksa daftar kriteria yang belum lengkap di bagian atas halaman untuk melanjutkan.
 
-### 11 Kriteria Dasar Kelengkapan Profil (100%):
-Formulir Profil disatukan dalam **satu halaman terpadu (*Unified Profile Form*)** yang mencakup 11 kriteria wajib berikut:
-
-| No | Kriteria | Keterangan & Ketentuan Sistem |
+### 11 Kriteria Dasar Kelengkapan Profil:
+| No | Kriteria | Keterangan & Ketentuan |
 |:---:|:---|:---|
-| 1 | **Pas Foto Formal (3x4)** | Format **JPG, JPEG, PNG, atau WEBP**, ukuran maksimal **5 MB**. Gunakan foto formal berlatar belakang rapi dengan rasio 3:4. Sistem menyediakan *live preview* dan tombol hapus/ganti foto. |
-| 2 | **Nama Lengkap** | Sesuai dengan e-KTP dan ijazah asli. |
-| 3 | **Nomor Induk Kependudukan (NIK)** | 16 digit angka KTP. **Terkunci permanen** dari data saat pendaftaran akun (tidak dapat diubah mandiri demi integritas 1 Akun = 1 NIK). |
-| 4 | **Alamat Email** | Email aktif terdaftar pada akun Anda (dapat diperbarui jika diperlukan). |
-| 5 | **Nomor WhatsApp / HP** | Nomor ponsel aktif format Indonesia (contoh: `081234567890`). |
+| 1 | **Pas Foto Formal** | Format JPG/PNG, ukuran maks. 2 MB. Gunakan foto resmi berlatar belakang rapi. Foto langsung tersimpan saat disimpan. |
+| 2 | **Nama Lengkap** | Sesuai dengan e-KTP dan ijazah. |
+| 3 | **NIK** | 16 digit Nomor Induk Kependudukan sesuai e-KTP asli. |
+| 4 | **Email** | Email aktif terverifikasi pada akun Anda. |
+| 5 | **Nomor WhatsApp / HP** | Nomor ponsel aktif yang terhubung WhatsApp. |
 | 6 | **Tempat Lahir** | Nama kota/kabupaten tempat Anda dilahirkan. |
-| 7 | **Tanggal Lahir** | Tanggal lahir valid (sebelum hari ini) sesuai KTP. |
-| 8 | **Jenis Kelamin** | Pilihan: `Laki-laki` atau `Perempuan`. |
-| 9 | **Alamat Sesuai KTP** | Alamat lengkap termasuk RT/RW, kelurahan/desa, kecamatan, dan kota/kabupaten. |
-| 10 | **Alamat Domisili** | Tempat tinggal saat ini. Jika tempat tinggal Anda sama dengan KTP, cukup centang opsi *"Alamat domisili saat ini sama dengan alamat KTP"*. |
-| 11 | **Minimal 1 Riwayat Pendidikan** | Data pendidikan formal terakhir yang telah diselesaikan (Jenjang: SMA/SMK, D3, D4, S1, Profesi, S2; Nama Institusi/Universitas, Program Studi/Jurusan, Tahun Kelulusan, IPK, dan Akreditasi). |
+| 7 | **Tanggal Lahir** | Format tanggal/bulan/tahun sesuai KTP. |
+| 8 | **Jenis Kelamin** | Laki-laki / Perempuan. |
+| 9 | **Alamat Sesuai KTP** | Alamat lengkap termasuk RT/RW, kelurahan, kecamatan, dan kota/kabupaten. |
+| 10 | **Alamat Domisili** | Tempat tinggal Anda saat ini (centang "Sama dengan KTP" jika tidak berbeda). |
+| 11 | **Minimal 1 Riwayat Pendidikan** | Jenjang terakhir yang relevan dengan formasi yang Anda lamar. |
 
-> **Catatan Berkas Pendukung (STR & Sertifikat Pelatihan)**:
-> Bagi tenaga medis/kesehatan, dokumen fisik seperti **Surat Tanda Registrasi (STR)**, **Sertifikat Pelatihan (BTCLS/ACLS/PPGD)**, Surat Pengalaman Kerja, dan CV **tidak diinput terpisah di menu Profil**, melainkan diunggah langsung dalam bentuk **file PDF** pada **Langkah 4: Workspace Pemberkasan**.
-
-![Gambar 8 Halaman Formulir Profil Terpadu 100%](docs_screenshots/gambar_08_profil_terpadu.png)
+### Mengisi Bagian Tambahan pada Profil:
+- **Pendidikan**: Klik *Tambah Pendidikan*, isi jenjang (D3, D4, S1, Profesi, dll.), nama universitas/institusi, program studi, tahun masuk, tahun kelulusan, nilai IPK, dan nomor ijazah.
+- **Surat Tanda Registrasi (STR) *(Khusus Tenaga Kesehatan)***:
+  - Klik *Tambah Lisensi / STR*.
+  - Masukkan nomor STR resmi, lembaga penerbit (KTKI / KKI), tanggal terbit, dan masa berlaku (atau centang pilihan *Berlaku Seumur Hidup* jika sudah seumur hidup).
+- **Sertifikasi Pelatihan & Keahlian**:
+  - Masukkan sertifikat yang relevan (contoh: *BTCLS, ACLS, PPGD, ATLS, Pelatihan K3RS, Sertifikasi Kompetensi*, dll.).
+- **Pengalaman Kerja**:
+  - Cantumkan riwayat pengalaman kerja di fasilitas kesehatan/instansi sebelumnya (nama instansi, posisi, rentang tanggal bekerja, dan deskripsi singkat tugas).
 
 ---
 
 ## Langkah 4: Manajemen Dokumen & Unggah Berkas Persyaratan
 
-Setelah melengkapi profil hingga 100%, klik tombol **"Menuju ke Pemberkasan"** di pojok kanan atas profil, atau akses melalui menu **Lamaran Saya** &rarr; klik tombol **Pemberkasan** (`/portal/lamaran/{id}/berkas`).
+Setelah melengkapi profil, langkah berikutnya adalah mengunggah dokumen digital persyaratan lowongan di **Workspace Pemberkasan**.
+
+Akses melalui menu **Lamaran Saya** &rarr; klik tombol **Pemberkasan** atau buka tautan `/portal/lamaran/{nomor_lamaran}/berkas`.
 
 ### Aturan Format & Ukuran Berkas:
-- **Format File Standar**: Dokumen wajib diunggah dalam format **PDF (.pdf)**.
-- **Ukuran Maksimal**: Maksimal **2 MB (2.048 KB)** per file berkas.
+- **Format File**: Format standar adalah **PDF (.pdf)**.
+- **Ukuran Maksimal**: Maksimal **2 MB (2.048 KB)** per file dokumen.
 - **Kualitas Hasil Pindai (*Scan*)**:
-  - Gunakan pemindai dokumen (*scanner*) atau aplikasi pemindai dokumen yang rapi (bukan foto miring/buram).
-  - Pastikan teks, nomor registrasi STR, nomor ijazah, tanda tangan, dan cap stempel resmi terbaca jelas.
+  - Gunakan pemindai dokumen (bukan sekadar difoto miring atau terpotong).
+  - Pastikan teks, stempel resmi, tanda tangan, dan nomor ijazah/STR dapat terbaca dengan sangat jelas.
 
-### Dokumen yang Dipersyaratkan Sesuai Formasi:
-> **Catatan Penting**: Daftar berkas persyaratan di bawah ini merupakan contoh referensi lengkap (khususnya untuk tenaga medis/kesehatan). Pada sistem riil, jenis dokumen yang wajib Anda unggah bersifat **dinamis** dan disesuaikan secara otomatis dengan posisi formasi lowongan yang Anda pilih.
-
-1. **Berkas Wajib Umum**:
+### Dokumen yang Umum Dipersyaratkan:
+1. **Dokumen Wajib**:
+   - Kartu Tanda Penduduk (e-KTP) Asli.
+   - Kartu Keluarga (KK).
+   - Ijazah Asli Pendidikan Terakhir.
+   - Transkrip Nilai Akademik Asli.
+   - Surat Tanda Registrasi (STR) yang masih berlaku *(khusus formasi tenaga kesehatan)*.
    - Surat Lamaran Pekerjaan (ditujukan kepada Direktur RSI Fatimah Banyuwangi).
    - Daftar Riwayat Hidup / Curriculum Vitae (CV) terbaru.
-   - Scan Ijazah Asli Pendidikan Terakhir.
-   - Scan Transkrip Nilai Akademik Asli.
-   - Scan e-KTP Asli.
-   - Scan Kartu Keluarga (KK).
-2. **Berkas Khusus Tenaga Kesehatan**:
-   - Scan Surat Tanda Registrasi (STR) aktif (KKI / KTKI / Kemenkes).
-   - Scan Sertifikat Pelatihan Keahlian (contoh: BTCLS, ACLS, ATLS) jika dipersyaratkan.
-3. **Berkas Tambahan / Opsional**:
+2. **Dokumen Pendukung *(Opsional/Sesuai Formasi)***:
    - Surat Keterangan Catatan Kepolisian (SKCK) aktif.
-   - Surat Keterangan Sehat dari Dokter / Rumah Sakit.
-   - Surat Bebas Narkoba.
+   - Surat Keterangan Sehat dari Dokter.
+   - Sertifikat Pelatihan Tambahan yang relevan.
 
-### Cara Mengunggah & Memeriksa Berkas:
-1. Pada baris dokumen yang ingin diunggah, klik tombol **Pilih File**, cari berkas PDF dari perangkat Anda, lalu klik **Unggah Berkas**.
-2. Indikator progres akan meningkat seiring kelengkapan berkas wajib.
-3. Klik tombol **Preview / Unduh** untuk memastikan file yang Anda unggah benar dan tidak tertukar.
-4. Jika ingin mengganti file, cukup pilih file baru dan klik **Ganti File**, atau klik **Hapus** selama status lamaran masih **DRAFT**.
-
-### Fitur Pembatalan Draf Lamaran:
-Jika Anda ingin membatalkan draf lamaran sebelum disubmit, Anda dapat melakukannya melalui tombol **Batalkan Draf Lamaran** pada halaman detail lamaran.
-*(Perhatian: Sesuai kebijakan sistem RSI Fatimah, akun pelamar wajib terikat pada lamaran aktif. Jika Anda membatalkan satu-satunya draf lamaran Anda, akun dan berkas sementara akan dihapus secara otomatis dan sesi Anda akan diakhiri).*
-
-![Gambar 9 Halaman Workspace Unggah Berkas Persyaratan](docs_screenshots/gambar_09_berkas_workspace.png)
+### Cara Mengunggah & Memeriksa:
+1. Pada baris dokumen yang ingin diunggah, klik area unggah atau pilih **Pilih File**.
+2. Pilih file berkas dari komputer/ponsel Anda, lalu sistem akan mengunggah file tersebut.
+3. Setelah berhasil, klik ikon **Lihat / Preview** untuk memastikan file yang terunggah sudah benar dan tidak tertukar.
+4. Jika salah mengunggah file, Anda dapat mengklik tombol **Hapus** atau mengunggah ulang selama status lamaran masih **DRAFT**.
 
 ---
 
 ## Langkah 5: Peninjauan (Review) & Final Submit Lamaran
 
-Setelah seluruh berkas wajib terunggah dan profil terisi 100%, tombol **"Lanjut ke Step 3: Review & Kirim"** pada halaman berkas akan aktif.
+Setelah seluruh berkas wajib terunggah dan profil terisi 100%, Anda dapat melanjutkan ke tahapan **Review & Konfirmasi Akhir**.
 
-1. Buka halaman review melalui tautan `/portal/lamaran/{id}/review`.
-2. Periksa kembali seluruh data yang dirangkum:
-   - Data formasi lowongan dan unit kerja tujuan.
-   - Data profil pribadi, kontak, dan riwayat pendidikan terakhir.
-   - Daftar seluruh dokumen persyaratan yang telah diunggah.
-3. **Pernyataan Integritas & Kebenaran Data**:
-   - Baca pakta integritas pelamar.
-   - Centang kotak pernyataan persetujuan:
-     *"Saya menyatakan dengan sesungguhnya bahwa seluruh data dan dokumen yang saya unggah adalah benar, sah, dan dapat dipertanggungjawabkan..."*
-4. **Final Submit (Kirim Lamaran)**:
+1. Klik tombol **Lanjut ke Review Lamaran** pada halaman berkas, atau akses tautan `/portal/lamaran/{nomor_lamaran}/review`.
+2. Di halaman Review, periksa kembali:
+   - Ringkasan data profil diri dan kontak.
+   - Riwayat pendidikan dan lisensi STR yang tercantum.
+   - Daftar dokumen persyaratan yang telah diunggah.
+3. **Pernyataan Kebenaran Data**:
+   - Baca klausul pakta integritas dan kebenaran data pelamar.
+   - Centang kotak persetujuan: *"Saya menyatakan bahwa seluruh data dan dokumen yang saya berikan adalah benar, asli, dan sah..."*
+4. **Final Submit**:
    - Klik tombol **Kirim Lamaran Sekarang**.
-   - Muncul dialog konfirmasi akhir peringatan penguncian data. Klik **Ya, Kirim Lamaran**.
-5. **Penerbitan Nomor Lamaran Resmi**:
-   - Sistem secara atomik mengunci data (*snapshot snapshot* permanen) dan menerbitkan **Nomor Lamaran Resmi** dengan format:
-     `LAM-{KODE_PERIODE}-{NOMOR_URUT_6}` (contoh: `LAM-2026-A-000001`).
+   - Sistem akan menampilkan dialog konfirmasi akhir. Klik **Ya, Kirim Lamaran**.
 
 > **PERINGATAN PENTING**:
 > Setelah tombol **Kirim Lamaran** ditekan:
-> 1. Status lamaran Anda resmi berubah dari **DRAFT** menjadi **SUBMITTED (Lamaran Terkirim)**.
-> 2. Berkas lamaran Anda **TERKUNCI SECARA PERMANEN**. Anda tidak dapat lagi mengubah isian profil untuk lamaran tersebut maupun mengunggah ulang dokumen berkas.
-> 3. Salinan resmi (*snapshot*) berkas Anda dibekukan dan diteruskan ke Tim Seleksi SDM / SDI RSI Fatimah Banyuwangi untuk proses verifikasi.
-
-![Gambar 10 Halaman Review Lamaran & Dialog Konfirmasi Final Submit](docs_screenshots/gambar_10_review_submit.png)
+> 1. Status lamaran Anda berubah dari **DRAFT** menjadi **SUBMITTED (Diajukan)**.
+> 2. Berkas lamaran Anda **TERKUNCI SECARA PERMANEN**. Anda tidak dapat lagi mengubah data profil untuk lamaran tersebut maupun mengganti berkas yang telah dikirim.
+> 3. Data profil dan berkas Anda pada saat pengiriman akan disimpan sebagai salinan resmi (*snapshot*) untuk dinilai oleh Panitia Seleksi SDM / Tim SDI.
 
 ---
 
 ## Langkah 6: Pemantauan Seleksi (Tracking & Hasil Pengumuman)
 
-Setelah lamaran terkirim, Anda dapat memantau setiap perkembangan tahapan seleksi secara *real-time*.
+Setelah lamaran terkirim, Anda dapat memantau setiap perkembangan proses seleksi secara mandiri dan *real-time*.
 
-Akses melalui menu **Lamaran Saya** &rarr; klik tombol **Tracking Lamaran** (`/portal/lamaran/{id}/tracking`).
+Akses melalui menu **Tracking Lamaran** atau tautan `/portal/lamaran/{nomor_lamaran}/tracking`.
 
 ### Tahapan Seleksi RSI Fatimah Banyuwangi:
-Setiap lowongan memiliki tahapan seleksi yang terstruktur, umumnya mencakup:
-1. **Seleksi Administrasi & Verifikasi STR**:
-   Pemeriksaan keabsahan dokumen asli, kesesuaian kualifikasi pendidikan, serta keabsahan STR tenaga kesehatan melalui basis data Kemenkes/KTKI.
-2. **Ujian Tertulis & Tes Kemampuan Bidang (TKB) / Skill Test**:
-   Tes teori profesi, tes psikotes dasar, atau simulasi keterampilan klinis.
-3. **Wawancara Direksi & Tes Al-Islam / Kemuhammadiyahan**:
-   Wawancara kompetensi, komitmen kerja pelayanan islami, serta tes kemampuan membaca Al-Qur'an.
-4. **Pemeriksaan Kesehatan / Medical Check-Up (MCU)**:
-   Pemeriksaan fisik, laboratorium, dan tes bebas narkoba di RSI Fatimah Banyuwangi.
-5. **Pengumuman Akhir, Orientasi & Penempatan**:
-   Penetapan kelulusan final, kontrak kerja (PKWT), masa orientasi karyawan baru, dan penempatan unit kerja.
+1. **Tahap 1 — Seleksi Administrasi & Verifikasi STR**:
+   Pemeriksaan kelengkapan dokumen asli, kesesuaian kualifikasi pendidikan, serta keabsahan STR tenaga kesehatan melalui basis data Kemenkes/KTKI.
+2. **Tahap 2 — Ujian Tertulis / Tes Kompetensi Bidang (TKB)**:
+   Pelaksanaan tes keilmuan profesi, tes psikotes dasar, atau ujian teori sesuai formasi yang dilamar.
+3. **Tahap 3 — Wawancara Direksi & Tes Al-Islam**:
+   Wawancara kompetensi kerja, pemahaman visi-misi rumah sakit, komitmen kerja, serta tes membaca Al-Qur'an.
+4. **Tahap 4 — Pemeriksaan Kesehatan / Medical Check-Up (MCU)**:
+   Pemeriksaan kesehatan fisik, bebas NAPZA, dan laboratorium di RSI Fatimah Banyuwangi.
+5. **Tahap 5 — Pengumuman Akhir, Orientasi & Penempatan**:
+   Penetapan kelulusan final, penandatanganan kontrak kerja (PKWT), masa orientasi karyawan baru, dan penempatan unit kerja.
 
-### Kebijakan Pengumuman Terjadwal (*Publication Gate / Anti-Leak*):
-- Sistem menerapkan gerbang publikasi berbasis waktu (*time-aware publication gate*).
-- Hasil penilaian tahapan dan pengumuman akhir hanya akan tampil pada portal pelamar **tepat pada tanggal dan jam publikasi resmi** yang telah ditetapkan oleh Tim Panitia SDM. Sebelum waktu pengumuman tiba, status lamaran tetap berstatus aman *"Menunggu Pengumuman"*.
-
-### Arti Indikator Status pada Portal:
-- 🟡 **Kuning (*Draft Lamaran*)**: Draf lamaran masih dalam proses pengisian oleh pelamar dan belum dikirim resmi.
-- 🔵 **Biru (*Lamaran Terkirim / Submitted*)**: Berkas berhasil dikirim dan masuk dalam antrean penilaian panitia.
-- 🟣 **Ungu (*Proses Seleksi / In Process*)**: Berkas atau kandidat sedang dalam proses penilaian tahapan seleksi aktif.
-- 🩵 **Biru Muda / Sky (*Menunggu Pengumuman Akhir*)**: Penilaian seleksi telah dievaluasi panitia, namun pengumuman resmi masih menunggu waktu publikasi sesuai jadwal yang ditetapkan (*Publication Gate / Anti-Leak*).
-- 🟢 **Hijau (*Diterima / Lolos*)**: Dinyatakan lolos pada tahapan tersebut atau dinyatakan diterima resmi sebagai calon karyawan baru.
-- 🔴 **Merah (*Tidak Lolos*)**: Belum memenuhi kualifikasi pada tahapan seleksi yang diikuti.
-- ⚪ **Abu-abu / Slate (*Tidak Dilanjutkan*)**: Status tahapan seleksi bagi pelamar yang belum memenuhi kualifikasi pada tahapan sebelumnya sehingga proses seleksi berikutnya tidak dilanjutkan.
-
-![Gambar 11 Halaman Pemantauan Tahapan Seleksi / Tracking](docs_screenshots/gambar_11_tracking_seleksi.png)
+### Arti Indikator Warna Status pada Portal:
+- 🔵 **Biru Muda / Sedang Berjalan (*In Progress*)**: Berkas atau tahapan sedang dalam proses penilaian oleh Tim HRD/SDI.
+- 🟢 **Hijau (*Lolos / Tahap Berikutnya*)**: Anda dinyatakan **LOLOS** pada tahapan tersebut dan berhak mengikuti tahapan berikutnya. Petunjuk pelaksanaan akan ditampilkan pada layar dan dikirim ke email Anda.
+- 🔴 **Merah (*Tidak Lolos / Ditolak*)**: Anda dinyatakan belum memenuhi kriteria kualifikasi pada tahapan tersebut. Panitia akan mencantumkan alasan penolakan secara transparan (contoh: berkas STR kedaluwarsa, kualifikasi jurusan tidak sesuai, dll.).
 
 ---
 
 ## Langkah 7: Konfirmasi Pengumuman & Kebijakan Siklus Akun
 
-RSI Fatimah menerapkan kebijakan perlindungan data pribadi dan siklus hidup akun (*Data Privacy & Lifecycle Policy*):
+RSI Fatimah menerapkan kebijakan tata kelola data yang aman dan taat regulasi perlindungan data pribadi pelamar (*Data Privacy & Lifecycle Policy*).
 
 ### Konfirmasi Membaca Pengumuman (Acknowledge)
-Pada kartu banner maupun modal pop-up pengumuman hasil seleksi di portal pelamar:
-- Pelamar diwajibkan mengklik tombol konfirmasi penolakan: **"Konfirmasi & Akhiri Akun"** atau **"Saya Mengerti, Konfirmasi & Akhiri Akun"**.
-- Waktu konfirmasi Anda akan dicatat ke sistem secara otomatis (`announcement_seen_at`).
+Pada kartu pengumuman di dashboard atau halaman detail lamaran:
+- Pelamar diwajibkan mengklik tombol **"Saya Telah Membaca dan Memahami Pengumuman Ini"**.
+- Klik tombol tersebut mencatat waktu konfirmasi resmi (`announcement_seen_at`) ke dalam sistem.
 
-### Kebijakan Siklus Akun Setelah Seleksi:
-1. **Bagi Pelamar yang Diterima (Lolos Akhir)**:
-   - Data profil pelamar diekspor secara resmi ke sistem kepegawaian internal rumah sakit (SDI).
-   - Akses portal pelamar akan diarsipkan setelah resmi bertugas.
-2. **Bagi Pelamar yang Belum Lolos**:
-   - Setelah pelamar mengonfirmasi membaca pengumuman penolakan melalui tombol konfirmasi, sistem akan secara otomatis menutup sesi login pelamar.
-   - Sesuai regulasi privasi data RSI Fatimah Banyuwangi, seluruh dokumen berkas digital (*file upload*) dan akun pendaftaran akan dibersihkan (*cleanup*) secara aman dari server, sehingga data pribadi pelamar tidak tersimpan tanpa batas waktu.
-
-![Gambar 12 Halaman Kartu Pengumuman & Konfirmasi Membaca Pengumuman](docs_screenshots/gambar_12_konfirmasi_pengumuman.png)
+### Kebijakan Setelah Pengumuman:
+1. **Bagi Pelamar yang Lolos Seleksi Akhir**:
+   - Data profil pelamar akan diekspor secara resmi ke sistem kepegawaian internal (SDI).
+   - Akses portal pelamar akan diarsipkan dan dinonaktifkan secara tertib saat Anda resmi menjadi karyawan aktif rumah sakit.
+2. **Bagi Pelamar yang Belum Lolos Seleksi**:
+   - Setelah pelamar membaca dan mengonfirmasi pengumuman hasil penolakan, sistem akan menutup sesi login.
+   - Berkas dokumen fisik (*file upload*) yang tersimpan akan dibersihkan (*cleanup*) secara aman dari server sesuai masa retensi data, guna melindungi kerahasiaan identitas dan privasi pelamar.
 
 ---
 
 ## 10. Pusat Notifikasi
 
-Sistem menggunakan pemberitahuan ganda (*Dual-Channel Notification*):
-1. **Notifikasi di Dalam Aplikasi (In-App Notification)**:
-   - Diakses melalui menu **Notifikasi** (berikon lonceng dengan indikator jumlah pesan belum dibaca) pada bilah menu navigasi samping (Sidebar) sebelah kiri untuk versi desktop atau melalui menu laci (*drawer*) pada perangkat ponsel pintar (`/portal/notifikasi`).
-   - Pojok kanan atas bilah navigasi hanya memuat foto profil pelamar dan tombol keluar (*logout*).
-   - Notifikasi otomatis masuk saat:
+Sistem menggunakan saluran pemberitahuan ganda (*Dual-Channel Notification*):
+1. **Notifikasi di Dalam Aplikasi (In-App)**:
+   - Ikon lonceng notifikasi di pojok kanan atas portal (`/portal/notifikasi`).
+   - Memberikan notifikasi instan saat:
      * Draf lamaran berhasil dibuat.
-     * Lamaran berhasil dikirim resmi (final submit).
+     * Lamaran berhasil disubmit.
      * Berkas selesai diverifikasi oleh panitia.
-     * Hasil pengumuman setiap tahapan seleksi diterbitkan.
-   - Dilengkapi tombol aksi **Lihat Detail** dan fitur **Tandai Semua Sudah Dibaca** untuk mengelola notifikasi.
+     * Hasil pengumuman setiap tahapan diterbitkan.
+   - Klik pada item notifikasi untuk langsung menuju ke halaman terkait, atau klik **Tandai Semua Sudah Dibaca**.
 2. **Notifikasi Email Resmi**:
-   - Dikirimkan secara otomatis ke alamat email yang Anda daftarkan saat ada pembaruan status penting atau instruksi pelaksanaan tahapan berikutnya.
+   - Dikirimkan dari sistem resmi RSI Fatimah Banyuwangi ke alamat email terdaftar Anda.
    - Selalu periksa folder **Kotak Masuk (Inbox)** dan folder **Spam/Promotions**.
-
-![Gambar 13 Halaman Pusat Notifikasi Pelamar](docs_screenshots/gambar_13_pusat_notifikasi.png)
 
 ---
 
 ## 11. Tanya Jawab & Pemecahan Masalah (FAQ & Troubleshooting)
 
 ### Q1: Mengapa muncul pesan "Pendaftaran akun baru dilakukan saat memilih lowongan yang ingin dilamar"?
-**Jawab**: Anda tidak dapat mendaftar akun kosong tanpa memilih posisi. Kunjungi menu **Lowongan** (`/lowongan`), pilih formasi yang diminati, lalu klik **Lamar Posisi Ini**. Formulir pendaftaran akun akan terbuka otomatis dan langsung mengaitkan draf lamaran pada posisi tersebut.
+**Jawab**: Anda tidak dapat mendaftar akun kosong tanpa tujuan formasi. Kunjungi halaman **Lowongan** terlebih dahulu, pilih posisi yang diminati, lalu klik **Lamar Posisi Ini**. Formulir pendaftaran akun akan terbuka otomatis.
 
-### Q2: Mengapa tombol "Kirim Lamaran" di halaman Review atau "Menuju ke Pemberkasan" di Profil tidak dapat diklik?
-**Jawab**: Pastikan seluruh syarat berikut terpenuhi:
-1. Kelengkapan Profil Dasar Anda sudah mencapai **100% Selesai** (semua 11 kriteria terpenuhi).
-2. Seluruh dokumen berkas bertanda **Wajib** pada menu Pemberkasan telah berhasil diunggah.
-3. Anda telah **mencentang kotak pernyataan kebenaran data** di halaman Review.
-4. Masa periode pendaftaran lowongan masih dalam masa buka (belum melewati batas waktu/deadline).
+### Q2: Mengapa tombol "Kirim Lamaran" di halaman Review tidak dapat diklik (non-aktif)?
+**Jawab**: Pastikan tiga syarat berikut telah terpenuhi seluruhnya:
+1. Kelengkapan Profil Dasar Anda sudah mencapai **100% Selesai**.
+2. Seluruh berkas bertanda **Wajib** pada menu Pemberkasan telah terunggah dan statusnya valid.
+3. Anda telah **mencentang kotak pernyataan kebenaran data**.
+4. Masa periode pendaftaran lowongan masih dalam status buka (belum melewati *deadline*).
 
-### Q3: Berapa ukuran maksimal dan format file pas foto dan dokumen berkas?
+### Q3: File saya ditolak saat diunggah. Apa yang harus saya lakukan?
 **Jawab**:
-- **Pas Foto Profil**: Format **JPG, JPEG, PNG, atau WEBP**, ukuran maksimal **5 MB (5.120 KB)**.
-- **Dokumen Berkas Persyaratan**: Format **PDF (.pdf)**, ukuran maksimal **2 MB (2.048 KB)** per file berkas.
+- Periksa ukuran file: Pastikan ukuran file tidak melebihi **2 MB (2.048 KB)**. Gunakan alat kompresi PDF legal jika ukuran melebihi batas.
+- Periksa ekstensi file: Gunakan format **.pdf** untuk dokumen berkas, dan format **.jpg / .png** untuk pas foto.
 
-### Q4: Mengapa Nomor Induk Kependudukan (NIK) pada halaman Profil tidak dapat diedit?
-**Jawab**: NIK bersifat permanen dan menjadi identitas tunggal Anda di sistem rekrutmen RSI Fatimah (prinsip 1 NIK = 1 Akun). NIK telah terverifikasi sejak pendaftaran akun baru demi mencegah duplikasi pendaftaran.
+### Q4: Apakah saya bisa mengubah berkas atau data setelah tombol Kirim Lamaran ditekan?
+**Jawab**: **Tidak bisa**. Setelah dikirim resmi, seluruh berkas terkunci demi menjaga objektivitas dan keaslian seleksi. Harap periksa seluruh dokumen melalui tombol *Preview* sebelum menekan tombol submit.
 
-### Q5: Di mana saya mengisi data STR dan Sertifikat Pelatihan? Mengapa tidak ada tombol "Tambah STR" di Profil?
-**Jawab**: Pengisian profil dasar berfokus pada data identitas, kontak, dan pendidikan formal terakhir. Dokumen STR (Surat Tanda Registrasi) dan Sertifikat Pelatihan (BTCLS/ACLS/dll.) diunggah langsung dalam bentuk **file PDF** pada **Langkah 4: Workspace Pemberkasan** (`/portal/lamaran/{id}/berkas`).
+### Q5: Saya adalah tenaga medis, tetapi masa berlaku STR saya belum ada tanggal berakhirnya (Seumur Hidup). Bagaimana cara mengisinya?
+**Jawab**: Pada formulir Tambah Lisensi / STR di Profil Anda, centang pilihan **"Berlaku Seumur Hidup"**. Sistem akan secara otomatis menyesuaikan status validitas STR Anda tanpa memerlukan tanggal kedaluwarsa.
 
 ### Q6: Bagaimana jika saya tidak sengaja menekan tombol Enter atau Simpan saat data belum terisi semua?
-**Jawab**: Anda tidak perlu khawatir! Sistem menerapkan penyimpanan bertahap (*incremental save*). Pas foto dan data apa pun yang sudah Anda input akan langsung tersimpan aman ke server. Persentase kelengkapan profil Anda akan otomatis bertambah (misalnya menjadi 45% atau 73%). Anda dapat melanjutkan pengisian kapan saja hingga mencapai 100%.
+**Jawab**: Anda tidak perlu khawatir! Sistem menerapkan penyimpanan bertahap (*incremental save*). Ketika Anda menekan Enter atau mengklik Simpan, pas foto dan data apa pun yang sudah Anda isi akan langsung tersimpan di server. Persentase profil Anda akan bertambah (misalnya menjadi 30% atau 60%). Anda dapat langsung melanjutkan pengisian kolom yang masih kosong tanpa perlu mengulang dari awal.
 
-### Q7: Apakah saya bisa membatalkan atau mengubah lamaran setelah tombol "Kirim Lamaran" ditekan?
-**Jawab**: **Tidak bisa**. Setelah tombol *Kirim Lamaran* ditekan, status berubah menjadi *SUBMITTED* dan berkas **terkunci permanen** (*snapshot frozen*) demi menjaga objektivitas seleksi. Selalu teliti dan periksa kembali melalui tombol *Preview* sebelum mengirimkan lamaran.
-
-### Q8: Bagaimana jika saya lupa kata sandi akun?
-**Jawab**: Buka halaman login (`/masuk`), klik tautan **Lupa Password?**, masukkan alamat email terdaftar Anda, dan ikuti instruksi pengaturan ulang kata sandi yang dikirimkan ke kotak masuk email Anda.
+### Q7: Bagaimana jika saya tidak menerima email konfirmasi / lupa password?
+**Jawab**:
+1. Periksa folder *Spam*, *Junk*, atau *Promotions* pada penyedia email Anda (Gmail, Yahoo, dll.).
+2. Pastikan penulisan alamat email saat registrasi sudah benar tanpa ada salah ketik (*typo*).
+3. Jika masih mengalami kendala, hubungi kanal bantuan resmi sekretariat rekrutmen.
 
 ---
 

@@ -60,6 +60,17 @@
                     </div>
                 </a>
 
+                <!-- Kelola Panduan CMS -->
+                <a href="{{ route('admin.guides.index') }}"
+                   class="flex items-center justify-between px-5 py-2.5 text-sm font-medium border-l-4 transition-colors {{ request()->routeIs('admin.guides*') ? 'bg-[#E6F2F8] text-[#0179B5] font-semibold border-[#0179B5]' : 'border-transparent text-slate-600 hover:text-[#0179B5] hover:bg-slate-50' }}">
+                    <div class="flex items-center gap-3">
+                        <svg class="w-4 h-4 {{ request()->routeIs('admin.guides*') ? 'text-[#0179B5]' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                        <span>Kelola Panduan</span>
+                    </div>
+                </a>
+
                 <!-- Siklus Akun (User Lifecycle) -->
                 <a href="{{ route('admin.lifecycle.index') }}"
                    class="flex items-center justify-between px-5 py-2.5 text-sm font-medium border-l-4 transition-colors {{ request()->routeIs('admin.lifecycle*') ? 'bg-[#E6F2F8] text-[#0179B5] font-semibold border-[#0179B5]' : 'border-transparent text-slate-600 hover:text-[#0179B5] hover:bg-slate-50' }}">
@@ -89,6 +100,17 @@
                     </div>
                 </a>
             </nav>
+        </div>
+    </div>
+
+    <!-- Sisi Bawah: Info Server & Mode -->
+    <div class="px-5">
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+            <div class="flex items-center gap-2">
+                <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                <span class="text-sm font-semibold text-slate-800">Sistem Rekrutmen SDI</span>
+            </div>
+            <p class="text-xs text-slate-500 mt-1">RSI Fatimah Banyuwangi</p>
         </div>
     </div>
 </aside>
