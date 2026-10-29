@@ -20,6 +20,7 @@ class ApplicantProfile extends Model
     protected $fillable = [
         'user_id',
         'nik',
+        'nickname',
         'birth_place',
         'birth_date',
         'gender',

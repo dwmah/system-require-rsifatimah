@@ -219,17 +219,56 @@
                 {{-- Nama Lengkap --}}
                 <div>
                     <label for="name" class="block text-xs font-semibold text-slate-700 mb-1.5">
-                        Nama Lengkap <span class="text-red-500 font-bold">*</span>
+                        Nama Lengkap (Wajib Beserta Gelar Jika Ada) <span class="text-red-500 font-bold">*</span>
                     </label>
                     <input
                         type="text"
                         name="name"
                         id="name"
                         value="{{ old('name', $user->name) }}"
+                        placeholder="Contoh: dr. Budi Santoso, Sp.A / Siti Aisyah, S.Kep., Ns."
                         required
                         class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $errors->has('name') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100' }} focus:outline-hidden focus:ring-2"
                     >
+                    <p class="text-[11px] text-slate-400 mt-1">Wajib mencantumkan gelar akademik atau profesi jika memilikinya.</p>
                     <x-form.error name="name" />
+                </div>
+
+                {{-- Nama Panggilan --}}
+                <div>
+                    <label for="nickname" class="block text-xs font-semibold text-slate-700 mb-1.5">
+                        Nama Panggilan <span class="text-red-500 font-bold">*</span>
+                    </label>
+                    <input
+                        type="text"
+                        name="nickname"
+                        id="nickname"
+                        value="{{ old('nickname', $profile?->nickname) }}"
+                        placeholder="Contoh: Budi / Siti"
+                        required
+                        maxlength="50"
+                        class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $errors->has('nickname') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100' }} focus:outline-hidden focus:ring-2"
+                    >
+                    <p class="text-[11px] text-slate-400 mt-1">Nama sapaan akrab untuk komunikasi dan wawancara.</p>
+                    <x-form.error name="nickname" />
+                </div>
+
+                {{-- Jenis Kelamin --}}
+                <div>
+                    <label for="gender" class="block text-xs font-semibold text-slate-700 mb-1.5">
+                        Jenis Kelamin <span class="text-red-500 font-bold">*</span>
+                    </label>
+                    <select
+                        name="gender"
+                        id="gender"
+                        required
+                        class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $errors->has('gender') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100' }} focus:outline-hidden focus:ring-2 bg-white"
+                    >
+                        <option value="">-- Pilih Jenis Kelamin --</option>
+                        <option value="Laki-laki" {{ old('gender', $profile?->gender) === 'Laki-laki' ? 'selected' : '' }}>Laki-laki</option>
+                        <option value="Perempuan" {{ old('gender', $profile?->gender) === 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
+                    </select>
+                    <x-form.error name="gender" />
                 </div>
 
                 {{-- Tempat Lahir --}}
@@ -264,24 +303,6 @@
                         class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $errors->has('birth_date') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100' }} focus:outline-hidden focus:ring-2"
                     >
                     <x-form.error name="birth_date" />
-                </div>
-
-                {{-- Jenis Kelamin --}}
-                <div class="sm:col-span-2">
-                    <label for="gender" class="block text-xs font-semibold text-slate-700 mb-1.5">
-                        Jenis Kelamin <span class="text-red-500 font-bold">*</span>
-                    </label>
-                    <select
-                        name="gender"
-                        id="gender"
-                        required
-                        class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $errors->has('gender') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100' }} focus:outline-hidden focus:ring-2 bg-white"
-                    >
-                        <option value="">-- Pilih Jenis Kelamin --</option>
-                        <option value="Laki-laki" {{ old('gender', $profile?->gender) === 'Laki-laki' ? 'selected' : '' }}>Laki-laki</option>
-                        <option value="Perempuan" {{ old('gender', $profile?->gender) === 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
-                    </select>
-                    <x-form.error name="gender" />
                 </div>
             </div>
         </div>

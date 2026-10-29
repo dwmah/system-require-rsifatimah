@@ -759,6 +759,7 @@ class ApplicantSelectionTrackingTest extends TestCase
         // 1. Coba tamper via profile personal update
         $this->actingAs($user)->patch(route('profile.personal.update'), array_merge([
             'name' => 'Nama Baru',
+            'nickname' => 'Budi',
             'birth_place' => 'Banyuwangi',
             'birth_date' => '1995-05-15',
             'gender' => 'Laki-laki',
