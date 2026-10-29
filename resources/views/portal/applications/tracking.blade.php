@@ -282,7 +282,15 @@
 
                                 {{-- Stage Attachment / Test Result Document --}}
                                 @if (!empty($stage['has_attachment']) && !empty($stage['attachment_url']))
-                                    <div class="p-3 bg-sky-50/70 border border-sky-200 rounded-lg flex items-center justify-between gap-3 flex-wrap">
+                                    @php
+                                        $attachmentName = $stage['attachment_name'] ?? 'Lampiran';
+                                        $attachmentMime = strtolower($stage['attachment_mime'] ?? '');
+                                        $isPdf = str_contains($attachmentMime, 'pdf') || str_ends_with(strtolower($attachmentName), '.pdf');
+                                        $isImg = str_contains($attachmentMime, 'image') || in_array(strtolower(pathinfo($attachmentName, PATHINFO_EXTENSION)), ['jpg', 'jpeg', 'png', 'webp']);
+                                        $previewUrl = $stage['attachment_url'] . (str_contains($stage['attachment_url'], '?') ? '&' : '?') . 'preview=1';
+                                        $downloadUrl = $stage['attachment_url'];
+                                    @endphp
+                                    <div x-data="{ showPreviewModal: false }" class="p-3 bg-sky-50/70 border border-sky-200 rounded-lg flex items-center justify-between gap-3 flex-wrap">
                                         <div class="flex items-center gap-2.5 min-w-0">
                                             <div class="w-8 h-8 rounded-lg bg-sky-100 text-[#0179B5] flex items-center justify-center shrink-0">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
@@ -292,11 +300,76 @@
                                                 <p class="text-[11px] text-slate-500 truncate max-w-xs">{{ $stage['attachment_name'] }}</p>
                                             </div>
                                         </div>
-                                        <a href="{{ $stage['attachment_url'] }}" target="_blank"
-                                           class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#0179B5] hover:bg-[#016293] text-white text-xs font-medium rounded-lg shadow-xs transition-colors shrink-0">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                                            <span>Lihat / Unduh Lampiran Hasil Tes (PDF/Gambar)</span>
-                                        </a>
+
+                                        <div class="flex items-center gap-2 shrink-0">
+                                            <button type="button" @click="showPreviewModal = true"
+                                                    class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#0179B5] hover:bg-[#016293] text-white text-xs font-medium rounded-lg shadow-xs transition-colors cursor-pointer">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                                <span>Lihat / Unduh Lampiran Hasil Tes (PDF/Gambar)</span>
+                                            </button>
+                                        </div>
+
+                                        {{-- Modal Pratinjau / Review Sebelum Unduh --}}
+                                        <div x-show="showPreviewModal" x-cloak
+                                             class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6"
+                                             @keydown.escape.window="showPreviewModal = false">
+                                            <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" @click="showPreviewModal = false"></div>
+
+                                            <div class="relative bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden z-10 border border-slate-200">
+                                                {{-- Modal Header --}}
+                                                <div class="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 bg-slate-50/80">
+                                                    <div class="min-w-0 pr-3">
+                                                        <h4 class="text-sm font-bold text-slate-900 truncate">Pratinjau Hasil: {{ $stage['name'] }}</h4>
+                                                        <p class="text-[11px] text-slate-500 font-mono truncate">{{ $stage['attachment_name'] }}</p>
+                                                    </div>
+                                                    <div class="flex items-center gap-2 shrink-0">
+                                                        <a href="{{ $downloadUrl }}"
+                                                           class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-[#0179B5] text-white hover:bg-[#016293] shadow-xs transition-colors"
+                                                           title="Unduh Berkas Hasil Seleksi">
+                                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                                            <span>Unduh Berkas</span>
+                                                        </a>
+                                                        <button type="button" @click="showPreviewModal = false"
+                                                                class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+                                                                title="Tutup">
+                                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                {{-- Modal Body (Preview Viewer) --}}
+                                                <div class="flex-1 overflow-auto p-4 flex items-center justify-center bg-slate-100 min-h-[350px]">
+                                                    @if ($isPdf)
+                                                        <iframe src="{{ $previewUrl }}" class="w-full h-[72vh] rounded-xl border border-slate-300 bg-white shadow-xs"></iframe>
+                                                    @elseif ($isImg)
+                                                        <div class="w-full flex items-center justify-center">
+                                                            <img src="{{ $previewUrl }}" alt="{{ $stage['attachment_name'] }}" class="max-h-[72vh] max-w-full object-contain rounded-lg shadow-md bg-white p-1">
+                                                        </div>
+                                                    @else
+                                                        <div class="text-center p-6 bg-white rounded-xl border border-slate-200">
+                                                            <p class="text-xs text-slate-500 mb-3">Pratinjau visual tidak dapat ditampilkan langsung untuk format file ini.</p>
+                                                            <a href="{{ $downloadUrl }}" class="px-4 py-2 bg-[#0179B5] text-white text-xs font-semibold rounded-lg inline-flex items-center gap-1.5">
+                                                                Unduh File Lampiran
+                                                            </a>
+                                                        </div>
+                                                    @endif
+                                                </div>
+
+                                                {{-- Modal Footer --}}
+                                                <div class="px-5 py-3 border-t border-slate-100 bg-white flex items-center justify-between text-xs text-slate-500">
+                                                    <span>Diunggah resmi oleh Panitia Rekrutmen RSI Fatimah Banyuwangi</span>
+                                                    <div class="flex items-center gap-2">
+                                                        <button type="button" @click="showPreviewModal = false" class="px-3 py-1.5 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer">
+                                                            Tutup
+                                                        </button>
+                                                        <a href="{{ $downloadUrl }}" class="px-3.5 py-1.5 rounded-lg bg-[#0179B5] text-white font-semibold hover:bg-[#016293] transition-colors inline-flex items-center gap-1.5">
+                                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                                            <span>Unduh File</span>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 @endif
 
