@@ -89,6 +89,7 @@ class ApplicantProfileTest extends TestCase
         // Send malicious payload attempting to change NIK
         $response = $this->actingAs($user)->patch(route('profile.personal.update'), [
             'name' => 'Nama Baru',
+            'nickname' => 'Baru',
             'nik' => '3510999999999999', // should be ignored!
             'birth_place' => 'Banyuwangi',
             'birth_date' => '1998-05-20',
@@ -100,6 +101,7 @@ class ApplicantProfileTest extends TestCase
 
         $user->refresh();
         $this->assertEquals('Nama Baru', $user->name);
+        $this->assertEquals('Baru', $user->applicantProfile->nickname);
         $this->assertEquals('3510123456780001', $user->applicantProfile->nik); // NIK must remain unchanged
         $this->assertEquals('Banyuwangi', $user->applicantProfile->birth_place);
     }
@@ -109,7 +111,8 @@ class ApplicantProfileTest extends TestCase
         $user = $this->createApplicantUser();
 
         $response = $this->actingAs($user)->patch(route('profile.personal.update'), [
-            'name' => 'Fatimah Zahra',
+            'name' => 'Fatimah Zahra, S.Kep.',
+            'nickname' => 'Fatimah',
             'birth_place' => 'Surabaya',
             'birth_date' => '1995-10-15',
             'gender' => 'Perempuan',
@@ -119,10 +122,26 @@ class ApplicantProfileTest extends TestCase
         $response->assertSessionHas('success');
 
         $user->refresh();
-        $this->assertEquals('Fatimah Zahra', $user->name);
+        $this->assertEquals('Fatimah Zahra, S.Kep.', $user->name);
+        $this->assertEquals('Fatimah', $user->applicantProfile->nickname);
         $this->assertEquals('Surabaya', $user->applicantProfile->birth_place);
         $this->assertEquals('1995-10-15', $user->applicantProfile->birth_date->format('Y-m-d'));
         $this->assertEquals('Perempuan', $user->applicantProfile->gender);
+    }
+
+    public function test_nickname_is_required_when_updating_personal_data(): void
+    {
+        $user = $this->createApplicantUser();
+
+        $response = $this->actingAs($user)->patch(route('profile.personal.update'), [
+            'name' => 'Fatimah Zahra',
+            'nickname' => '',
+            'birth_place' => 'Surabaya',
+            'birth_date' => '1995-10-15',
+            'gender' => 'Perempuan',
+        ]);
+
+        $response->assertSessionHasErrors(['nickname']);
     }
 
     public function test_birth_date_today_is_rejected(): void
@@ -131,6 +150,7 @@ class ApplicantProfileTest extends TestCase
 
         $response = $this->actingAs($user)->patch(route('profile.personal.update'), [
             'name' => 'Nama Pelamar',
+            'nickname' => 'Pelamar',
             'birth_place' => 'Banyuwangi',
             'birth_date' => now()->toDateString(),
             'gender' => 'Laki-laki',
@@ -585,7 +605,8 @@ class ApplicantProfileTest extends TestCase
         $photoFile = UploadedFile::fake()->image('my_pas_foto.jpg', 300, 400);
 
         $response = $this->actingAs($user)->patch(route('profile.update'), [
-            'name' => 'Dawam Ahmadi Updated',
+            'name' => 'Dawam Ahmadi Updated, S.Kom.',
+            'nickname' => 'Dawam',
             'birth_place' => 'Banyuwangi',
             'birth_date' => '1998-05-14',
             'gender' => 'Laki-laki',
@@ -600,7 +621,8 @@ class ApplicantProfileTest extends TestCase
         $response->assertSessionHas('success', 'Data profil berhasil disimpan.');
 
         $user->refresh();
-        $this->assertEquals('Dawam Ahmadi Updated', $user->name);
+        $this->assertEquals('Dawam Ahmadi Updated, S.Kom.', $user->name);
+        $this->assertEquals('Dawam', $user->applicantProfile->nickname);
         $this->assertEquals('dawam.updated@example.com', $user->email);
         $this->assertEquals('6281234567899', $user->phone);
         $this->assertEquals('Banyuwangi', $user->applicantProfile->birth_place);
@@ -624,6 +646,7 @@ class ApplicantProfileTest extends TestCase
 
         $response = $this->actingAs($user)->patch(route('profile.update'), [
             'name' => $user->name,
+            'nickname' => 'Budi',
             'birth_place' => 'Banyuwangi',
             'birth_date' => '1998-05-14',
             'gender' => 'Laki-laki',
@@ -646,6 +669,7 @@ class ApplicantProfileTest extends TestCase
 
         $response = $this->actingAs($user)->patch(route('profile.update'), [
             'name' => 'Dawam Ahmadi Updated',
+            'nickname' => 'Dawam',
             'birth_place' => 'Banyuwangi',
             'birth_date' => '1998-05-14',
             'gender' => 'Laki-laki',
@@ -677,6 +701,7 @@ class ApplicantProfileTest extends TestCase
         // Updating again updates the existing education record
         $response2 = $this->actingAs($user)->patch(route('profile.update'), [
             'name' => 'Dawam Ahmadi Updated',
+            'nickname' => 'Dawam',
             'birth_place' => 'Banyuwangi',
             'birth_date' => '1998-05-14',
             'gender' => 'Laki-laki',
@@ -705,6 +730,7 @@ class ApplicantProfileTest extends TestCase
         // Submit profile with personal info and photo, but empty institution_name and empty study_program
         $response = $this->actingAs($user)->patch(route('profile.update'), [
             'name' => 'Fatimah Pelamar',
+            'nickname' => 'Fatimah',
             'birth_place' => 'Banyuwangi',
             'birth_date' => '1998-05-14',
             'gender' => 'Perempuan',
@@ -730,6 +756,7 @@ class ApplicantProfileTest extends TestCase
         // When institution_name is provided, education is created and profile becomes 100% complete
         $response2 = $this->actingAs($user)->patch(route('profile.update'), [
             'name' => 'Fatimah Pelamar',
+            'nickname' => 'Fatimah',
             'birth_place' => 'Banyuwangi',
             'birth_date' => '1998-05-14',
             'gender' => 'Perempuan',

@@ -50,6 +50,7 @@ class UpdateProfileRequest extends FormRequest
             'remove_photo' => ['nullable', 'boolean'],
             // Data Pribadi
             'name' => ['required', 'string', 'max:255'],
+            'nickname' => ['required', 'string', 'max:50'],
             'birth_place' => ['required', 'string', 'max:255'],
             'birth_date' => ['required', 'date', 'before:today'],
             'gender' => ['required', 'string', 'in:Laki-laki,Perempuan'],
@@ -88,6 +89,7 @@ class UpdateProfileRequest extends FormRequest
     {
         return [
             'name' => 'Nama Lengkap',
+            'nickname' => 'Nama Panggilan',
             'birth_place' => 'Tempat Lahir',
             'birth_date' => 'Tanggal Lahir',
             'gender' => 'Jenis Kelamin',
@@ -116,6 +118,8 @@ class UpdateProfileRequest extends FormRequest
 
         return [
             'name.required' => 'Nama lengkap wajib diisi.',
+            'nickname.required' => 'Nama panggilan wajib diisi.',
+            'nickname.max' => 'Nama panggilan maksimal 50 karakter.',
             'birth_place.required' => 'Tempat lahir wajib diisi.',
             'birth_date.required' => 'Tanggal lahir wajib diisi.',
             'birth_date.before' => 'Tanggal lahir harus sebelum hari ini.',

@@ -44,6 +44,7 @@ class ApplicationSnapshotService
         $personalData = [
             'registration_number' => $user->registration_number,
             'name' => $user->name,
+            'nickname' => $profile?->nickname,
             'email' => $user->email,
             'phone' => $user->phone,
             'nik' => $profile?->nik,

@@ -351,6 +351,9 @@
                     </h2>
                     <div class="space-y-2 text-sm divide-y divide-slate-100">
                         <div class="flex justify-between py-2"><span class="text-slate-500">Nama Lengkap:</span> <strong class="text-slate-900">{{ $user->name }}</strong></div>
+                        @if(!empty($profile->nickname))
+                            <div class="flex justify-between py-2"><span class="text-slate-500">Nama Panggilan:</span> <strong class="text-slate-900">{{ $profile->nickname }}</strong></div>
+                        @endif
                         <div class="flex justify-between py-2"><span class="text-slate-500">NIK (KTP):</span> <strong class="text-slate-900 font-mono">{{ $profile->nik ?? '-' }}</strong></div>
                         <div class="flex justify-between py-2"><span class="text-slate-500">Jenis Kelamin:</span> <strong class="text-slate-900">{{ $genderLabel }}</strong></div>
                         <div class="flex justify-between py-2"><span class="text-slate-500">Tempat, Tanggal Lahir:</span> <strong class="text-slate-900">{{ $profile->birth_place ?? '-' }}, {{ $profile->birth_date ? \Carbon\Carbon::parse($profile->birth_date)->locale('id')->translatedFormat('d F Y') : '-' }}</strong></div>

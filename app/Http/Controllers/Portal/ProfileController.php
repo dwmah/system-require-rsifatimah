@@ -70,6 +70,7 @@ class ProfileController extends Controller
             $user->applicantProfile()->updateOrCreate(
                 ['user_id' => $user->id],
                 [
+                    'nickname' => $validated['nickname'] ?? null,
                     'birth_place' => $validated['birth_place'],
                     'birth_date' => $validated['birth_date'],
                     'gender' => $validated['gender'],
@@ -129,6 +130,7 @@ class ProfileController extends Controller
             ]);
 
             $profileData = [
+                'nickname' => $validated['nickname'] ?? null,
                 'birth_place' => $validated['birth_place'],
                 'birth_date' => $validated['birth_date'],
                 'gender' => $validated['gender'],

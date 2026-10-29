@@ -443,6 +443,12 @@
                                 <span class="text-slate-500 block">Nama Lengkap:</span>
                                 <strong class="text-slate-900">{{ $pd['name'] ?? '-' }}</strong>
                             </div>
+                            @if(!empty($pd['nickname']))
+                                <div>
+                                    <span class="text-slate-500 block">Nama Panggilan:</span>
+                                    <strong class="text-slate-900">{{ $pd['nickname'] }}</strong>
+                                </div>
+                            @endif
                             <div>
                                 <span class="text-slate-500 block">NIK (KTP):</span>
                                 <strong class="font-mono text-slate-900">{{ $pd['nik'] ?? '-' }}</strong>
