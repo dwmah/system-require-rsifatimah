@@ -54,6 +54,7 @@ class ApplicationDocumentAndSubmissionTest extends TestCase
             $profile = ApplicantProfile::create([
                 'user_id' => $user->id,
                 'nik' => sprintf('3510998877%06d', $seq),
+                'nickname' => 'Pelamar',
                 'birth_place' => 'Banyuwangi',
                 'birth_date' => '1995-08-17',
                 'gender' => 'Laki-laki',

@@ -50,6 +50,7 @@ class ApplicantDraftCancellationAndVacancySwitchTest extends TestCase
         $profile = ApplicantProfile::create([
             'user_id' => $user->id,
             'nik' => sprintf('3510123456%06d', $seq),
+            'nickname' => 'Siti',
             'gender' => 'female',
             'birth_place' => 'Banyuwangi',
             'birth_date' => '1998-07-20',

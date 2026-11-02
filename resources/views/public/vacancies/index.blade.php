@@ -1,10 +1,5 @@
 <x-layouts.public title="Lowongan Pekerjaan" active-menu="lowongan">
     <div class="space-y-6">
-        {{-- Breadcrumb --}}
-        <x-ui.breadcrumb :items="[
-            ['label' => 'Lowongan Pekerjaan']
-        ]" />
-
         {{-- Section Header --}}
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
             <div>

@@ -25,7 +25,7 @@ class RecruitmentNotificationService
             'title' => 'Lamaran Berhasil Dikirim',
             'message' => "Lamaran Anda untuk formasi {$application->jobVacancy->title} berhasil dikirim dan sedang menunggu verifikasi berkas oleh Tim SDI.",
             'type' => 'info',
-            'action_url' => route('portal.home'),
+            'action_url' => route('portal.applications.tracking', $application),
         ]);
 
         // 2. Email Notification
@@ -52,7 +52,7 @@ class RecruitmentNotificationService
                 'title' => 'Selamat! Anda Lolos Tahap Administrasi',
                 'message' => "Berkas lamaran Anda untuk formasi {$application->jobVacancy->title} telah diverifikasi dan dinyatakan LENGKAP. Silakan cek jadwal tahapan seleksi berikutnya.",
                 'type' => 'success',
-                'action_url' => route('portal.home'),
+                'action_url' => route('portal.applications.tracking', $application),
             ]);
         } else {
             RecruitmentNotification::create([
@@ -60,7 +60,7 @@ class RecruitmentNotificationService
                 'title' => 'Hasil Verifikasi Berkas Administrasi',
                 'message' => "Berkas lamaran Anda untuk formasi {$application->jobVacancy->title} belum memenuhi syarat: ".($application->rejection_reason ?? 'Berkas tidak lengkap/tidak sesuai.'),
                 'type' => 'danger',
-                'action_url' => route('portal.home'),
+                'action_url' => route('portal.applications.tracking', $application),
             ]);
         }
 
@@ -86,7 +86,7 @@ class RecruitmentNotificationService
             'title' => "Pembaruan Tahapan: {$stageName}",
             'message' => "Tahapan seleksi Anda telah diperbarui ke: {$stageName}. ".($note ? "Catatan: {$note}" : ''),
             'type' => 'info',
-            'action_url' => route('portal.home'),
+            'action_url' => route('portal.applications.tracking', $application),
         ]);
 
         try {

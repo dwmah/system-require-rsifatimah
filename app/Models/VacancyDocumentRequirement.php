@@ -89,6 +89,29 @@ class VacancyDocumentRequirement extends Model
     }
 
     /**
+     * Nilai atribut accept yang kompatibel dengan browser & file picker OS (.pdf, .mp4, dll).
+     */
+    public function getAcceptAttributeValueAttribute(): string
+    {
+        if (empty($this->allowed_mimes)) {
+            return '.pdf,application/pdf';
+        }
+
+        $tokens = array_filter(array_map('trim', explode(',', $this->allowed_mimes)));
+        $acceptTokens = [];
+
+        foreach ($tokens as $token) {
+            $acceptTokens[] = $token;
+            $ext = ApplicationDocumentService::mimeToExtension($token);
+            if ($ext) {
+                $acceptTokens[] = '.'.$ext;
+            }
+        }
+
+        return implode(',', array_unique($acceptTokens));
+    }
+
+    /**
      * Lowongan pekerjaan pemilik syarat dokumen.
      */
     public function jobVacancy(): BelongsTo

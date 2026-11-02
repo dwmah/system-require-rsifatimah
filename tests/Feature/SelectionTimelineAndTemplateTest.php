@@ -55,6 +55,7 @@ class SelectionTimelineAndTemplateTest extends TestCase
         $profile = ApplicantProfile::create([
             'user_id' => $this->applicant->id,
             'nik' => '3510000000000001',
+            'nickname' => 'Dokter',
             'birth_place' => 'Banyuwangi',
             'birth_date' => '1995-05-15',
             'gender' => 'Laki-laki',

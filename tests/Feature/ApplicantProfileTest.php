@@ -2,11 +2,17 @@
 
 namespace Tests\Feature;
 
+use App\Enums\JobApplicationStatus;
+use App\Enums\JobVacancyStatus;
+use App\Enums\RecruitmentPeriodStatus;
 use App\Models\ApplicantCertification;
 use App\Models\ApplicantEducation;
 use App\Models\ApplicantLicense;
 use App\Models\ApplicantProfile;
 use App\Models\ApplicantWorkExperience;
+use App\Models\JobApplication;
+use App\Models\JobVacancy;
+use App\Models\RecruitmentPeriod;
 use App\Models\User;
 use App\Services\Profile\ProfileCompletenessService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -459,39 +465,40 @@ class ApplicantProfileTest extends TestCase
         $service = new ProfileCompletenessService;
 
         // 1. Fresh user right after registration:
-        // Has name, email, phone, NIK (4 criteria of 11 = 36%)
+        // Has name, email, phone, NIK (4 criteria of 12 = 33%)
         $user = $this->createApplicantUser();
-        $this->assertEquals(36, $service->percentage($user));
+        $this->assertEquals(33, $service->percentage($user));
         $this->assertFalse($service->isComplete($user));
-        $this->assertCount(7, $service->missingItems($user));
+        $this->assertCount(8, $service->missingItems($user));
 
-        // 2. Fill personal data (+3 criteria: birth_place, birth_date, gender -> 7/11 = 64%)
+        // 2. Fill personal data (+4 criteria: nickname, birth_place, birth_date, gender -> 8/12 = 67%)
         $user->applicantProfile->update([
+            'nickname' => 'Dawam',
             'birth_place' => 'Banyuwangi',
             'birth_date' => '1996-04-12',
             'gender' => 'Laki-laki',
         ]);
-        $this->assertEquals(64, $service->percentage($user->fresh()));
+        $this->assertEquals(67, $service->percentage($user->fresh()));
 
-        // 3. Fill address (+2 criteria: address_ktp, address_domicile -> 9/11 = 82%)
+        // 3. Fill address (+2 criteria: address_ktp, address_domicile -> 10/12 = 83%)
         $user->applicantProfile->update([
             'address_ktp' => 'Jl. Ahmad Yani No. 5',
             'address_domicile' => 'Jl. Ahmad Yani No. 5',
             'same_as_ktp' => true,
         ]);
-        $this->assertEquals(82, $service->percentage($user->fresh()));
+        $this->assertEquals(83, $service->percentage($user->fresh()));
 
-        // 4. Add education (+1 criterion: min 1 education -> 10/11 = 91%)
+        // 4. Add education (+1 criterion: min 1 education -> 11/12 = 92%)
         $edu = ApplicantEducation::create([
             'applicant_profile_id' => $user->applicantProfile->id,
             'education_level' => 'S1',
             'institution_name' => 'Universitas Jember',
             'study_program' => 'Keperawatan',
         ]);
-        $this->assertEquals(91, $service->percentage($user->fresh()));
+        $this->assertEquals(92, $service->percentage($user->fresh()));
         $this->assertFalse($service->isComplete($user->fresh()));
 
-        // 5. Add photo (+1 criterion: pas foto formal 3x4 -> 11/11 = 100%)
+        // 5. Add photo (+1 criterion: pas foto formal 3x4 -> 12/12 = 100%)
         $user->applicantProfile->update([
             'photo_path' => 'profile-photos/sample.jpg',
         ]);
@@ -516,9 +523,9 @@ class ApplicantProfileTest extends TestCase
         ]);
         $this->assertEquals(100, $service->percentage($user->fresh()));
 
-        // 7. Deleting the photo drops completeness back to 91%
+        // 7. Deleting the photo drops completeness back to 92%
         $user->applicantProfile->update(['photo_path' => null]);
-        $this->assertEquals(91, $service->percentage($user->fresh()));
+        $this->assertEquals(92, $service->percentage($user->fresh()));
         $this->assertFalse($service->isComplete($user->fresh()));
     }
 
@@ -538,10 +545,11 @@ class ApplicantProfileTest extends TestCase
         $this->assertTrue($details['name']);
         $this->assertTrue($details['email']);
         $this->assertTrue($details['phone']);
+        $this->assertFalse($details['nickname']);
         $this->assertFalse($details['nik']);
         $this->assertFalse($details['birth_place']);
         $this->assertFalse($details['photo']);
-        $this->assertEquals(27, $service->percentage($user));
+        $this->assertEquals(25, $service->percentage($user));
         $this->assertFalse($service->isComplete($user));
     }
 
@@ -553,13 +561,13 @@ class ApplicantProfileTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('Kelengkapan Profil Dasar');
-        $response->assertSee('36% Selesai');
+        $response->assertSee('33% Selesai');
         $response->assertSee('Lengkapi Profil Sekarang');
     }
 
     public function test_pemberkasan_cta_is_disabled_when_profile_is_incomplete(): void
     {
-        $user = $this->createApplicantUser(); // Incomplete (~36%)
+        $user = $this->createApplicantUser(); // Incomplete (~33%)
 
         $response = $this->actingAs($user)->get(route('profile.show'));
 
@@ -572,6 +580,7 @@ class ApplicantProfileTest extends TestCase
     public function test_pemberkasan_cta_is_enabled_when_profile_is_100_percent_complete(): void
     {
         $user = $this->createApplicantUser([], [
+            'nickname' => 'Dawam',
             'birth_place' => 'Banyuwangi',
             'birth_date' => '1995-05-15',
             'gender' => 'Laki-laki',
@@ -774,5 +783,129 @@ class ApplicantProfileTest extends TestCase
         $this->assertCount(1, $user->applicantProfile->educations);
         $this->assertTrue($completenessService->isComplete($user));
         $this->assertEquals(100, $completenessService->percentage($user));
+    }
+
+    public function test_profile_page_shows_detail_lamaran_cta_and_locks_form_when_application_is_submitted(): void
+    {
+        $user = $this->createApplicantUser([], [
+            'nickname' => 'Dawam',
+            'birth_place' => 'Banyuwangi',
+            'birth_date' => '1995-05-15',
+            'gender' => 'Laki-laki',
+            'address_ktp' => 'Jl. Ahmad Yani No. 10',
+            'address_domicile' => 'Jl. Ahmad Yani No. 10',
+            'same_as_ktp' => true,
+            'photo_path' => 'profile-photos/sample.jpg',
+        ]);
+
+        ApplicantEducation::create([
+            'applicant_profile_id' => $user->applicantProfile->id,
+            'education_level' => 'S1',
+            'institution_name' => 'Universitas Airlangga',
+            'study_program' => 'Ilmu Keperawatan',
+        ]);
+
+        $period = RecruitmentPeriod::create([
+            'code' => 'PER-2026',
+            'name' => 'Periode Rekrutmen 2026',
+            'registration_start_at' => now()->subDays(10),
+            'registration_end_at' => now()->addDays(20),
+            'status' => RecruitmentPeriodStatus::OPEN,
+        ]);
+
+        $vacancy = JobVacancy::create([
+            'recruitment_period_id' => $period->id,
+            'code' => 'VAC-TEST-LOCK',
+            'title' => 'Perawat IGD Terkunci',
+            'unit' => 'IGD',
+            'employment_type' => 'PKWT',
+            'location' => 'RSI Fatimah',
+            'quota' => 2,
+            'status' => JobVacancyStatus::OPEN,
+            'open_at' => now()->subDays(5),
+            'close_at' => now()->addDays(5),
+        ]);
+
+        JobApplication::create([
+            'user_id' => $user->id,
+            'recruitment_period_id' => $period->id,
+            'job_vacancy_id' => $vacancy->id,
+            'status' => JobApplicationStatus::SUBMITTED,
+            'application_number' => 'LAM-LOCK-001',
+            'submitted_at' => now(),
+        ]);
+
+        $response = $this->actingAs($user)->get(route('profile.show'));
+
+        $response->assertStatus(200);
+        $response->assertSee('Lihat Detail Lamaran');
+        $response->assertDontSee('Menuju ke Pemberkasan');
+        $response->assertDontSee('Data Profil Terkunci');
+        $response->assertSee('Pas Foto Terkunci');
+        $response->assertSee('disabled', false);
+    }
+
+    public function test_profile_update_is_blocked_when_applicant_has_submitted_application(): void
+    {
+        $user = $this->createApplicantUser([], [
+            'nickname' => 'Dawam',
+            'birth_place' => 'Banyuwangi',
+            'birth_date' => '1995-05-15',
+            'gender' => 'Laki-laki',
+            'address_ktp' => 'Jl. Ahmad Yani No. 10',
+            'address_domicile' => 'Jl. Ahmad Yani No. 10',
+            'same_as_ktp' => true,
+        ]);
+
+        $period = RecruitmentPeriod::create([
+            'code' => 'PER-2026',
+            'name' => 'Periode Rekrutmen 2026',
+            'registration_start_at' => now()->subDays(10),
+            'registration_end_at' => now()->addDays(20),
+            'status' => RecruitmentPeriodStatus::OPEN,
+        ]);
+
+        $vacancy = JobVacancy::create([
+            'recruitment_period_id' => $period->id,
+            'code' => 'VAC-TEST-LOCK-2',
+            'title' => 'Apoteker Terkunci',
+            'unit' => 'Farmasi',
+            'employment_type' => 'PKWT',
+            'location' => 'RSI Fatimah',
+            'quota' => 1,
+            'status' => JobVacancyStatus::OPEN,
+            'open_at' => now()->subDays(5),
+            'close_at' => now()->addDays(5),
+        ]);
+
+        JobApplication::create([
+            'user_id' => $user->id,
+            'recruitment_period_id' => $period->id,
+            'job_vacancy_id' => $vacancy->id,
+            'status' => JobApplicationStatus::SUBMITTED,
+            'application_number' => 'LAM-LOCK-002',
+            'submitted_at' => now(),
+        ]);
+
+        $response = $this->actingAs($user)->patch(route('profile.update'), [
+            'name' => 'Nama Yang Coba Diubah',
+            'nickname' => 'Ubah',
+            'birth_place' => 'Jakarta',
+            'birth_date' => '1995-05-15',
+            'gender' => 'Laki-laki',
+            'email' => $user->email,
+            'phone' => '081234567890',
+            'address_ktp' => 'Jl. KTP Baru',
+            'same_as_ktp' => '1',
+            'education_level' => 'S1',
+            'institution_name' => 'Universitas Indonesia',
+            'study_program' => 'Farmasi',
+        ]);
+
+        $response->assertRedirect(route('profile.show'));
+        $response->assertSessionHas('error');
+
+        $user->refresh();
+        $this->assertNotEquals('Nama Yang Coba Diubah', $user->name);
     }
 }

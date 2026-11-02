@@ -1,19 +1,12 @@
 <x-layouts.applicant title="Lamaran Saya - Workspace Dokumen">
     <div class="space-y-6" x-data="{ uploadModalOpen: false, selectedReqId: null, selectedReqName: '' }">
-        <!-- Breadcrumb & Header -->
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div class="flex items-center gap-2 text-xs text-slate-500">
-                <a href="{{ route('portal.home') }}" class="hover:text-[#0179B5]">Portal Pelamar</a>
-                <span>/</span>
-                <span class="text-slate-800 font-semibold">Lamaran Saya</span>
-            </div>
-
-            @if(!$application)
+        @if(!$application)
+            <div class="flex justify-end">
                 <a href="{{ route('portal.applications.create') }}" class="px-4 py-2 bg-[#0179B5] hover:bg-[#016293] text-white text-xs font-semibold rounded-lg shadow-sm transition-colors">
                     + Pilih Formasi Lowongan
                 </a>
-            @endif
-        </div>
+            </div>
+        @endif
 
         @if($application)
             <!-- Active Application Overview Card -->

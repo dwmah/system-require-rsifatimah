@@ -61,6 +61,7 @@ class RecruitmentFullWorkflowTest extends TestCase
         ApplicantProfile::create([
             'user_id' => $this->applicant->id,
             'nik' => '3510123456780001',
+            'nickname' => 'Fauzi',
             'gender' => 'male',
             'birth_place' => 'Banyuwangi',
             'birth_date' => '1995-05-12',

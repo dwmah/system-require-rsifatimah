@@ -5,12 +5,6 @@
     :user-email="$user->email"
 >
     <div class="space-y-6 max-w-5xl">
-        {{-- Breadcrumb --}}
-        <x-ui.breadcrumb :items="[
-            ['label' => 'Portal Pelamar', 'url' => route('portal.home')],
-            ['label' => 'Profil Saya', 'active' => true],
-        ]" />
-
         @php
             $targetPemberkasanUrl = $pemberkasanUrl ?? (
                 isset($activeDraft) && $activeDraft
@@ -30,9 +24,20 @@
                 </p>
             </div>
 
-            {{-- CTA Menuju Pemberkasan (Pojok Kanan Atas) --}}
+            {{-- CTA Menuju Pemberkasan / Detail Lamaran (Pojok Kanan Atas) --}}
             <div class="shrink-0">
-                @if ($isComplete)
+                @if (!empty($isProfileLocked) && !empty($activeApplication))
+                    <a
+                        href="{{ route('portal.applications.show', $activeApplication) }}"
+                        class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-[#0179B5] hover:bg-[#016293] active:bg-[#01527c] shadow-xs hover:shadow-sm transition-all duration-150 group"
+                        id="btn-cta-pemberkasan"
+                    >
+                        <span>Lihat Detail Lamaran</span>
+                        <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                    </a>
+                @elseif ($isComplete)
                     <a
                         href="{{ $targetPemberkasanUrl }}"
                         class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-[#0179B5] hover:bg-[#016293] active:bg-[#01527c] shadow-xs hover:shadow-sm transition-all duration-150 group"
@@ -64,6 +69,7 @@
             </div>
         </div>
 
+
         {{-- Flash Feedback Alerts --}}
         @if (session('success'))
             <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800 flex items-center gap-2.5 shadow-2xs">
@@ -90,18 +96,12 @@
             </div>
         @endif
 
-        {{-- 1. Profile Completeness Overview --}}
-        @include('portal.profile.partials.completeness', [
-            'percentage' => $percentage,
-            'isComplete' => $isComplete,
-            'details' => $details,
-            'missingItems' => $missingItems,
-        ])
-
-        {{-- 2. Formulir Profil Lengkap (1 Card: Pas Foto Teratas, Data Pribadi, Kontak & Alamat, Riwayat Pendidikan) --}}
+        {{-- Formulir Profil Lengkap (1 Card: Pas Foto Teratas, Data Pribadi, Kontak & Alamat, Riwayat Pendidikan) --}}
         @include('portal.profile.partials.personal-data', [
             'user' => $user,
             'profile' => $profile,
+            'isProfileLocked' => $isProfileLocked ?? false,
+            'activeApplication' => $activeApplication ?? null,
         ])
 
     </div>

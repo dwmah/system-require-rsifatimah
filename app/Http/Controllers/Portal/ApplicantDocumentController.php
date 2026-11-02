@@ -37,12 +37,12 @@ class ApplicantDocumentController extends Controller
 
         $request->validate([
             'vacancy_document_requirement_id' => 'required|exists:vacancy_document_requirements,id',
-            'document_file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120', // Maks 5MB
+            'document_file' => 'required|file|mimes:pdf,jpg,jpeg,png,mp4|max:51200',
         ], [
             'vacancy_document_requirement_id.required' => 'Jenis persyaratan dokumen tidak valid.',
             'document_file.required' => 'Silakan pilih berkas dokumen yang ingin diunggah.',
-            'document_file.mimes' => 'Format berkas hanya diperbolehkan PDF, JPG, JPEG, atau PNG.',
-            'document_file.max' => 'Ukuran berkas dokumen maksimal 5 MB.',
+            'document_file.mimes' => 'Format berkas hanya diperbolehkan PDF, JPG, JPEG, PNG, atau MP4 (Video).',
+            'document_file.max' => 'Ukuran berkas dokumen melebihi batas maksimal yang diizinkan.',
         ]);
 
         $req = VacancyDocumentRequirement::findOrFail($request->vacancy_document_requirement_id);

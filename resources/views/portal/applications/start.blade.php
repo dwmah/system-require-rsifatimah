@@ -1,15 +1,7 @@
 <x-layouts.applicant title="Konfirmasi Formasi Lamaran — Rekrutmen RSI Fatimah">
     <div class="max-w-4xl mx-auto space-y-6">
-        {{-- Breadcrumb & Back --}}
-        <div class="flex items-center justify-between">
-            <nav class="flex items-center gap-2 text-xs text-slate-500">
-                <a href="{{ route('portal.home') }}" class="hover:text-rsi-700 transition-colors">Portal</a>
-                <span>/</span>
-                <a href="{{ route('vacancies.show', $jobVacancy) }}" class="hover:text-rsi-700 transition-colors">Lowongan</a>
-                <span>/</span>
-                <span class="text-slate-900 font-medium">Konfirmasi Formasi</span>
-            </nav>
-
+        {{-- Back Action --}}
+        <div class="flex items-center justify-end">
             <a
                 href="{{ route('vacancies.show', $jobVacancy) }}"
                 class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-rsi-700 transition-colors"

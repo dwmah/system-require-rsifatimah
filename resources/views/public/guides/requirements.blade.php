@@ -1,11 +1,5 @@
 <x-layouts.public :title="$guide->title ?? 'Panduan Persyaratan Pendaftaran'" active-menu="persyaratan">
     <div class="space-y-6 max-w-4xl">
-        {{-- Breadcrumb --}}
-        <x-ui.breadcrumb :items="[
-            ['label' => 'Panduan'],
-            ['label' => 'Persyaratan Pendaftaran']
-        ]" />
-
         {{-- Section Header --}}
         <div class="border-b border-slate-200 pb-5">
             <h1 class="text-2xl font-bold text-slate-900 tracking-tight">

@@ -33,14 +33,21 @@ class ProfileController extends Controller
         $missingItems = $completenessService->missingItems($user);
         $details = $completenessService->details($user);
 
+        $activeApplication = $user->jobApplications()
+            ->with(['jobVacancy'])
+            ->latest()
+            ->first();
+
         $activeDraft = $user->jobApplications()
             ->where('status', JobApplicationStatus::DRAFT)
             ->latest()
             ->first();
 
+        $isProfileLocked = $activeApplication && $activeApplication->status !== JobApplicationStatus::DRAFT;
+
         $pemberkasanUrl = $activeDraft
             ? route('portal.applications.documents.index', $activeDraft)
-            : route('portal.applications.index');
+            : ($activeApplication ? route('portal.applications.show', $activeApplication) : route('portal.applications.index'));
 
         return view('portal.profile.show', [
             'user' => $user,
@@ -50,6 +57,8 @@ class ProfileController extends Controller
             'missingItems' => $missingItems,
             'details' => $details,
             'activeDraft' => $activeDraft,
+            'activeApplication' => $activeApplication,
+            'isProfileLocked' => $isProfileLocked,
             'pemberkasanUrl' => $pemberkasanUrl,
         ]);
     }
@@ -60,6 +69,12 @@ class ProfileController extends Controller
     public function updatePersonal(UpdatePersonalDataRequest $request): RedirectResponse
     {
         $user = $request->user();
+
+        if ($this->isProfileLocked($user)) {
+            return redirect()->route('profile.show')
+                ->with('error', 'Profil tidak dapat diubah karena berkas lamaran Anda telah resmi dikirim ke panitia seleksi.');
+        }
+
         $validated = $request->validated();
 
         DB::transaction(function () use ($user, $validated) {
@@ -87,6 +102,12 @@ class ProfileController extends Controller
     public function updateContact(UpdateContactAddressRequest $request): RedirectResponse
     {
         $user = $request->user();
+
+        if ($this->isProfileLocked($user)) {
+            return redirect()->route('profile.show')
+                ->with('error', 'Profil tidak dapat diubah karena berkas lamaran Anda telah resmi dikirim ke panitia seleksi.');
+        }
+
         $validated = $request->validated();
 
         $sameAsKtp = (bool) ($validated['same_as_ktp'] ?? false);
@@ -117,6 +138,12 @@ class ProfileController extends Controller
     public function updateProfile(UpdateProfileRequest $request): RedirectResponse
     {
         $user = $request->user();
+
+        if ($this->isProfileLocked($user)) {
+            return redirect()->route('profile.show')
+                ->with('error', 'Profil tidak dapat diubah karena berkas lamaran Anda telah resmi dikirim ke panitia seleksi.');
+        }
+
         $validated = $request->validated();
 
         $sameAsKtp = (bool) ($validated['same_as_ktp'] ?? false);
@@ -206,6 +233,13 @@ class ProfileController extends Controller
      */
     public function updatePhoto(Request $request): RedirectResponse
     {
+        $user = $request->user();
+
+        if ($this->isProfileLocked($user)) {
+            return redirect()->route('profile.show')
+                ->with('error', 'Pas foto tidak dapat diubah karena berkas lamaran Anda telah resmi dikirim ke panitia seleksi.');
+        }
+
         $request->validate([
             'photo' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:5120'],
         ], [
@@ -256,6 +290,12 @@ class ProfileController extends Controller
     public function destroyPhoto(Request $request): RedirectResponse
     {
         $user = $request->user();
+
+        if ($this->isProfileLocked($user)) {
+            return redirect()->route('profile.show')
+                ->with('error', 'Pas foto tidak dapat dihapus karena berkas lamaran Anda telah resmi dikirim ke panitia seleksi.');
+        }
+
         $profile = $user->applicantProfile;
 
         if ($profile && $profile->photo_path) {
@@ -268,5 +308,21 @@ class ProfileController extends Controller
         }
 
         return redirect()->route('profile.show')->with('success', 'Foto profil berhasil dihapus.');
+    }
+
+    /**
+     * Cek apakah data profil pelamar sedang dikunci karena lamaran aktif sudah dikirim ke panitia seleksi.
+     */
+    protected function isProfileLocked($user): bool
+    {
+        if (! $user) {
+            return false;
+        }
+
+        $activeApplication = $user->jobApplications()
+            ->latest()
+            ->first();
+
+        return (bool) ($activeApplication && $activeApplication->status !== JobApplicationStatus::DRAFT);
     }
 }

@@ -23,18 +23,20 @@ class ApplicationController extends Controller
 {
     /**
      * Menampilkan daftar seluruh lamaran pekerjaan milik pelamar yang sedang aktif.
+     * Jika pelamar memiliki lamaran aktif/terdaftar, langsung dialihkan ke detail lamaran.
      */
-    public function index(Request $request, SelectionTrackingService $trackingService): View
+    public function index(Request $request, SelectionTrackingService $trackingService): View|RedirectResponse
     {
-        $applications = $request->user()
+        $application = $request->user()
             ->jobApplications()
-            ->with(['jobVacancy', 'recruitmentPeriod', 'snapshot', 'documents'])
             ->latest()
-            ->get();
+            ->first();
 
-        foreach ($applications as $app) {
-            $app->safe_status = $trackingService->publicApplicationStatus($app);
+        if ($application) {
+            return redirect()->route('portal.applications.show', $application);
         }
+
+        $applications = collect();
 
         return view('portal.applications.index', compact('applications'));
     }

@@ -1,20 +1,10 @@
 <x-layouts.applicant title="Unggah Berkas Persyaratan — {{ $jobApplication->jobVacancy->title }}">
     <div class="max-w-5xl mx-auto space-y-6">
-        {{-- Breadcrumb & Back Action --}}
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-200">
-            <nav class="flex items-center gap-2 text-xs text-slate-500">
-                <a href="{{ route('portal.home') }}" class="hover:text-rsi-700 transition-colors">Portal</a>
-                <span>/</span>
-                <a href="{{ route('portal.applications.index') }}" class="hover:text-rsi-700 transition-colors">Lamaran Saya</a>
-                <span>/</span>
-                <a href="{{ route('portal.applications.show', $jobApplication) }}" class="hover:text-rsi-700 transition-colors">Detail</a>
-                <span>/</span>
-                <span class="text-slate-900 font-medium">Unggah Berkas</span>
-            </nav>
-
+        {{-- Back Action --}}
+        <div class="flex items-center justify-end pb-2 border-b border-slate-200">
             <a
                 href="{{ route('portal.applications.show', $jobApplication) }}"
-                class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-rsi-700 transition-colors self-start sm:self-auto"
+                class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-rsi-700 transition-colors"
             >
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -173,7 +163,17 @@
                                     </span>
                                 @endif
 
-                                @if (str_contains(strtolower($requirement->allowed_mimes), 'video/mp4') || str_contains(strtolower($requirement->allowed_mimes), 'mp4'))
+                                @php
+                                    $hasVideo = str_contains(strtolower($requirement->allowed_mimes ?? ''), 'video/mp4') || str_contains(strtolower($requirement->allowed_mimes ?? ''), 'mp4');
+                                    $hasPdf = str_contains(strtolower($requirement->allowed_mimes ?? ''), 'pdf');
+                                @endphp
+
+                                @if ($hasVideo && $hasPdf)
+                                    <span class="inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
+                                        <svg class="w-3 h-3 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                                        PDF / Video MP4
+                                    </span>
+                                @elseif ($hasVideo)
                                     <span class="inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
                                         <svg class="w-3 h-3 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
                                         MP4 Video
@@ -328,7 +328,7 @@
                                                 type="file"
                                                 name="file"
                                                 x-ref="replaceInput"
-                                                accept="{{ $requirement->allowed_mimes }}"
+                                                accept="{{ $requirement->accept_attribute_value ?? $requirement->allowed_mimes }}"
                                                 class="sr-only"
                                                 @change="if ($event.target.files && $event.target.files.length > 0) {
                                                     const file = $event.target.files[0];
@@ -407,7 +407,7 @@
                                             type="file"
                                             name="file"
                                             x-ref="fileInput"
-                                            accept="{{ $requirement->allowed_mimes }}"
+                                            accept="{{ $requirement->accept_attribute_value ?? $requirement->allowed_mimes }}"
                                             class="sr-only"
                                             @change="if ($event.target.files && $event.target.files.length > 0) {
                                                 const file = $event.target.files[0];

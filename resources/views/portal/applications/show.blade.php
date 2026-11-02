@@ -1,24 +1,13 @@
 <x-layouts.applicant title="Detail Lamaran — {{ $jobApplication->jobVacancy->title }}">
     <div class="max-w-5xl mx-auto space-y-6">
-        {{-- Breadcrumb & Top Actions --}}
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-200">
-            <nav class="flex items-center gap-2 text-xs text-slate-500">
-                <a href="{{ route('portal.home') }}" class="hover:text-rsi-700 transition-colors">Portal</a>
-                <span>/</span>
-                <a href="{{ route('portal.applications.index') }}" class="hover:text-rsi-700 transition-colors">Lamaran Saya</a>
-                <span>/</span>
-                <span class="text-slate-900 font-medium">Detail Lamaran</span>
-            </nav>
-
-            <a
-                href="{{ route('portal.applications.index') }}"
-                class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-rsi-700 transition-colors self-start sm:self-auto"
-            >
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-                <span>Daftar Lamaran</span>
-            </a>
+        {{-- Page Header --}}
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Lamaran Saya</h1>
+                <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
+                    Informasi detail formasi, ringkasan data pendaftaran, dan status berkas lamaran Anda.
+                </p>
+            </div>
         </div>
 
         {{-- Flash Alerts --}}

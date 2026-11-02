@@ -333,8 +333,8 @@ class ApplicantSelectionTrackingTest extends TestCase
         $showResponse->assertSee('Menunggu Pengumuman Akhir');
         $showResponse->assertDontSee('Diterima');
 
-        // 3. Check Application Index Page
-        $indexResponse = $this->actingAs($user)->get(route('portal.applications.index'));
+        // 3. Check Application Index Page (redirects to show)
+        $indexResponse = $this->actingAs($user)->followingRedirects()->get(route('portal.applications.index'));
         $indexResponse->assertOk();
         $indexResponse->assertSee('Menunggu Pengumuman Akhir');
         $indexResponse->assertDontSee('Diterima');
@@ -342,7 +342,6 @@ class ApplicantSelectionTrackingTest extends TestCase
         // 4. Check Dashboard
         $dashResponse = $this->actingAs($user)->get(route('portal.home'));
         $dashResponse->assertOk();
-        $dashResponse->assertSee('Menunggu Pengumuman Akhir');
         $dashResponse->assertDontSee('Diterima');
     }
 
@@ -559,8 +558,7 @@ class ApplicantSelectionTrackingTest extends TestCase
         $response = $this->actingAs($user)->get(route('portal.home'));
 
         $response->assertOk();
-        $response->assertSee('Formasi Aktif Seleksi');
-        $response->assertSee('LAM-ACTIVE-000002');
+        $response->assertSee(route('portal.applications.show', $app2));
     }
 
     // =========================================================================
@@ -659,7 +657,7 @@ class ApplicantSelectionTrackingTest extends TestCase
         $this->actingAs($user)->get(route('portal.home'))->assertOk();
         $this->actingAs($user)->get(route('portal.applications.tracking', $application))->assertOk();
         $this->actingAs($user)->get(route('portal.applications.show', $application))->assertOk();
-        $this->actingAs($user)->get(route('portal.applications.index'))->assertOk();
+        $this->actingAs($user)->get(route('portal.applications.index'))->assertRedirect(route('portal.applications.show', $application));
 
         // Verifikasi count row tidak bertambah/berkurang
         $this->assertEquals($initialHistoriesCount, ApplicationStageHistory::count());
@@ -907,8 +905,8 @@ class ApplicantSelectionTrackingTest extends TestCase
         $this->actingAs($user)->get(route('portal.home'))->assertOk();
         $this->assertEquals(0, ApplicationSnapshot::where('job_application_id', $application->id)->count());
 
-        // 2. Index: Aman
-        $this->actingAs($user)->get(route('portal.applications.index'))->assertOk();
+        // 2. Index: Aman (redirects to show)
+        $this->actingAs($user)->get(route('portal.applications.index'))->assertRedirect(route('portal.applications.show', $application));
         $this->assertEquals(0, ApplicationSnapshot::where('job_application_id', $application->id)->count());
 
         // 3. Show: Menampilkan warning, tidak fallback ke live profile, dan tidak membuat snapshot

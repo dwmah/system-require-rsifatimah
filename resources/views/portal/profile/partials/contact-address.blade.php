@@ -12,11 +12,8 @@
 >
     <div class="flex items-center justify-between pb-4 mb-6 border-b border-slate-100">
         <div>
-            <div class="flex items-center gap-2 mb-1">
+            <div class="mb-1">
                 <h3 class="text-base font-bold text-slate-900">Alamat & Kontak</h3>
-                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">
-                    WAJIB UNTUK PROFIL DASAR
-                </span>
             </div>
             <p class="text-xs text-slate-500">Informasi domisili tempat tinggal dan jalur komunikasi resmi.</p>
         </div>
