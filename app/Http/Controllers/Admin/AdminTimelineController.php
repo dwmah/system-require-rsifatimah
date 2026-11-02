@@ -47,10 +47,12 @@ class AdminTimelineController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'start_date' => 'required|date',
-            'submission_deadline' => 'required|date|after_or_equal:start_date',
+            'submission_deadline' => 'required_without:registration_end_at|nullable|date|after_or_equal:start_date',
+            'registration_end_at' => 'required_without:submission_deadline|nullable|date|after_or_equal:start_date',
             'is_active' => 'boolean',
         ]);
 
+        $endDate = $validated['registration_end_at'] ?? $validated['submission_deadline'];
         $isActive = $request->boolean('is_active');
 
         if ($isActive) {
@@ -61,7 +63,7 @@ class AdminTimelineController extends Controller
             'name' => $validated['name'],
             'code' => 'PER-'.date('Ymd').'-'.strtoupper(Str::random(4)),
             'registration_start_at' => $validated['start_date'],
-            'registration_end_at' => $validated['submission_deadline'],
+            'registration_end_at' => $endDate,
             'status' => $isActive ? RecruitmentPeriodStatus::OPEN : RecruitmentPeriodStatus::DRAFT,
         ]);
 
@@ -76,10 +78,12 @@ class AdminTimelineController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'start_date' => 'required|date',
-            'submission_deadline' => 'required|date|after_or_equal:start_date',
+            'submission_deadline' => 'required_without:registration_end_at|nullable|date|after_or_equal:start_date',
+            'registration_end_at' => 'required_without:submission_deadline|nullable|date|after_or_equal:start_date',
             'is_active' => 'boolean',
         ]);
 
+        $endDate = $validated['registration_end_at'] ?? $validated['submission_deadline'];
         $isActive = $request->boolean('is_active');
 
         if ($isActive && $period->status !== RecruitmentPeriodStatus::OPEN) {
@@ -91,7 +95,7 @@ class AdminTimelineController extends Controller
         $period->update([
             'name' => $validated['name'],
             'registration_start_at' => $validated['start_date'],
-            'registration_end_at' => $validated['submission_deadline'],
+            'registration_end_at' => $endDate,
             'status' => $isActive ? RecruitmentPeriodStatus::OPEN : RecruitmentPeriodStatus::COMPLETED,
         ]);
 
@@ -239,14 +243,8 @@ class AdminTimelineController extends Controller
             $vacancies = $vacanciesQuery->get();
 
             foreach ($vacancies as $vacancy) {
-                // Hapus tahapan lama yang tidak memiliki relasi critical/histories jika aman,
-                // atau sinkronkan berdasarkan sequence order
-                $existingStages = $vacancy->selectionStages()->orderBy('sort_order')->get();
-                $usedStageIds = DB::table('application_stage_histories')
-                    ->whereIn('vacancy_selection_stage_id', $existingStages->pluck('id'))
-                    ->pluck('vacancy_selection_stage_id')
-                    ->toArray();
-
+                // Sinkronkan tahapan berdasarkan sequence order template
+                $existingStages = $vacancy->selectionStages()->orderBy('sort_order')->orderBy('id')->get();
                 $processedStageIds = [];
 
                 foreach ($stagesData as $idx => $sData) {
@@ -280,12 +278,13 @@ class AdminTimelineController extends Controller
                     }
                 }
 
-                // Bersihkan stage berlebih jika ada dan belum dipakai
+                // Bersihkan stage berlebih jika ada
                 foreach ($existingStages as $existing) {
                     if (! in_array($existing->id, $processedStageIds, true)) {
-                        if (! in_array($existing->id, $usedStageIds, true)) {
-                            $existing->delete();
-                        }
+                        DB::table('application_stage_histories')
+                            ->where('vacancy_selection_stage_id', $existing->id)
+                            ->delete();
+                        $existing->delete();
                     }
                 }
             }

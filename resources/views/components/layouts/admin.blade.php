@@ -36,11 +36,6 @@
 
             <!-- Sisi Kanan: Profile & Logout Dropdown -->
             <div class="flex items-center gap-4">
-                <div class="hidden sm:flex items-center gap-2 px-3 py-1 bg-white/10 border border-white/20 rounded-full text-xs text-white">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span>Admin SDI Terverifikasi</span>
-                </div>
-
                 <div class="relative" x-data="{ open: false }" @click.outside="open = false">
                     <button @click="open = !open" class="flex items-center gap-2.5 pl-1 py-1 cursor-pointer rounded-lg hover:bg-white/10 px-2 transition-colors focus:outline-none">
                         <div class="w-8 h-8 rounded-full bg-white text-[#0179B5] font-bold text-xs flex items-center justify-center shadow-xs">

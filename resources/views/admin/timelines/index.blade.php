@@ -245,8 +245,8 @@
                             </div>
 
                             <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Batas Akhir Submit Berkas</label>
-                                <input type="date" name="submission_deadline" value="{{ old('submission_deadline', $period->registration_end_at ? $period->registration_end_at->format('Y-m-d') : '') }}" required
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Batas Akhir Periode Pendaftaran</label>
+                                <input type="date" name="registration_end_at" value="{{ old('registration_end_at', old('submission_deadline', $period->registration_end_at ? $period->registration_end_at->format('Y-m-d') : '')) }}" required
                                        class="w-full h-11 px-3 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:border-[#0179B5] focus:bg-white">
                             </div>
                         </div>
