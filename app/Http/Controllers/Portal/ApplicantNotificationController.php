@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Portal;
 
+use App\Enums\JobApplicationStatus;
 use App\Http\Controllers\Controller;
 use App\Models\RecruitmentNotification;
 use Illuminate\Http\RedirectResponse;
@@ -39,11 +40,29 @@ class ApplicantNotificationController extends Controller
             $notification->update(['read_at' => now()]);
         }
 
-        if ($notification->action_url) {
-            return redirect($notification->action_url);
+        return redirect($this->resolveTargetUrl($notification, $user));
+    }
+
+    /**
+     * Tentukan URL tujuan notifikasi dengan memprioritaskan alur & tahapan seleksi
+     * jika notifikasi mengarah ke alur seleksi / dashboard pelamar.
+     */
+    protected function resolveTargetUrl(RecruitmentNotification $notification, $user): string
+    {
+        if ($notification->action_url && $notification->action_url !== route('portal.home') && $notification->action_url !== url('/portal')) {
+            return $notification->action_url;
         }
 
-        return redirect()->route('portal.notifications.index');
+        $application = $user->jobApplications()
+            ->whereNotIn('status', [JobApplicationStatus::DRAFT])
+            ->latest()
+            ->first() ?? $user->jobApplications()->latest()->first();
+
+        if ($application) {
+            return route('portal.applications.tracking', $application);
+        }
+
+        return $notification->action_url ?: route('portal.notifications.index');
     }
 
     /**

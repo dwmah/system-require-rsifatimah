@@ -48,6 +48,7 @@
             $items = [
                 'photo' => 'Pas Foto 3x4',
                 'name' => 'Nama Lengkap',
+                'nickname' => 'Nama Panggilan',
                 'nik' => 'NIK Terdaftar',
                 'email' => 'Alamat Email',
                 'phone' => 'Nomor HP/WA',

@@ -1,7 +1,13 @@
 @props([
     'user',
     'profile',
+    'isProfileLocked' => false,
+    'activeApplication' => null,
 ])
+
+@php
+    $inputLockedClass = $isProfileLocked ? 'bg-slate-50 text-slate-600 cursor-not-allowed border-slate-200 select-none' : '';
+@endphp
 
 <div
     class="bg-white rounded-2xl border border-slate-200 shadow-2xs p-6 sm:p-7"
@@ -49,11 +55,8 @@
     {{-- Card Header --}}
     <div class="flex items-center justify-between pb-4 mb-6 border-b border-slate-100">
         <div>
-            <div class="flex items-center gap-2 mb-1">
+            <div class="mb-1">
                 <h3 class="text-base font-bold text-slate-900">Data Pribadi & Profil</h3>
-                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">
-                    WAJIB
-                </span>
             </div>
             <p class="text-xs text-slate-500">Pas foto formal, identitas diri lengkap, alamat kontak resmi, serta riwayat pendidikan formal terakhir Anda.</p>
         </div>
@@ -69,7 +72,7 @@
 
         {{-- SECTION 1: PAS FOTO FORMAL (Paling Atas Sendiri) --}}
         <div class="p-4 sm:p-5 rounded-2xl bg-slate-50/80 border border-slate-200/90">
-            <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5">
+            <div class="flex flex-col sm:flex-row items-center gap-5">
                 {{-- Frame Pas Foto 3:4 (Strict 105px x 140px) --}}
                 <div class="relative shrink-0" style="width: 105px; height: 140px;">
                     <div class="rounded-xl overflow-hidden bg-white border-2 border-slate-200 shadow-xs relative"
@@ -107,24 +110,8 @@
                 {{-- Info & Action Controls --}}
                 <div class="flex-1 space-y-2.5 text-center sm:text-left min-w-0">
                     <div>
-                        <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 mb-1">
+                        <div class="mb-1">
                             <h4 class="text-sm font-bold text-slate-900">Pas Foto Formal (3x4)</h4>
-
-                            <template x-if="hasNewPhoto">
-                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-sky-50 text-sky-700 border border-sky-200">
-                                    FOTO BARU DIPILIH
-                                </span>
-                            </template>
-                            <template x-if="removePhoto && !hasNewPhoto">
-                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">
-                                    AKAN DIHAPUS
-                                </span>
-                            </template>
-                            <template x-if="!hasNewPhoto && !removePhoto">
-                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold {{ $profile?->photo_url ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200' }}">
-                                    {{ $profile?->photo_url ? 'DIUNGGAH' : 'WAJIB PROFIL LENGKAP' }}
-                                </span>
-                            </template>
                         </div>
                         <p class="text-xs text-slate-500 leading-relaxed">
                             Pas foto formal berlatar belakang polos untuk identitas resmi dan kartu seleksi penerimaan karyawan. Format JPG, PNG, atau WEBP (maks. 5 MB).
@@ -143,57 +130,58 @@
 
                     {{-- Photo Actions --}}
                     <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-1">
-                        <label
-                            for="profile_photo_input"
-                            class="cursor-pointer inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#0179B5] hover:bg-[#016293] text-white text-xs font-bold rounded-xl shadow-xs transition-colors"
-                        >
-                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                            <span x-text="hasExistingPhoto || hasNewPhoto ? 'Ganti Pas Foto' : 'Pilih Pas Foto'"></span>
-                        </label>
-
-                        <template x-if="hasNewPhoto">
-                            <button
-                                type="button"
-                                @click="cancelPhoto()"
-                                class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold rounded-xl transition-colors cursor-pointer"
-                            >
-                                Batalkan Pilihan
-                            </button>
-                        </template>
-
-                        <template x-if="hasExistingPhoto && !hasNewPhoto && !removePhoto">
-                            <button
-                                type="button"
-                                @click="markRemovePhoto()"
-                                class="inline-flex items-center gap-1 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-semibold rounded-xl border border-rose-200 transition-colors cursor-pointer"
-                            >
-                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        @if ($isProfileLocked)
+                            <div class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 text-slate-600 text-xs font-semibold rounded-xl border border-slate-200 shadow-2xs">
+                                <svg class="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                                 </svg>
-                                <span>Hapus Foto</span>
-                            </button>
-                        </template>
-
-                        <template x-if="removePhoto && !hasNewPhoto">
-                            <button
-                                type="button"
-                                @click="undoRemovePhoto()"
-                                class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition-colors cursor-pointer"
+                                <span>Pas Foto Terkunci</span>
+                            </div>
+                        @else
+                            <label
+                                for="profile_photo_input"
+                                class="cursor-pointer inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#0179B5] hover:bg-[#016293] text-white text-xs font-bold rounded-xl shadow-xs transition-colors"
                             >
-                                Batal Hapus
-                            </button>
-                        </template>
-                    </div>
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                <span x-text="hasExistingPhoto || hasNewPhoto ? 'Ganti Pas Foto' : 'Pilih Pas Foto'"></span>
+                            </label>
 
-                    {{-- Selected file feedback indicator --}}
-                    <div x-show="hasNewPhoto" x-cloak class="pt-1">
-                        <div class="inline-flex items-center gap-2 px-2.5 py-1 bg-sky-50 border border-sky-200 rounded-lg text-xs text-slate-700">
-                            <span class="font-medium truncate max-w-xs" x-text="fileName"></span>
-                            <span class="text-slate-400 font-mono text-[11px]" x-text="'(' + fileSize + ')'"></span>
-                        </div>
+                            <template x-if="hasNewPhoto">
+                                <button
+                                    type="button"
+                                    @click="cancelPhoto()"
+                                    class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold rounded-xl transition-colors cursor-pointer"
+                                >
+                                    Batalkan Pilihan
+                                </button>
+                            </template>
+
+                            <template x-if="hasExistingPhoto && !hasNewPhoto && !removePhoto">
+                                <button
+                                    type="button"
+                                    @click="markRemovePhoto()"
+                                    class="inline-flex items-center gap-1 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-semibold rounded-xl border border-rose-200 transition-colors cursor-pointer"
+                                >
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                    <span>Hapus Foto</span>
+                                </button>
+                            </template>
+
+                            <template x-if="removePhoto && !hasNewPhoto">
+                                <button
+                                    type="button"
+                                    @click="undoRemovePhoto()"
+                                    class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition-colors cursor-pointer"
+                                >
+                                    Batal Hapus
+                                </button>
+                            </template>
+                        @endif
                     </div>
 
                     <x-form.error name="photo" />
@@ -244,7 +232,8 @@
                         value="{{ old('name', $user->name) }}"
                         placeholder="Contoh: dr. Budi Santoso, Sp.A / Siti Aisyah, S.Kep., Ns."
                         required
-                        class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $errors->has('name') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100' }} focus:outline-hidden focus:ring-2"
+                        @disabled($isProfileLocked)
+                        class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $isProfileLocked ? $inputLockedClass : ($errors->has('name') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100') }} focus:outline-hidden focus:ring-2"
                     >
                     <p class="text-[11px] text-slate-400 mt-1">Wajib mencantumkan gelar akademik atau profesi jika memilikinya.</p>
                     <x-form.error name="name" />
@@ -263,7 +252,8 @@
                         placeholder="Contoh: Budi / Siti"
                         required
                         maxlength="50"
-                        class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $errors->has('nickname') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100' }} focus:outline-hidden focus:ring-2"
+                        @disabled($isProfileLocked)
+                        class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $isProfileLocked ? $inputLockedClass : ($errors->has('nickname') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100') }} focus:outline-hidden focus:ring-2"
                     >
                     <p class="text-[11px] text-slate-400 mt-1">Nama sapaan akrab untuk komunikasi dan wawancara.</p>
                     <x-form.error name="nickname" />
@@ -278,7 +268,8 @@
                         name="gender"
                         id="gender"
                         required
-                        class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $errors->has('gender') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100' }} focus:outline-hidden focus:ring-2 bg-white"
+                        @disabled($isProfileLocked)
+                        class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $isProfileLocked ? $inputLockedClass : ($errors->has('gender') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100') }} focus:outline-hidden focus:ring-2 bg-white"
                     >
                         <option value="">-- Pilih Jenis Kelamin --</option>
                         <option value="Laki-laki" {{ old('gender', $profile?->gender) === 'Laki-laki' ? 'selected' : '' }}>Laki-laki</option>
@@ -299,7 +290,8 @@
                         value="{{ old('birth_place', $profile?->birth_place) }}"
                         placeholder="Kota / Kabupaten tempat lahir"
                         required
-                        class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $errors->has('birth_place') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100' }} focus:outline-hidden focus:ring-2"
+                        @disabled($isProfileLocked)
+                        class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $isProfileLocked ? $inputLockedClass : ($errors->has('birth_place') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100') }} focus:outline-hidden focus:ring-2"
                     >
                     <x-form.error name="birth_place" />
                 </div>
@@ -316,7 +308,8 @@
                         value="{{ old('birth_date', $profile?->birth_date?->format('Y-m-d')) }}"
                         max="{{ now()->subDay()->toDateString() }}"
                         required
-                        class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $errors->has('birth_date') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100' }} focus:outline-hidden focus:ring-2"
+                        @disabled($isProfileLocked)
+                        class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $isProfileLocked ? $inputLockedClass : ($errors->has('birth_date') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100') }} focus:outline-hidden focus:ring-2"
                     >
                     <x-form.error name="birth_date" />
                 </div>
@@ -342,7 +335,8 @@
                         id="email"
                         value="{{ old('email', $user->email) }}"
                         required
-                        class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $errors->has('email') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100' }} focus:outline-hidden focus:ring-2"
+                        @disabled($isProfileLocked)
+                        class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $isProfileLocked ? $inputLockedClass : ($errors->has('email') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100') }} focus:outline-hidden focus:ring-2"
                     >
                     <x-form.error name="email" />
                 </div>
@@ -359,7 +353,8 @@
                         value="{{ old('phone', $user->phone) }}"
                         placeholder="Contoh: 081234567890"
                         required
-                        class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $errors->has('phone') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100' }} focus:outline-hidden focus:ring-2"
+                        @disabled($isProfileLocked)
+                        class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $isProfileLocked ? $inputLockedClass : ($errors->has('phone') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100') }} focus:outline-hidden focus:ring-2"
                     >
                     <x-form.error name="phone" />
                 </div>
@@ -375,21 +370,23 @@
                         rows="3"
                         x-model="addressKtp"
                         required
+                        @disabled($isProfileLocked)
                         placeholder="Alamat lengkap beserta RT/RW, Kelurahan, Kecamatan, dan Kota/Kabupaten"
-                        class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $errors->has('address_ktp') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100' }} focus:outline-hidden focus:ring-2"
+                        class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $isProfileLocked ? $inputLockedClass : ($errors->has('address_ktp') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100') }} focus:outline-hidden focus:ring-2"
                     >{{ old('address_ktp', $profile?->address_ktp) }}</textarea>
                     <x-form.error name="address_ktp" />
                 </div>
 
                 {{-- Checkbox Same As KTP --}}
                 <div class="sm:col-span-2 pt-1">
-                    <label class="flex items-center gap-2 cursor-pointer select-none">
+                    <label class="flex items-center gap-2 {{ $isProfileLocked ? 'cursor-not-allowed opacity-75' : 'cursor-pointer' }} select-none">
                         <input
                             type="checkbox"
                             name="same_as_ktp"
                             value="1"
                             x-model="sameAsKtp"
-                            class="w-4 h-4 rounded border-slate-300 text-rsi-700 focus:ring-rsi-500"
+                            @disabled($isProfileLocked)
+                            class="w-4 h-4 rounded border-slate-300 text-rsi-700 focus:ring-rsi-500 {{ $isProfileLocked ? 'cursor-not-allowed' : '' }}"
                         >
                         <span class="text-xs font-medium text-slate-700">
                             Alamat domisili saat ini sama dengan alamat KTP
@@ -407,7 +404,8 @@
                         id="address_domicile"
                         rows="3"
                         placeholder="Alamat tempat tinggal saat ini"
-                        class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $errors->has('address_domicile') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100' }} focus:outline-hidden focus:ring-2"
+                        @disabled($isProfileLocked)
+                        class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $isProfileLocked ? $inputLockedClass : ($errors->has('address_domicile') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100') }} focus:outline-hidden focus:ring-2"
                     >{{ old('address_domicile', $profile?->address_domicile) }}</textarea>
                     <x-form.error name="address_domicile" />
                 </div>
@@ -436,7 +434,8 @@
                     <select
                         name="education_level"
                         id="education_level"
-                        class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $errors->has('education_level') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100' }} focus:outline-hidden focus:ring-2 bg-white"
+                        @disabled($isProfileLocked)
+                        class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $isProfileLocked ? $inputLockedClass : ($errors->has('education_level') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100') }} focus:outline-hidden focus:ring-2 bg-white"
                     >
                         <option value="">-- Pilih Jenjang Pendidikan --</option>
                         @foreach ([
@@ -468,7 +467,8 @@
                         max="{{ now()->year }}"
                         value="{{ old('graduation_year', $education?->graduation_year) }}"
                         placeholder="Contoh: {{ now()->year }}"
-                        class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $errors->has('graduation_year') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100' }} focus:outline-hidden focus:ring-2"
+                        @disabled($isProfileLocked)
+                        class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $isProfileLocked ? $inputLockedClass : ($errors->has('graduation_year') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100') }} focus:outline-hidden focus:ring-2"
                     >
                     <x-form.error name="graduation_year" />
                 </div>
@@ -484,7 +484,8 @@
                         id="institution_name"
                         value="{{ old('institution_name', $education?->institution_name) }}"
                         placeholder="Contoh: Politeknik Negeri Banyuwangi"
-                        class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $errors->has('institution_name') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100' }} focus:outline-hidden focus:ring-2"
+                        @disabled($isProfileLocked)
+                        class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $isProfileLocked ? $inputLockedClass : ($errors->has('institution_name') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100') }} focus:outline-hidden focus:ring-2"
                     >
                     <x-form.error name="institution_name" />
                 </div>
@@ -500,7 +501,8 @@
                         id="study_program"
                         value="{{ old('study_program', $education?->study_program) }}"
                         placeholder="Contoh: Teknologi Rekayasa Perangkat Lunak"
-                        class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $errors->has('study_program') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100' }} focus:outline-hidden focus:ring-2"
+                        @disabled($isProfileLocked)
+                        class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $isProfileLocked ? $inputLockedClass : ($errors->has('study_program') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100') }} focus:outline-hidden focus:ring-2"
                     >
                     <x-form.error name="study_program" />
                 </div>
@@ -519,7 +521,8 @@
                         id="gpa"
                         value="{{ old('gpa', $education?->gpa ? number_format((float) $education->gpa, 2, '.', '') : '') }}"
                         placeholder="Contoh: 3.90"
-                        class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $errors->has('gpa') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100' }} focus:outline-hidden focus:ring-2"
+                        @disabled($isProfileLocked)
+                        class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $isProfileLocked ? $inputLockedClass : ($errors->has('gpa') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100') }} focus:outline-hidden focus:ring-2"
                     >
                     <x-form.error name="gpa" />
                 </div>
@@ -535,7 +538,8 @@
                         id="accreditation"
                         value="{{ old('accreditation', $education?->accreditation) }}"
                         placeholder="Contoh: Unggul / A / B"
-                        class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $errors->has('accreditation') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100' }} focus:outline-hidden focus:ring-2"
+                        @disabled($isProfileLocked)
+                        class="w-full rounded-lg text-sm transition-all py-2 px-3.5 border {{ $isProfileLocked ? $inputLockedClass : ($errors->has('accreditation') ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 text-slate-900 focus:border-rsi-600 focus:ring-rsi-100') }} focus:outline-hidden focus:ring-2"
                     >
                     <x-form.error name="accreditation" />
                 </div>
@@ -545,14 +549,33 @@
         {{-- Single CTA: Simpan Perubahan --}}
         <div class="pt-4 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-100">
             <p class="text-xs text-slate-400 text-center sm:text-left">
-                Semua data pribadi, kontak, pas foto, dan riwayat pendidikan akan disimpan secara bersamaan.
+                @if ($isProfileLocked)
+                    Data profil tidak dapat diubah karena lamaran Anda telah resmi terkirim ke panitia seleksi.
+                @else
+                    Semua data pribadi, kontak, pas foto, dan riwayat pendidikan akan disimpan secara bersamaan.
+                @endif
             </p>
-            <x-ui.button type="submit" variant="primary" size="sm" class="w-full sm:w-auto shadow-xs">
-                <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                <span>Simpan Perubahan</span>
-            </x-ui.button>
+            @if ($isProfileLocked)
+                <button
+                    type="button"
+                    disabled
+                    aria-disabled="true"
+                    class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-slate-400 bg-slate-100 border border-slate-200 cursor-not-allowed select-none shadow-none opacity-80"
+                    title="Data profil dikunci karena lamaran Anda sedang dalam proses seleksi."
+                >
+                    <svg class="w-4 h-4 mr-1 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                    <span>Simpan Perubahan</span>
+                </button>
+            @else
+                <x-ui.button type="submit" variant="primary" size="sm" class="w-full sm:w-auto shadow-xs">
+                    <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>Simpan Perubahan</span>
+                </x-ui.button>
+            @endif
         </div>
     </form>
 </div>

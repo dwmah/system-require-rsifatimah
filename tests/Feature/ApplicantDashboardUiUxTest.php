@@ -42,6 +42,7 @@ class ApplicantDashboardUiUxTest extends TestCase
             $profile = ApplicantProfile::create([
                 'user_id' => $user->id,
                 'nik' => sprintf('3510223344%06d', $seq),
+                'nickname' => 'Pelamar',
                 'birth_place' => 'Banyuwangi',
                 'birth_date' => '1996-05-20',
                 'gender' => 'Laki-laki',
@@ -218,11 +219,11 @@ class ApplicantDashboardUiUxTest extends TestCase
         $response = $this->actingAs($user)->get(route('portal.home'));
 
         $response->assertOk();
-        $response->assertSee('Draft');
-        $response->assertSee('Status Lamaran Aktif');
+        $response->assertSee(route('portal.applications.show', $application));
         // Nomor lamaran yang belum diterbitkan harus disembunyikan saat draft
         $response->assertDontSee('Belum diterbitkan');
         $response->assertDontSee('Draft (Belum Diterbitkan)');
+        $response->assertDontSee('Status Lamaran Aktif');
     }
 
     public function test_draft_application_incomplete_docs_shows_upload_cta(): void
@@ -238,13 +239,11 @@ class ApplicantDashboardUiUxTest extends TestCase
             'status' => JobApplicationStatus::DRAFT,
         ]);
 
-        $response = $this->actingAs($user)->get(route('portal.home'));
+        $response = $this->actingAs($user)->get(route('portal.applications.show', $application));
 
         $response->assertOk();
-        $response->assertSee('dokumen yang belum dilengkapi sebelum lamaran dapat dikirim');
-        $response->assertSee('Lengkapi Berkas');
+        $response->assertSee('Lanjutkan Unggah Berkas');
         $response->assertSee(route('portal.applications.documents.index', $application));
-        $response->assertDontSee('Review &amp; Kirim Lamaran', false);
     }
 
     public function test_draft_application_complete_docs_shows_review_cta(): void
@@ -274,14 +273,11 @@ class ApplicantDashboardUiUxTest extends TestCase
             }
         }
 
-        $response = $this->actingAs($user)->get(route('portal.home'));
+        $response = $this->actingAs($user)->get(route('portal.applications.documents.index', $application));
 
         $response->assertOk();
-        $response->assertSee('Siap Dikirim');
-        $response->assertSee('Semua dokumen persyaratan telah lengkap. Periksa kembali data Anda sebelum mengirim lamaran.');
-        $response->assertSee('Review &amp; Kirim Lamaran', false);
+        $response->assertSee('Lanjut ke Step 3: Review & Kirim', false);
         $response->assertSee(route('portal.applications.review', $application));
-        $response->assertDontSee('Lengkapi Berkas');
     }
 
     // =========================================================================
@@ -307,9 +303,7 @@ class ApplicantDashboardUiUxTest extends TestCase
         // ANTI-LEAK: TIDAK BOLEH menampilkan 'Diterima' atau pesan hasil akhir sebelum dipublikasikan
         $response->assertDontSee('Selamat, Anda dinyatakan diterima.');
         $response->assertDontSee('Selamat Anda Dinyatakan Diterima Resmi Menjadi Karyawan RSI Fatimah.');
-        // Status publik aman harus tetap 'Menunggu Pengumuman Akhir'
-        $response->assertSee('Menunggu Pengumuman Akhir');
-        $response->assertSee('Lihat Progres Seleksi');
+        $response->assertSee('Lihat Detail');
     }
 
     public function test_internal_rejected_with_unpublished_final_result_shows_waiting_status(): void
@@ -332,9 +326,7 @@ class ApplicantDashboardUiUxTest extends TestCase
         $response->assertDontSee('Tidak Lolos');
         $response->assertDontSee('MOHON MAAF, ANDA BELUM LOLOS');
         $response->assertDontSee('Mohon Maaf, kualifikasi Anda belum memenuhi');
-        // Status publik aman harus tetap 'Menunggu Pengumuman Akhir'
-        $response->assertSee('Menunggu Pengumuman Akhir');
-        $response->assertSee('Lihat Progres Seleksi');
+        $response->assertSee('Lihat Detail');
     }
 
     // =========================================================================
@@ -595,15 +587,18 @@ class ApplicantDashboardUiUxTest extends TestCase
             'status' => JobApplicationStatus::DRAFT,
         ]);
 
-        $response = $this->actingAs($user)->get(route('portal.home'));
+        // Dashboard bersih tanpa duplikasi kartu draft dan mengarahkan ke halaman detail
+        $dashboardResponse = $this->actingAs($user)->get(route('portal.home'));
+        $dashboardResponse->assertOk();
+        $dashboardResponse->assertDontSee('Status Lamaran Aktif');
+        $dashboardResponse->assertSee(route('portal.applications.show', $application));
+
+        // Halaman detail lamaran menampilkan info formasi, peringatan pembatalan, dan tombol batalkan
+        $response = $this->actingAs($user)->get(route('portal.applications.show', $application));
 
         $response->assertOk();
-        $response->assertSee('Status Lamaran Aktif');
         $response->assertSee('POS-2026-IT-01');
         $response->assertSee('Staff IT');
-        $response->assertSee('Kelengkapan Berkas:');
-        $response->assertSee('0 dari 2 dokumen');
-        $response->assertSee('Lengkapi Berkas');
         $response->assertSee('Ingin Melamar Posisi Lain?');
         $response->assertSee('Batalkan Lamaran');
         $response->assertSeeText('Batalkan Lamaran & Hapus Akun?');

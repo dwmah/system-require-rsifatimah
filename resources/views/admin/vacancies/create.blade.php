@@ -54,7 +54,7 @@
                           } else if (type === 'umum') {
                               this.documents = [
                                   { name: 'Surat Lamaran Kerja', desc: 'Ditujukan kepada Direktur RSI Fatimah', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
-                                  { name: 'Curriculum Vitae (CV) & Portofolio', desc: 'Riwayat hidup dan bukti hasil karya / proyek', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
+                                  { name: 'Curriculum Vitae (CV) & Portofolio', desc: 'Riwayat hidup dan bukti hasil karya / proyek (PDF atau Video MP4)', mandatory: 1, mimes: 'application/pdf,video/mp4', max_size: 20480 },
                                   { name: 'Ijazah & Transkrip Terakhir', desc: 'Scan legalisir ijazah dan transkrip nilai', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
                                   { name: 'KTP & Kartu Keluarga', desc: 'Scan identitas kependudukan', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
                                   { name: 'Sertifikat Keahlian / Kompetensi', desc: 'Sertifikat sertifikasi IT / akuntansi / administrasi', mandatory: 0, mimes: 'application/pdf', max_size: 5120 },
@@ -297,12 +297,14 @@
                                     </div>
                                     <div class="sm:col-span-4">
                                         <select :name="'document_mimes[' + index + ']'" x-model="doc.mimes"
-                                                @change="if (doc.mimes === 'video/mp4' && (!doc.max_size || doc.max_size < 20480)) { doc.max_size = 20480; } else if (doc.mimes !== 'video/mp4' && doc.max_size > 10240) { doc.max_size = 5120; }"
+                                                @change="if (doc.mimes.includes('video/mp4') && (!doc.max_size || doc.max_size < 20480)) { doc.max_size = 20480; } else if (!doc.mimes.includes('video/mp4') && doc.max_size > 10240) { doc.max_size = 5120; }"
                                                 class="w-full h-9 px-2 text-xs bg-white border border-slate-300 rounded-lg focus:outline-none focus:border-[#0179B5]">
                                             <option value="application/pdf">Dokumen PDF (.pdf)</option>
                                             <option value="image/jpeg,image/png">Gambar (.jpg, .png)</option>
                                             <option value="application/pdf,image/jpeg,image/png">Dokumen/Gambar (.pdf, .jpg, .png)</option>
                                             <option value="video/mp4">Video MP4 (.mp4)</option>
+                                            <option value="application/pdf,video/mp4">Dokumen PDF atau Video MP4 (.pdf, .mp4)</option>
+                                            <option value="application/pdf,video/mp4,image/jpeg,image/png">Semua Format (PDF, Video MP4, Gambar)</option>
                                         </select>
                                     </div>
                                     <div class="sm:col-span-3">

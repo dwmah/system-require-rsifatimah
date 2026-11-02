@@ -47,6 +47,7 @@ class ApplicationDraftAndSnapshotTest extends TestCase
             $profile = ApplicantProfile::create(array_merge([
                 'user_id' => $user->id,
                 'nik' => sprintf('3510123456%06d', $seq),
+                'nickname' => 'Pelamar',
                 'birth_place' => 'Banyuwangi',
                 'birth_date' => '1996-06-15',
                 'gender' => 'Laki-laki',
@@ -347,7 +348,7 @@ class ApplicationDraftAndSnapshotTest extends TestCase
         $this->actingAs($userA)->post(route('portal.applications.store', $vacancyA));
         $this->actingAs($userB)->post(route('portal.applications.store', $vacancyB));
 
-        $responseA = $this->actingAs($userA)->get(route('portal.applications.index'));
+        $responseA = $this->actingAs($userA)->followingRedirects()->get(route('portal.applications.index'));
         $responseA->assertStatus(200);
         $responseA->assertSeeText($vacancyA->title);
         $responseA->assertDontSeeText($vacancyB->title);
@@ -390,8 +391,8 @@ class ApplicationDraftAndSnapshotTest extends TestCase
         $vacancy->recruitmentPeriod->update(['status' => RecruitmentPeriodStatus::COMPLETED]);
         $vacancy->update(['status' => JobVacancyStatus::CLOSED]);
 
-        // Index remains accessible
-        $this->actingAs($user)->get(route('portal.applications.index'))->assertStatus(200);
+        // Index redirects directly to show when application exists
+        $this->actingAs($user)->get(route('portal.applications.index'))->assertRedirect(route('portal.applications.show', $application));
 
         // Show remains accessible
         $this->actingAs($user)->get(route('portal.applications.show', $application))->assertStatus(200);

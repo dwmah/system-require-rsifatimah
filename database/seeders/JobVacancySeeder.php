@@ -46,7 +46,7 @@ class JobVacancySeeder extends Seeder
                 ],
                 'documents' => [
                     ['name' => 'Surat Lamaran', 'description' => 'Ditujukan kepada Direktur RSI Fatimah Banyuwangi', 'is_required' => true, 'allowed_mimes' => 'application/pdf', 'max_size_kb' => 2048, 'sort_order' => 1],
-                    ['name' => 'Curriculum Vitae (CV)', 'description' => 'Daftar riwayat hidup terbaru dan nomor kontak aktif', 'is_required' => true, 'allowed_mimes' => 'application/pdf', 'max_size_kb' => 2048, 'sort_order' => 2],
+                    ['name' => 'Curriculum Vitae (CV)', 'description' => 'Daftar riwayat hidup terbaru dan nomor kontak aktif (format PDF atau Video MP4)', 'is_required' => true, 'allowed_mimes' => 'application/pdf,video/mp4', 'max_size_kb' => 20480, 'sort_order' => 2],
                     ['name' => 'Ijazah & Transkrip Nilai', 'description' => 'Scan ijazah asli dan transkrip legalisir', 'is_required' => true, 'allowed_mimes' => 'application/pdf', 'max_size_kb' => 2048, 'sort_order' => 3],
                     ['name' => 'Surat Tanda Registrasi (STR)', 'description' => 'Scan STR Perawat yang masih aktif', 'is_required' => true, 'allowed_mimes' => 'application/pdf', 'max_size_kb' => 2048, 'sort_order' => 4],
                     ['name' => 'KTP', 'description' => 'Scan KTP elektronik yang masih berlaku', 'is_required' => true, 'allowed_mimes' => 'application/pdf', 'max_size_kb' => 2048, 'sort_order' => 5],
@@ -92,7 +92,7 @@ class JobVacancySeeder extends Seeder
                 ],
                 'documents' => [
                     ['name' => 'Surat Lamaran', 'description' => 'Ditujukan kepada Direktur RSI Fatimah Banyuwangi', 'is_required' => true, 'allowed_mimes' => 'application/pdf', 'max_size_kb' => 2048, 'sort_order' => 1],
-                    ['name' => 'Curriculum Vitae (CV)', 'description' => 'Riwayat hidup lengkap dan pengalaman klinis', 'is_required' => true, 'allowed_mimes' => 'application/pdf', 'max_size_kb' => 2048, 'sort_order' => 2],
+                    ['name' => 'Curriculum Vitae (CV)', 'description' => 'Riwayat hidup lengkap dan pengalaman klinis (format PDF atau Video MP4)', 'is_required' => true, 'allowed_mimes' => 'application/pdf,video/mp4', 'max_size_kb' => 20480, 'sort_order' => 2],
                     ['name' => 'Ijazah Sarjana & Profesi Dokter', 'description' => 'Scan ijazah S.Ked dan Dokter', 'is_required' => true, 'allowed_mimes' => 'application/pdf', 'max_size_kb' => 2048, 'sort_order' => 3],
                     ['name' => 'STR Dokter Aktif', 'description' => 'Surat Tanda Registrasi KKI/Kemenkes aktif', 'is_required' => true, 'allowed_mimes' => 'application/pdf', 'max_size_kb' => 2048, 'sort_order' => 4],
                     ['name' => 'Sertifikat ACLS / ATLS', 'description' => 'Sertifikat resusitasi kardiovaskular lanjut', 'is_required' => true, 'allowed_mimes' => 'application/pdf', 'max_size_kb' => 2048, 'sort_order' => 5],
@@ -133,7 +133,7 @@ class JobVacancySeeder extends Seeder
                 ],
                 'documents' => [
                     ['name' => 'Surat Lamaran', 'description' => 'Ditujukan kepada Direktur RSI Fatimah Banyuwangi', 'is_required' => true, 'allowed_mimes' => 'application/pdf', 'max_size_kb' => 2048, 'sort_order' => 1],
-                    ['name' => 'Curriculum Vitae (CV)', 'description' => 'Daftar riwayat hidup terbaru', 'is_required' => true, 'allowed_mimes' => 'application/pdf', 'max_size_kb' => 2048, 'sort_order' => 2],
+                    ['name' => 'Curriculum Vitae (CV)', 'description' => 'Daftar riwayat hidup terbaru (format PDF atau Video MP4)', 'is_required' => true, 'allowed_mimes' => 'application/pdf,video/mp4', 'max_size_kb' => 20480, 'sort_order' => 2],
                     ['name' => 'Ijazah & Transkrip Radiologi', 'description' => 'Scan ijazah D3/D4 Radiologi', 'is_required' => true, 'allowed_mimes' => 'application/pdf', 'max_size_kb' => 2048, 'sort_order' => 3],
                     ['name' => 'STR Radiografer', 'description' => 'STR aktif dari KTKI', 'is_required' => true, 'allowed_mimes' => 'application/pdf', 'max_size_kb' => 2048, 'sort_order' => 4],
                     ['name' => 'KTP', 'description' => 'Scan KTP elektronik', 'is_required' => true, 'allowed_mimes' => 'application/pdf', 'max_size_kb' => 2048, 'sort_order' => 5],
@@ -173,7 +173,7 @@ class JobVacancySeeder extends Seeder
                 ],
                 'documents' => [
                     ['name' => 'Surat Lamaran', 'description' => 'Ditujukan kepada Direktur RSI Fatimah Banyuwangi', 'is_required' => true, 'allowed_mimes' => 'application/pdf', 'max_size_kb' => 2048, 'sort_order' => 1],
-                    ['name' => 'Curriculum Vitae (CV)', 'description' => 'Riwayat hidup lengkap', 'is_required' => true, 'allowed_mimes' => 'application/pdf', 'max_size_kb' => 2048, 'sort_order' => 2],
+                    ['name' => 'Curriculum Vitae (CV)', 'description' => 'Riwayat hidup lengkap (format PDF atau Video MP4)', 'is_required' => true, 'allowed_mimes' => 'application/pdf,video/mp4', 'max_size_kb' => 20480, 'sort_order' => 2],
                     ['name' => 'Ijazah Apoteker & Berita Acara Sumpah', 'description' => 'Scan ijazah profesi dan bukti sumpah apoteker', 'is_required' => true, 'allowed_mimes' => 'application/pdf', 'max_size_kb' => 2048, 'sort_order' => 3],
                     ['name' => 'STRA Aktif', 'description' => 'Surat Tanda Registrasi Apoteker yang masih berlaku', 'is_required' => true, 'allowed_mimes' => 'application/pdf', 'max_size_kb' => 2048, 'sort_order' => 4],
                     ['name' => 'KTP', 'description' => 'Scan KTP elektronik', 'is_required' => true, 'allowed_mimes' => 'application/pdf', 'max_size_kb' => 2048, 'sort_order' => 5],
@@ -213,7 +213,7 @@ class JobVacancySeeder extends Seeder
                 ],
                 'documents' => [
                     ['name' => 'Surat Lamaran', 'description' => 'Ditujukan kepada Direktur RSI Fatimah Banyuwangi', 'is_required' => true, 'allowed_mimes' => 'application/pdf', 'max_size_kb' => 2048, 'sort_order' => 1],
-                    ['name' => 'Curriculum Vitae (CV)', 'description' => 'Riwayat hidup lengkap', 'is_required' => true, 'allowed_mimes' => 'application/pdf', 'max_size_kb' => 2048, 'sort_order' => 2],
+                    ['name' => 'Curriculum Vitae (CV)', 'description' => 'Riwayat hidup lengkap (format PDF atau Video MP4)', 'is_required' => true, 'allowed_mimes' => 'application/pdf,video/mp4', 'max_size_kb' => 20480, 'sort_order' => 2],
                     ['name' => 'Ijazah & Transkrip TLM', 'description' => 'Scan ijazah D3/D4 Analis Kesehatan', 'is_required' => true, 'allowed_mimes' => 'application/pdf', 'max_size_kb' => 2048, 'sort_order' => 3],
                     ['name' => 'STR Pranata Lab', 'description' => 'STR aktif KTKI', 'is_required' => true, 'allowed_mimes' => 'application/pdf', 'max_size_kb' => 2048, 'sort_order' => 4],
                     ['name' => 'KTP', 'description' => 'Scan KTP elektronik', 'is_required' => true, 'allowed_mimes' => 'application/pdf', 'max_size_kb' => 2048, 'sort_order' => 5],
@@ -254,7 +254,7 @@ class JobVacancySeeder extends Seeder
                 ],
                 'documents' => [
                     ['name' => 'Surat Lamaran', 'description' => 'Ditujukan kepada Direktur RSI Fatimah Banyuwangi', 'is_required' => true, 'allowed_mimes' => 'application/pdf', 'max_size_kb' => 2048, 'sort_order' => 1],
-                    ['name' => 'Curriculum Vitae (CV) & Portofolio IT', 'description' => 'Cantumkan tautan GitHub / proyek aplikasi yang pernah dibangun', 'is_required' => true, 'allowed_mimes' => 'application/pdf', 'max_size_kb' => 2048, 'sort_order' => 2],
+                    ['name' => 'Curriculum Vitae (CV) & Portofolio IT', 'description' => 'Cantumkan tautan GitHub / proyek aplikasi atau demo video yang pernah dibangun (PDF atau Video MP4)', 'is_required' => true, 'allowed_mimes' => 'application/pdf,video/mp4', 'max_size_kb' => 20480, 'sort_order' => 2],
                     ['name' => 'Ijazah & Transkrip Akademik', 'description' => 'Scan ijazah S1/D4 bidang IT', 'is_required' => true, 'allowed_mimes' => 'application/pdf', 'max_size_kb' => 2048, 'sort_order' => 3],
                     ['name' => 'KTP', 'description' => 'Scan KTP elektronik', 'is_required' => true, 'allowed_mimes' => 'application/pdf', 'max_size_kb' => 2048, 'sort_order' => 4],
                     ['name' => 'Sertifikat Keahlian IT / Jaringan', 'description' => 'Sertifikasi keahlian IT (MTCNA, CCNA, Database, Web Dev)', 'is_required' => false, 'allowed_mimes' => 'application/pdf', 'max_size_kb' => 2048, 'sort_order' => 5],

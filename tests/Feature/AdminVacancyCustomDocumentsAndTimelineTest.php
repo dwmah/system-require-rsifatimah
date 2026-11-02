@@ -50,6 +50,7 @@ class AdminVacancyCustomDocumentsAndTimelineTest extends TestCase
         $profile = ApplicantProfile::create([
             'user_id' => $this->applicant->id,
             'nik' => '3510123456780001',
+            'nickname' => 'Budi',
             'birth_place' => 'Banyuwangi',
             'birth_date' => '1998-05-15',
             'gender' => 'Laki-laki',

@@ -6,12 +6,6 @@
 
 <x-layouts.public :title="$jobVacancy->title" active-menu="lowongan">
     <div class="space-y-6 max-w-5xl">
-        {{-- Breadcrumb --}}
-        <x-ui.breadcrumb :items="[
-            ['label' => 'Lowongan Pekerjaan', 'url' => route('vacancies.index')],
-            ['label' => $jobVacancy->title]
-        ]" />
-
         {{-- Header Detail --}}
         <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-2xs">
             <div class="flex flex-wrap items-center justify-between gap-3 mb-3">

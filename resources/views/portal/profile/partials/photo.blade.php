@@ -80,11 +80,8 @@
         {{-- Info & Action Controls --}}
         <div class="flex-1 space-y-3 text-center sm:text-left min-w-0">
             <div>
-                <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 mb-1">
+                <div class="mb-1">
                     <h3 class="text-base font-bold text-slate-900">Pas Foto Formal</h3>
-                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold {{ $profile?->photo_url ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200' }}">
-                        {{ $profile?->photo_url ? 'DIUNGGAH' : 'WAJIB PROFIL LENGKAP' }}
-                    </span>
                 </div>
                 <p class="text-xs text-slate-500">
                     Pas foto formal berlatar belakang polos untuk identitas resmi dan kartu seleksi penerimaan karyawan.
@@ -135,11 +132,6 @@
 
                 {{-- Selected Preview: Confirmation --}}
                 <div x-show="isSelected" x-cloak class="space-y-2.5 pt-1">
-                    <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-sky-50 border border-sky-200 rounded-lg text-xs text-slate-700">
-                        <span class="font-medium truncate max-w-xs" x-text="fileName"></span>
-                        <span class="text-slate-400 font-mono text-[11px]" x-text="'(' + fileSize + ')'"></span>
-                    </div>
-
                     <div class="flex items-center justify-center sm:justify-start gap-2">
                         <button
                             type="submit"

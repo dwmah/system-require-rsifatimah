@@ -54,6 +54,7 @@ class VacancyVideoUploadRequirementTest extends TestCase
         $profile = ApplicantProfile::create([
             'user_id' => $this->applicant->id,
             'nik' => '3510998877665544',
+            'nickname' => 'Humas',
             'birth_place' => 'Banyuwangi',
             'birth_date' => '1998-05-10',
             'gender' => 'Laki-laki',
@@ -309,5 +310,81 @@ class VacancyVideoUploadRequirementTest extends TestCase
         $portalView = $this->actingAs($this->applicant)->get(route('portal.applications.documents.index', $application));
         $portalView->assertOk();
         $portalView->assertSee('MP4 Video');
+    }
+
+    public function test_applicant_can_upload_either_pdf_or_mp4_for_cv_and_portfolio_requirement(): void
+    {
+        $vacancy = JobVacancy::create([
+            'recruitment_period_id' => $this->period->id,
+            'code' => 'VAC-CV-PORTFOLIO-01',
+            'title' => 'Desainer Grafis & Multimedia',
+            'unit' => 'Humas',
+            'employment_type' => 'Kontrak',
+            'location' => 'RSI Fatimah',
+            'quota' => 2,
+            'description' => 'Lowongan multimedia.',
+            'open_at' => now()->subDay(),
+            'close_at' => now()->addDays(10),
+            'status' => JobVacancyStatus::OPEN,
+        ]);
+
+        $cvRequirement = VacancyDocumentRequirement::create([
+            'job_vacancy_id' => $vacancy->id,
+            'name' => 'Curriculum Vitae (CV) & Portofolio',
+            'description' => 'Format PDF atau Video MP4',
+            'is_required' => true,
+            'allowed_mimes' => 'application/pdf,video/mp4',
+            'max_size_kb' => 20480,
+            'sort_order' => 1,
+        ]);
+
+        $application = JobApplication::create([
+            'job_vacancy_id' => $vacancy->id,
+            'recruitment_period_id' => $this->period->id,
+            'user_id' => $this->applicant->id,
+            'application_number' => 'APP-CV-2026-0001',
+            'status' => JobApplicationStatus::DRAFT,
+        ]);
+
+        // 1. Upload Video MP4 for CV & Portfolio
+        $fakeVideo = UploadedFile::fake()->create('cv_video_portofolio.mp4', 3072, 'video/mp4');
+
+        $response1 = $this->actingAs($this->applicant)->post(
+            route('portal.applications.documents.store', [$application, $cvRequirement]),
+            ['file' => $fakeVideo]
+        );
+
+        $response1->assertRedirect(route('portal.applications.documents.index', $application));
+        $response1->assertSessionHas('success');
+
+        $this->assertDatabaseHas('application_documents', [
+            'job_application_id' => $application->id,
+            'vacancy_document_requirement_id' => $cvRequirement->id,
+            'original_name' => 'cv_video_portofolio.mp4',
+            'mime_type' => 'video/mp4',
+        ]);
+
+        // 2. Replace with PDF for the same requirement
+        $fakePdf = UploadedFile::fake()->create('cv_terbaru.pdf', 1024, 'application/pdf');
+
+        $response2 = $this->actingAs($this->applicant)->post(
+            route('portal.applications.documents.store', [$application, $cvRequirement]),
+            ['file' => $fakePdf]
+        );
+
+        $response2->assertRedirect(route('portal.applications.documents.index', $application));
+        $response2->assertSessionHas('success');
+
+        $this->assertDatabaseHas('application_documents', [
+            'job_application_id' => $application->id,
+            'vacancy_document_requirement_id' => $cvRequirement->id,
+            'original_name' => 'cv_terbaru.pdf',
+            'mime_type' => 'application/pdf',
+        ]);
+
+        // 3. Check badge in documents page
+        $portalView = $this->actingAs($this->applicant)->get(route('portal.applications.documents.index', $application));
+        $portalView->assertOk();
+        $portalView->assertSee('PDF / Video MP4');
     }
 }

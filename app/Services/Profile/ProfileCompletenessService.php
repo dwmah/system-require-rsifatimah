@@ -7,13 +7,14 @@ use App\Models\User;
 class ProfileCompletenessService
 {
     /**
-     * Labels for the 11 basic profile criteria.
+     * Labels for the 12 basic profile criteria.
      *
      * @var array<string, string>
      */
     protected const CRITERIA_LABELS = [
         'photo' => 'Pas Foto Formal',
         'name' => 'Nama Lengkap',
+        'nickname' => 'Nama Panggilan',
         'nik' => 'Nomor Induk Kependudukan (NIK)',
         'email' => 'Alamat Email',
         'phone' => 'Nomor WhatsApp / HP',
@@ -45,6 +46,7 @@ class ProfileCompletenessService
         return [
             'photo' => ! empty($profile?->photo_path),
             'name' => ! empty(trim((string) ($user->name ?? ''))),
+            'nickname' => ! empty(trim((string) ($profile?->nickname ?? ''))),
             'nik' => ! empty(trim((string) ($profile?->nik ?? ''))),
             'email' => ! empty(trim((string) ($user->email ?? ''))),
             'phone' => ! empty(trim((string) ($user->phone ?? ''))),
