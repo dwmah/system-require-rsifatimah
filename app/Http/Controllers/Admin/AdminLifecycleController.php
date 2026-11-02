@@ -164,4 +164,21 @@ class AdminLifecycleController extends Controller
 
         return back()->with('success', "Pengarsipan massal berhasil: {$count} akun pelamar tidak lolos telah diarsipkan (soft delete). Berkas dokumen tetap dipertahankan.");
     }
+
+    /**
+     * Hapus permanen akun pelamar yang telah diarsipkan beserta seluruh berkas fisiknya.
+     */
+    public function forceDelete(int|string $userId): RedirectResponse
+    {
+        $user = User::withTrashed()->findOrFail($userId);
+
+        if ($user->isAdmin()) {
+            return back()->with('error', 'Akun administrator tidak dapat dihapus.');
+        }
+
+        $userName = $user->name;
+        $this->lifecycleService->forceDeleteApplicant($user);
+
+        return back()->with('success', "Akun pelamar {$userName} beserta seluruh berkas dokumennya berhasil dihapus secara permanen.");
+    }
 }

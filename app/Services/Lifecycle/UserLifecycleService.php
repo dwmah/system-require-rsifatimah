@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class UserLifecycleService
 {
@@ -97,5 +98,47 @@ class UserLifecycleService
         return JobApplication::where('status', JobApplicationStatus::REJECTED)
             ->whereHas('user', fn ($q) => $q->onlyTrashed())
             ->with(['user' => fn ($q) => $q->withTrashed(), 'jobVacancy', 'documents']);
+    }
+
+    /**
+     * Hapus permanen akun pelamar beserta berkas fisik dari storage.
+     */
+    public function forceDeleteApplicant(User $user): bool
+    {
+        if ($user->isAdmin()) {
+            return false;
+        }
+
+        return DB::transaction(function () use ($user) {
+            // Hapus file fisik dokumen lamaran
+            $applications = $user->jobApplications()->with('documents')->get();
+            foreach ($applications as $application) {
+                foreach ($application->documents as $doc) {
+                    if ($doc->stored_path) {
+                        if (Storage::disk('applicant_documents')->exists($doc->stored_path)) {
+                            Storage::disk('applicant_documents')->delete($doc->stored_path);
+                        } elseif (Storage::disk('local')->exists($doc->stored_path)) {
+                            Storage::disk('local')->delete($doc->stored_path);
+                        }
+                    }
+                }
+            }
+
+            // Hapus file foto profil jika ada
+            if ($user->applicantProfile && $user->applicantProfile->photo_path) {
+                if (Storage::disk('public')->exists($user->applicantProfile->photo_path)) {
+                    Storage::disk('public')->delete($user->applicantProfile->photo_path);
+                }
+            }
+
+            // Force delete relasi dan user
+            $user->applicantProfile()?->delete();
+            $user->jobApplications()?->delete();
+            $user->forceDelete();
+
+            Log::warning("User force deleted permanently along with physical files: ID {$user->id}");
+
+            return true;
+        });
     }
 }

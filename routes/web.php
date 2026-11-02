@@ -246,6 +246,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/lifecycle/{user}/deactivate', [AdminLifecycleController::class, 'deactivate'])->name('lifecycle.deactivate');
     Route::post('/lifecycle/{user}/reactivate', [AdminLifecycleController::class, 'reactivate'])->name('lifecycle.reactivate');
     Route::delete('/lifecycle/{user}/cleanup', [AdminLifecycleController::class, 'cleanup'])->name('lifecycle.cleanup')->withTrashed();
+    Route::delete('/lifecycle/{user}/force-delete', [AdminLifecycleController::class, 'forceDelete'])->name('lifecycle.force-delete');
     Route::post('/lifecycle/cleanup-all-seen', [AdminLifecycleController::class, 'cleanupAllSeen'])->name('lifecycle.cleanup-all-seen');
 });
 

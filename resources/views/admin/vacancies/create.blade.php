@@ -29,10 +29,12 @@
                       // Section 3: Persyaratan Dokumen
                       documents: [
                           { name: 'Surat Lamaran Kerja', desc: 'Ditujukan kepada Direktur RSI Fatimah', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
+                          { name: 'Curriculum Vitae (CV)', desc: 'Riwayat hidup lengkap dan nomor kontak aktif', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
+                          { name: 'Portofolio / Berkas Karya', desc: 'Portofolio pengalaman kerja atau sertifikat kompetensi', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
                           { name: 'Ijazah Terakhir Legalisir', desc: 'Scan asli ijazah pendidikan formal', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
-                          { name: 'STR / Sertifikat Keahlian Aktif', desc: 'Wajib masih berlaku aktif', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
+                          { name: 'Transkrip Nilai Akademik', desc: 'Scan transkrip nilai akademik legalisir', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
+                          { name: 'STR / Sertifikat Keahlian Aktif', desc: 'Wajib masih berlaku aktif bagi tenaga medis/kesehatan', mandatory: 0, mimes: 'application/pdf', max_size: 5120 },
                           { name: 'SKCK (Kepolisian)', desc: 'Surat Keterangan Catatan Kepolisian', mandatory: 0, mimes: 'application/pdf', max_size: 5120 },
-                          { name: 'Rekomendasi Profesi / Ormas', desc: 'Surat rekomendasi bila ada', mandatory: 0, mimes: 'application/pdf', max_size: 5120 },
                           { name: 'Dokumen Pendukung Lainnya', desc: 'Sertifikat pelatihan / seminar terkait', mandatory: 0, mimes: 'application/pdf', max_size: 5120 }
                       ],
                       addDoc() {
@@ -45,6 +47,8 @@
                           if (type === 'medis') {
                               this.documents = [
                                   { name: 'Surat Lamaran Kerja', desc: 'Ditujukan kepada Direktur RSI Fatimah', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
+                                  { name: 'Curriculum Vitae (CV)', desc: 'Riwayat hidup lengkap dan nomor kontak aktif', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
+                                  { name: 'Portofolio Klinis / Berkas Pengalaman', desc: 'Portofolio kasus / pengalaman praktik klinis', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
                                   { name: 'Ijazah Profesi / Terakhir', desc: 'Scan ijazah asli legalisir', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
                                   { name: 'Transkrip Nilai Akademik', desc: 'Scan transkrip nilai akademik legalisir', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
                                   { name: 'STR (Surat Tanda Registrasi) Aktif', desc: 'Wajib masih aktif dari MTKI / KKI', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
@@ -70,10 +74,11 @@
                       // Section 4: Tahapan Seleksi & Batas Waktu
                       stageTemplates: {{ Js::from($stageTemplates) }},
                       stages: [
-                          { name: 'Pendaftaran Peserta Rekrutmen Dan Seleksi Administrasi', desc: 'Pendaftaran online, verifikasi berkas oleh tim SDI, dan pengumuman seleksi tahap 1', start_at: '{{ now()->format('Y-m-d') }}', end_at: '{{ now()->addDays(7)->format('Y-m-d') }}' },
-                          { name: 'Seleksi test tulis, test skill, Test Wawancara', desc: 'Tes kompetensi bidang, skill tindakan medis/teknis, wawancara direksi dan pengumuman lolos tahap 2', start_at: '{{ now()->addDays(8)->format('Y-m-d') }}', end_at: '{{ now()->addDays(14)->format('Y-m-d') }}' },
-                          { name: 'Seleksi test psikologi dan test kesehatan', desc: 'Psikotes dan tes kesehatan/MCU fisik di RS serta pengumuman lolos tahap 3', start_at: '{{ now()->addDays(15)->format('Y-m-d') }}', end_at: '{{ now()->addDays(20)->format('Y-m-d') }}' },
-                          { name: 'Masa Orientasi Magang Dokter Umum Baru (atau Karyawan Baru)', desc: 'Pembekalan nilai Al-Islam, orientasi mutu dan keselamatan pasien', start_at: '{{ now()->addDays(21)->format('Y-m-d') }}', end_at: '{{ now()->addDays(28)->format('Y-m-d') }}' }
+                          { name: 'Pendaftaran Peserta Rekrutmen', desc: 'Pendaftaran akun peserta rekrutmen dan verifikasi kelayakan biodata data diri pelamar', start_at: '{{ now()->format('Y-m-d') }}', end_at: '{{ now()->addDays(5)->format('Y-m-d') }}' },
+                          { name: 'Seleksi Administrasi', desc: 'Pemeriksaan dan verifikasi keabsahan seluruh berkas dokumen persyaratan (CV, Portofolio, Ijazah, STR, dll) oleh tim SDI serta pengumuman hasil seleksi berkas', start_at: '{{ now()->addDays(6)->format('Y-m-d') }}', end_at: '{{ now()->addDays(10)->format('Y-m-d') }}' },
+                          { name: 'Seleksi test tulis, test skill, Test Wawancara', desc: 'Tes kompetensi bidang, skill tindakan medis/teknis, wawancara direksi dan pengumuman lolos tahap 3', start_at: '{{ now()->addDays(11)->format('Y-m-d') }}', end_at: '{{ now()->addDays(16)->format('Y-m-d') }}' },
+                          { name: 'Seleksi test psikologi dan test kesehatan', desc: 'Psikotes dan tes kesehatan/MCU fisik di RS serta pengumuman lolos tahap 4', start_at: '{{ now()->addDays(17)->format('Y-m-d') }}', end_at: '{{ now()->addDays(22)->format('Y-m-d') }}' },
+                          { name: 'Masa Orientasi Magang Dokter Umum Baru (atau Karyawan Baru)', desc: 'Pembekalan nilai Al-Islam, orientasi mutu dan keselamatan pasien serta penugasan orientasi kerja', start_at: '{{ now()->addDays(23)->format('Y-m-d') }}', end_at: '{{ now()->addDays(30)->format('Y-m-d') }}' }
                       ],
                       applyStageTemplate(templateId) {
                           const tpl = this.stageTemplates.find(t => t.id == templateId);

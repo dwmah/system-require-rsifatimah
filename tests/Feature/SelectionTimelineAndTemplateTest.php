@@ -183,36 +183,43 @@ class SelectionTimelineAndTemplateTest extends TestCase
         $this->actingAs($this->admin);
 
         $template = SelectionStageTemplate::create([
-            'name' => 'Template 4 Tahap Standar',
+            'name' => 'Template 5 Tahap Standar',
             'is_default' => true,
             'stages_data' => [
                 [
                     'sequence_order' => 1,
-                    'name' => 'Pendaftaran Peserta Rekrutmen Dan Seleksi Administrasi',
-                    'description' => 'Seleksi Administrasi',
+                    'name' => 'Pendaftaran Peserta Rekrutmen',
+                    'description' => 'Verifikasi Biodata Pelamar',
                     'start_date' => '2026-11-01',
                     'end_date' => '2026-11-05',
                 ],
                 [
                     'sequence_order' => 2,
-                    'name' => 'Seleksi test tulis, test skill, Test Wawancara',
-                    'description' => 'Tes Bidang',
+                    'name' => 'Seleksi Administrasi',
+                    'description' => 'Verifikasi Berkas Dokumen Persyaratan',
                     'start_date' => '2026-11-06',
                     'end_date' => '2026-11-10',
                 ],
                 [
                     'sequence_order' => 3,
-                    'name' => 'Seleksi test psikologi dan test kesehatan',
-                    'description' => 'Psikotes & MCU',
+                    'name' => 'Seleksi test tulis, test skill, Test Wawancara',
+                    'description' => 'Tes Bidang',
                     'start_date' => '2026-11-11',
                     'end_date' => '2026-11-15',
                 ],
                 [
                     'sequence_order' => 4,
-                    'name' => 'Masa Orientasi Magang Dokter Umum Baru (atau Karyawan Baru)',
-                    'description' => 'Orientasi Kerja',
+                    'name' => 'Seleksi test psikologi dan test kesehatan',
+                    'description' => 'Psikotes & MCU',
                     'start_date' => '2026-11-16',
                     'end_date' => '2026-11-20',
+                ],
+                [
+                    'sequence_order' => 5,
+                    'name' => 'Masa Orientasi Magang Dokter Umum Baru (atau Karyawan Baru)',
+                    'description' => 'Orientasi Kerja',
+                    'start_date' => '2026-11-21',
+                    'end_date' => '2026-11-25',
                 ],
             ],
         ]);
@@ -224,11 +231,12 @@ class SelectionTimelineAndTemplateTest extends TestCase
         $response->assertSessionHas('success');
 
         $stages = $this->vacancy->fresh()->selectionStages()->orderBy('sort_order')->get();
-        $this->assertCount(4, $stages);
-        $this->assertEquals('Pendaftaran Peserta Rekrutmen Dan Seleksi Administrasi', $stages[0]->name);
-        $this->assertEquals('Seleksi test tulis, test skill, Test Wawancara', $stages[1]->name);
-        $this->assertEquals('Seleksi test psikologi dan test kesehatan', $stages[2]->name);
-        $this->assertEquals('Masa Orientasi Magang Dokter Umum Baru (atau Karyawan Baru)', $stages[3]->name);
+        $this->assertCount(5, $stages);
+        $this->assertEquals('Pendaftaran Peserta Rekrutmen', $stages[0]->name);
+        $this->assertEquals('Seleksi Administrasi', $stages[1]->name);
+        $this->assertEquals('Seleksi test tulis, test skill, Test Wawancara', $stages[2]->name);
+        $this->assertEquals('Seleksi test psikologi dan test kesehatan', $stages[3]->name);
+        $this->assertEquals('Masa Orientasi Magang Dokter Umum Baru (atau Karyawan Baru)', $stages[4]->name);
     }
 
     public function test_user_cannot_upload_document_after_submission_deadline_ended(): void
