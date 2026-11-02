@@ -239,14 +239,8 @@ class AdminTimelineController extends Controller
             $vacancies = $vacanciesQuery->get();
 
             foreach ($vacancies as $vacancy) {
-                // Hapus tahapan lama yang tidak memiliki relasi critical/histories jika aman,
-                // atau sinkronkan berdasarkan sequence order
-                $existingStages = $vacancy->selectionStages()->orderBy('sort_order')->get();
-                $usedStageIds = DB::table('application_stage_histories')
-                    ->whereIn('vacancy_selection_stage_id', $existingStages->pluck('id'))
-                    ->pluck('vacancy_selection_stage_id')
-                    ->toArray();
-
+                // Sinkronkan tahapan berdasarkan sequence order template
+                $existingStages = $vacancy->selectionStages()->orderBy('sort_order')->orderBy('id')->get();
                 $processedStageIds = [];
 
                 foreach ($stagesData as $idx => $sData) {
@@ -280,12 +274,13 @@ class AdminTimelineController extends Controller
                     }
                 }
 
-                // Bersihkan stage berlebih jika ada dan belum dipakai
+                // Bersihkan stage berlebih jika ada
                 foreach ($existingStages as $existing) {
                     if (! in_array($existing->id, $processedStageIds, true)) {
-                        if (! in_array($existing->id, $usedStageIds, true)) {
-                            $existing->delete();
-                        }
+                        DB::table('application_stage_histories')
+                            ->where('vacancy_selection_stage_id', $existing->id)
+                            ->delete();
+                        $existing->delete();
                     }
                 }
             }

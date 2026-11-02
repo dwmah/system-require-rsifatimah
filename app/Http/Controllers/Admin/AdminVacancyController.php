@@ -474,9 +474,15 @@ class AdminVacancyController extends Controller
                     $startAt = ! empty($stageStartAts[$idx]) ? Carbon::parse($stageStartAts[$idx]) : null;
                     $endAt = ! empty($stageEndAts[$idx]) ? Carbon::parse($stageEndAts[$idx]) : null;
 
-                    // Jika stageId tidak ada, cari tahapan lama yang belum terproses dengan nama yang sama
-                    if (! $stageId && $existingStage = $existingStages->whereNotIn('id', $processedStageIds)->firstWhere('name', trim($stageName))) {
-                        $stageId = $existingStage->id;
+                    // Jika stageId tidak ada, cari tahapan lama yang belum terproses dengan nama yang sama atau pada index yang sama
+                    if (! $stageId) {
+                        $existingStage = $existingStages->whereNotIn('id', $processedStageIds)->firstWhere('name', trim($stageName));
+                        if (! $existingStage && isset($existingStages[$idx]) && ! in_array($existingStages[$idx]->id, $processedStageIds, true)) {
+                            $existingStage = $existingStages[$idx];
+                        }
+                        if ($existingStage) {
+                            $stageId = $existingStage->id;
+                        }
                     }
 
                     if ($stageId && $existingStage = $existingStages->firstWhere('id', $stageId)) {
@@ -503,9 +509,10 @@ class AdminVacancyController extends Controller
 
                 foreach ($existingStages as $existing) {
                     if (! in_array($existing->id, $processedStageIds, true)) {
-                        if (! in_array($existing->id, $usedStageIds, true)) {
-                            $existing->delete();
-                        }
+                        DB::table('application_stage_histories')
+                            ->where('vacancy_selection_stage_id', $existing->id)
+                            ->delete();
+                        $existing->delete();
                     }
                 }
             }

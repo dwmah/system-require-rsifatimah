@@ -105,8 +105,8 @@
                       applyStageTemplate(templateId) {
                           const tpl = this.stageTemplates.find(t => t.id == templateId);
                           if (tpl && tpl.stages_data && Array.isArray(tpl.stages_data)) {
-                              this.stages = tpl.stages_data.map(s => ({
-                                  id: null,
+                              this.stages = tpl.stages_data.map((s, idx) => ({
+                                  id: (this.stages[idx] && this.stages[idx].id) ? this.stages[idx].id : null,
                                   name: s.name || '',
                                   desc: s.description || '',
                                   start_at: s.start_date ? s.start_date.substring(0, 10) : '',

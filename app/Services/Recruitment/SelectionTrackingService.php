@@ -153,9 +153,21 @@ class SelectionTrackingService
         $stages = $snapshot->vacancy_data['selection_stages'] ?? [];
 
         $liveStages = $application->jobVacancy
-            ? $application->jobVacancy->selectionStages()->orderBy('sort_order')->get()
+            ? $application->jobVacancy->selectionStages()->orderBy('sort_order')->orderBy('id')->get()
             : collect();
         $liveStagesById = $liveStages->keyBy('id');
+
+        $application->load('stageHistories');
+        $histories = $application->stageHistories->keyBy('vacancy_selection_stage_id');
+
+        // Filter out ghost stages from snapshot that no longer exist in liveStages and have no history
+        if ($liveStages->isNotEmpty()) {
+            $stages = array_values(array_filter($stages, function ($stg) use ($liveStagesById, $histories) {
+                $stgId = (int) ($stg['id'] ?? 0);
+
+                return $liveStagesById->has($stgId) || $histories->has($stgId);
+            }));
+        }
 
         // Merge / reconcile: sertakan setiap tahapan live yang belum ada di snapshot
         $snapshotStageIds = [];
@@ -186,10 +198,16 @@ class SelectionTrackingService
             ];
         }
 
-        usort($stages, fn ($a, $b) => ($a['sort_order'] ?? 0) <=> ($b['sort_order'] ?? 0));
+        // Jika liveStage ada, sinkronkan sort_order dengan liveStage agar urutan selalu konsisten
+        foreach ($stages as &$stageItem) {
+            $sId = (int) ($stageItem['id'] ?? 0);
+            if ($liveStage = $liveStagesById->get($sId)) {
+                $stageItem['sort_order'] = (int) $liveStage->sort_order;
+            }
+        }
+        unset($stageItem);
 
-        $application->load('stageHistories');
-        $histories = $application->stageHistories->keyBy('vacancy_selection_stage_id');
+        usort($stages, fn ($a, $b) => ($a['sort_order'] ?? 0) <=> ($b['sort_order'] ?? 0));
 
         $stagesOutput = [];
         $hasFailedBefore = false;
