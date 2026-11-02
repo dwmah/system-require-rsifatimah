@@ -47,10 +47,12 @@ class AdminTimelineController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'start_date' => 'required|date',
-            'submission_deadline' => 'required|date|after_or_equal:start_date',
+            'submission_deadline' => 'required_without:registration_end_at|nullable|date|after_or_equal:start_date',
+            'registration_end_at' => 'required_without:submission_deadline|nullable|date|after_or_equal:start_date',
             'is_active' => 'boolean',
         ]);
 
+        $endDate = $validated['registration_end_at'] ?? $validated['submission_deadline'];
         $isActive = $request->boolean('is_active');
 
         if ($isActive) {
@@ -61,7 +63,7 @@ class AdminTimelineController extends Controller
             'name' => $validated['name'],
             'code' => 'PER-'.date('Ymd').'-'.strtoupper(Str::random(4)),
             'registration_start_at' => $validated['start_date'],
-            'registration_end_at' => $validated['submission_deadline'],
+            'registration_end_at' => $endDate,
             'status' => $isActive ? RecruitmentPeriodStatus::OPEN : RecruitmentPeriodStatus::DRAFT,
         ]);
 
@@ -76,10 +78,12 @@ class AdminTimelineController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'start_date' => 'required|date',
-            'submission_deadline' => 'required|date|after_or_equal:start_date',
+            'submission_deadline' => 'required_without:registration_end_at|nullable|date|after_or_equal:start_date',
+            'registration_end_at' => 'required_without:submission_deadline|nullable|date|after_or_equal:start_date',
             'is_active' => 'boolean',
         ]);
 
+        $endDate = $validated['registration_end_at'] ?? $validated['submission_deadline'];
         $isActive = $request->boolean('is_active');
 
         if ($isActive && $period->status !== RecruitmentPeriodStatus::OPEN) {
@@ -91,7 +95,7 @@ class AdminTimelineController extends Controller
         $period->update([
             'name' => $validated['name'],
             'registration_start_at' => $validated['start_date'],
-            'registration_end_at' => $validated['submission_deadline'],
+            'registration_end_at' => $endDate,
             'status' => $isActive ? RecruitmentPeriodStatus::OPEN : RecruitmentPeriodStatus::COMPLETED,
         ]);
 

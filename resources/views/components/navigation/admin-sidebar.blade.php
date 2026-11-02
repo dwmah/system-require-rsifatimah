@@ -1,6 +1,6 @@
 @props(['active' => 'dashboard'])
 
-<aside class="w-64 bg-white border-r border-slate-200 flex-shrink-0 hidden md:flex flex-col justify-between py-6 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto z-30">
+<aside class="w-64 bg-white border-r border-slate-200 flex-shrink-0 hidden md:flex flex-col py-6 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto z-30">
     <div class="space-y-6">
         <!-- Section Menu Utama -->
         <div>
@@ -100,17 +100,6 @@
                     </div>
                 </a>
             </nav>
-        </div>
-    </div>
-
-    <!-- Sisi Bawah: Info Server & Mode -->
-    <div class="px-5">
-        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl">
-            <div class="flex items-center gap-2">
-                <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                <span class="text-sm font-semibold text-slate-800">Sistem Rekrutmen SDI</span>
-            </div>
-            <p class="text-xs text-slate-500 mt-1">RSI Fatimah Banyuwangi</p>
         </div>
     </div>
 </aside>

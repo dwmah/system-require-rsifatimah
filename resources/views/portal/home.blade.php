@@ -48,9 +48,9 @@
                     <h2 class="text-sm sm:text-base font-bold text-slate-900">Timeline Alur Seleksi Karyawan</h2>
                     <p class="text-xs text-slate-500 mt-0.5">Pantau perkembangan tahapan seleksi secara transparan</p>
                 </div>
-                @if($activePeriod && $activePeriod->submission_deadline)
+                @if($activePeriod && ($activePeriod->registration_end_at || $activePeriod->submission_deadline))
                     <div class="text-xs text-slate-600 bg-rose-50 border border-rose-100 px-3 py-1 rounded-lg self-start sm:self-auto">
-                        Batas Submit Berkas: <strong class="text-rose-600 font-semibold">{{ \Carbon\Carbon::parse($activePeriod->submission_deadline)->locale('id')->translatedFormat('d F Y, H.i') }} WIB</strong>
+                        Batas Akhir Pendaftaran: <strong class="text-rose-600 font-semibold">{{ \Carbon\Carbon::parse($activePeriod->registration_end_at ?? $activePeriod->submission_deadline)->locale('id')->translatedFormat('d F Y, H.i') }} WIB</strong>
                     </div>
                 @endif
             </div>
