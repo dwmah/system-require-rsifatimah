@@ -76,8 +76,10 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('/keluar', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
-    Route::get('/dokumen/preview/{document}', [ApplicantDocumentController::class, 'preview'])->name('documents.preview');
-    Route::get('/dokumen/download/{document}', [ApplicantDocumentController::class, 'download'])->name('documents.download');
+    Route::middleware('applicant.active')->group(function () {
+        Route::get('/dokumen/preview/{document}', [ApplicantDocumentController::class, 'preview'])->name('documents.preview');
+        Route::get('/dokumen/download/{document}', [ApplicantDocumentController::class, 'download'])->name('documents.download');
+    });
 });
 
 // =========================================================================

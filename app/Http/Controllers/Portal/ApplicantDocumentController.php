@@ -141,8 +141,8 @@ class ApplicantDocumentController extends Controller
         $user = Auth::user();
         $application = $document->jobApplication;
 
-        if (! $user) {
-            abort(403);
+        if (! $user || ($user->isApplicant() && ! $user->is_active)) {
+            abort(403, 'Akun Anda tidak aktif atau tidak memiliki izin akses.');
         }
 
         // Cek hak akses: Pemilik dokumen ATAU Admin HRD
@@ -167,8 +167,8 @@ class ApplicantDocumentController extends Controller
         $user = Auth::user();
         $application = $document->jobApplication;
 
-        if (! $user) {
-            abort(403);
+        if (! $user || ($user->isApplicant() && ! $user->is_active)) {
+            abort(403, 'Akun Anda tidak aktif atau tidak memiliki izin akses.');
         }
 
         // Cek hak akses: Pemilik dokumen ATAU Admin HRD

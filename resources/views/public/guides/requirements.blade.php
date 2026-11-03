@@ -24,12 +24,12 @@
                     @if(count($lines) > 1)
                         <ul class="list-disc list-outside ml-4 space-y-2 text-xs text-slate-600 leading-relaxed">
                             @foreach($lines as $line)
-                                <li>{!! $line !!}</li>
+                                <li>{{ $line }}</li>
                             @endforeach
                         </ul>
                     @else
                         <div class="text-xs text-slate-600 leading-relaxed space-y-1.5">
-                            <p>{!! nl2br($desc) !!}</p>
+                            <p>{!! nl2br(e($desc)) !!}</p>
                         </div>
                     @endif
                 </x-ui.card>

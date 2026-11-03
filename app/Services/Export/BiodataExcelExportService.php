@@ -347,7 +347,7 @@ class BiodataExcelExportService
             foreach ($rowData as $colIdx => $val) {
                 $cellRef = $this->getColumnLetter($colIdx).$rowIndex;
                 $cellStyle = in_array($colIdx, [3, 11, 12, 14, 15, 17, 18], true) ? 0 : $rowStyle;
-                $xml .= '<c r="'.$cellRef.'" t="inlineStr" s="'.$cellStyle.'"><is><t>'.$this->escapeXml((string) $val).'</t></is></c>'."\n";
+                $xml .= '<c r="'.$cellRef.'" t="inlineStr" s="'.$cellStyle.'"><is><t>'.$this->sanitizeCellValue($val).'</t></is></c>'."\n";
             }
             $xml .= '</row>'."\n";
 
@@ -375,6 +375,19 @@ class BiodataExcelExportService
         }
 
         return $letter;
+    }
+
+    /**
+     * Sanitize cell value to prevent formula injection in spreadsheets.
+     */
+    protected function sanitizeCellValue(mixed $value): string
+    {
+        $str = (string) $value;
+        if (in_array(substr($str, 0, 1), ['=', '+', '-', '@', "\t", "\r"], true)) {
+            $str = "'".$str;
+        }
+
+        return $this->escapeXml($str);
     }
 
     /**
