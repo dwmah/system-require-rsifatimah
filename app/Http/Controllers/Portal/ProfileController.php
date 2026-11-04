@@ -200,7 +200,7 @@ class ProfileController extends Controller
             $hasInstitution = ! empty(trim((string) ($validated['institution_name'] ?? '')));
             if ($hasInstitution) {
                 $educationData = [
-                    'education_level' => ! empty($validated['education_level']) ? $validated['education_level'] : 'D3',
+                    'education_level' => ! empty($validated['education_level']) ? $validated['education_level'] : null,
                     'institution_name' => trim((string) $validated['institution_name']),
                     'study_program' => $validated['study_program'] ?? '',
                     'graduation_year' => ! empty($validated['graduation_year']) ? (int) $validated['graduation_year'] : null,
@@ -215,13 +215,8 @@ class ProfileController extends Controller
                     $profile->educations()->create($educationData);
                 }
             } else {
-                // Bersihkan record pendidikan jika sebelumnya sempat tersimpan tanpa nama institusi
-                $profile->educations()
-                    ->where(function ($query) {
-                        $query->whereNull('institution_name')
-                            ->orWhere('institution_name', '');
-                    })
-                    ->delete();
+                // Jika nama institusi dikosongkan, hapus record pendidikan yang ada
+                $profile->educations()->delete();
             }
         });
 

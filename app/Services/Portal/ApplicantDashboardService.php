@@ -152,9 +152,17 @@ class ApplicantDashboardService
                     : collect();
 
                 $timelineStages = $stagesCollection->map(function ($stage, $index) {
+                    $rawName = (string) ($stage->name ?? 'Tahapan Seleksi');
+                    $stageName = match ($rawName) {
+                        'Masa Orientasi Magang Dokter Umum Baru (atau Karyawan Baru)' => 'Masa Orientasi & Pembekalan Karyawan Baru',
+                        'Seleksi test tulis, test skill, Test Wawancara' => 'Seleksi Tes Tertulis, Keterampilan, dan Wawancara',
+                        'Seleksi test psikologi dan test kesehatan', 'Seleksi test kesehatan' => 'Seleksi Psikotes dan Pemeriksaan Kesehatan (MCU)',
+                        default => $rawName,
+                    };
+
                     return [
                         'id' => (int) $stage->id,
-                        'name' => (string) ($stage->name ?? 'Tahapan Seleksi'),
+                        'name' => $stageName,
                         'description' => $stage->description,
                         'sort_order' => (int) ($stage->sort_order ?? ($index + 1)),
                         'public_state' => 'waiting',
@@ -213,9 +221,17 @@ class ApplicantDashboardService
                             $publishedAt = $history->published_at;
                         }
 
+                        $rawName = (string) ($stage->name ?? $stage->stage_name ?? 'Tahapan Seleksi');
+                        $stageName = match ($rawName) {
+                            'Masa Orientasi Magang Dokter Umum Baru (atau Karyawan Baru)' => 'Masa Orientasi & Pembekalan Karyawan Baru',
+                            'Seleksi test tulis, test skill, Test Wawancara' => 'Seleksi Tes Tertulis, Keterampilan, dan Wawancara',
+                            'Seleksi test psikologi dan test kesehatan', 'Seleksi test kesehatan' => 'Seleksi Psikotes dan Pemeriksaan Kesehatan (MCU)',
+                            default => $rawName,
+                        };
+
                         return [
                             'id' => (int) $stage->id,
-                            'name' => (string) ($stage->name ?? $stage->stage_name ?? 'Tahapan Seleksi'),
+                            'name' => $stageName,
                             'description' => $stage->description,
                             'sort_order' => (int) ($stage->sort_order ?? ($index + 1)),
                             'public_state' => $publicState,
@@ -238,8 +254,8 @@ class ApplicantDashboardService
                     ];
                 } elseif ($primaryApp->status === JobApplicationStatus::SUBMITTED) {
                     $quickAction = [
-                        'label' => 'Lihat Detail Lamaran',
-                        'url' => route('portal.applications.show', $primaryApp),
+                        'label' => 'Lihat Detail Alur Seleksi',
+                        'url' => route('portal.applications.tracking', $primaryApp),
                         'type' => 'submitted',
                     ];
                 } else {

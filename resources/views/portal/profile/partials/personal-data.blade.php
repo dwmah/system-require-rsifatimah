@@ -12,7 +12,7 @@
 <div
     class="bg-white rounded-2xl border border-slate-200 shadow-2xs p-6 sm:p-7"
     x-data="{
-        sameAsKtp: {{ old('same_as_ktp', $profile?->same_as_ktp ? 'true' : 'false') }},
+        sameAsKtp: {{ old('same_as_ktp', $profile?->same_as_ktp) ? 'true' : 'false' }},
         addressKtp: '{{ addslashes(old('address_ktp', $profile?->address_ktp ?? '')) }}',
         previewUrl: null,
         fileName: '',
@@ -420,9 +420,9 @@
             $education = $profile?->educations?->first();
         @endphp
         <div>
-            <div class="flex items-center justify-between mb-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-4">
                 <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Riwayat Pendidikan Terakhir</p>
-                <span class="text-[11px] text-slate-400">Pendidikan formal terakhir yang telah diselesaikan</span>
+                <span class="text-[11px] text-slate-500 font-medium">Wajib dilengkapi untuk memenuhi syarat kelengkapan pendaftaran</span>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">

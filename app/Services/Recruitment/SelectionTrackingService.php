@@ -275,7 +275,13 @@ class SelectionTrackingService
                 $isCurrent = false;
             }
 
-            $stageName = (string) ($stage['name'] ?? ($liveStage?->name ?? 'Tahapan Seleksi'));
+            $stageName = (string) ($liveStage?->name ?? ($stage['name'] ?? 'Tahapan Seleksi'));
+            $stageName = match ($stageName) {
+                'Masa Orientasi Magang Dokter Umum Baru (atau Karyawan Baru)' => 'Masa Orientasi & Pembekalan Karyawan Baru',
+                'Seleksi test tulis, test skill, Test Wawancara' => 'Seleksi Tes Tertulis, Keterampilan, dan Wawancara',
+                'Seleksi test psikologi dan test kesehatan', 'Seleksi test kesehatan' => 'Seleksi Psikotes dan Pemeriksaan Kesehatan (MCU)',
+                default => $stageName,
+            };
             $stageDescription = $stage['description'] ?? ($liveStage?->description ?? null);
             $startAt = ($liveStage && $liveStage->start_at) ? $liveStage->start_at : (! empty($stage['start_at']) ? Carbon::parse($stage['start_at']) : null);
             $endAt = ($liveStage && $liveStage->end_at) ? $liveStage->end_at : (! empty($stage['end_at']) ? Carbon::parse($stage['end_at']) : null);

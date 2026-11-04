@@ -96,7 +96,15 @@
             </div>
         @endif
 
-        {{-- Formulir Profil Lengkap (1 Card: Pas Foto Teratas, Data Pribadi, Kontak & Alamat, Riwayat Pendidikan) --}}
+        {{-- 1. Profile Completeness Overview (Progres 0-100% & Checklist Kelengkapan) --}}
+        @include('portal.profile.partials.completeness', [
+            'percentage' => $percentage,
+            'isComplete' => $isComplete,
+            'details' => $details,
+            'missingItems' => $missingItems,
+        ])
+
+        {{-- 2. Formulir Profil Lengkap (1 Card: Pas Foto Teratas, Data Pribadi, Kontak & Alamat, Riwayat Pendidikan) --}}
         @include('portal.profile.partials.personal-data', [
             'user' => $user,
             'profile' => $profile,

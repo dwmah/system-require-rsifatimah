@@ -144,7 +144,7 @@ class SelectionTimelineAndTemplateTest extends TestCase
             ],
             [
                 'sequence_order' => 2,
-                'name' => 'Seleksi test tulis, test skill, Test Wawancara',
+                'name' => 'Seleksi Tes Tertulis, Keterampilan, dan Wawancara',
                 'description' => 'Tahap tes kompetensi',
                 'start_date' => now()->addDays(7)->format('Y-m-d'),
                 'end_date' => now()->addDays(10)->format('Y-m-d'),
@@ -202,21 +202,21 @@ class SelectionTimelineAndTemplateTest extends TestCase
                 ],
                 [
                     'sequence_order' => 3,
-                    'name' => 'Seleksi test tulis, test skill, Test Wawancara',
+                    'name' => 'Seleksi Tes Tertulis, Keterampilan, dan Wawancara',
                     'description' => 'Tes Bidang',
                     'start_date' => '2026-11-11',
                     'end_date' => '2026-11-15',
                 ],
                 [
                     'sequence_order' => 4,
-                    'name' => 'Seleksi test psikologi dan test kesehatan',
+                    'name' => 'Seleksi Psikotes dan Pemeriksaan Kesehatan (MCU)',
                     'description' => 'Psikotes & MCU',
                     'start_date' => '2026-11-16',
                     'end_date' => '2026-11-20',
                 ],
                 [
                     'sequence_order' => 5,
-                    'name' => 'Masa Orientasi Magang Dokter Umum Baru (atau Karyawan Baru)',
+                    'name' => 'Masa Orientasi & Pembekalan Karyawan Baru',
                     'description' => 'Orientasi Kerja',
                     'start_date' => '2026-11-21',
                     'end_date' => '2026-11-25',
@@ -234,9 +234,9 @@ class SelectionTimelineAndTemplateTest extends TestCase
         $this->assertCount(5, $stages);
         $this->assertEquals('Pendaftaran Peserta Rekrutmen', $stages[0]->name);
         $this->assertEquals('Seleksi Administrasi', $stages[1]->name);
-        $this->assertEquals('Seleksi test tulis, test skill, Test Wawancara', $stages[2]->name);
-        $this->assertEquals('Seleksi test psikologi dan test kesehatan', $stages[3]->name);
-        $this->assertEquals('Masa Orientasi Magang Dokter Umum Baru (atau Karyawan Baru)', $stages[4]->name);
+        $this->assertEquals('Seleksi Tes Tertulis, Keterampilan, dan Wawancara', $stages[2]->name);
+        $this->assertEquals('Seleksi Psikotes dan Pemeriksaan Kesehatan (MCU)', $stages[3]->name);
+        $this->assertEquals('Masa Orientasi & Pembekalan Karyawan Baru', $stages[4]->name);
     }
 
     public function test_user_cannot_upload_document_after_submission_deadline_ended(): void

@@ -48,9 +48,21 @@
                     <h2 class="text-sm sm:text-base font-bold text-slate-900">Timeline Alur Seleksi Karyawan</h2>
                     <p class="text-xs text-slate-500 mt-0.5">Pantau perkembangan tahapan seleksi secara transparan</p>
                 </div>
-                @if($activePeriod && ($activePeriod->registration_end_at || $activePeriod->submission_deadline))
+                @php
+                    $regDeadline = null;
+                    $firstStageEnd = !empty($timelineStages[0]['end_at']) ? \Carbon\Carbon::parse($timelineStages[0]['end_at']) : null;
+                    if ($firstStageEnd) {
+                        $regDeadline = $firstStageEnd;
+                    } elseif ($activePeriod && ($activePeriod->registration_end_at || $activePeriod->submission_deadline)) {
+                        $regDeadline = \Carbon\Carbon::parse($activePeriod->registration_end_at ?? $activePeriod->submission_deadline);
+                        if ($regDeadline->year > now()->year && str_contains($activePeriod->name ?? '', (string) now()->year)) {
+                            $regDeadline = $regDeadline->year(now()->year);
+                        }
+                    }
+                @endphp
+                @if($regDeadline)
                     <div class="text-xs text-slate-600 bg-rose-50 border border-rose-100 px-3 py-1 rounded-lg self-start sm:self-auto">
-                        Batas Akhir Pendaftaran: <strong class="text-rose-600 font-semibold">{{ \Carbon\Carbon::parse($activePeriod->registration_end_at ?? $activePeriod->submission_deadline)->locale('id')->translatedFormat('d F Y, H.i') }} WIB</strong>
+                        Batas Akhir Pendaftaran: <strong class="text-rose-600 font-semibold">{{ $regDeadline->locale('id')->translatedFormat('d F Y, H.i') }} WIB</strong>
                     </div>
                 @endif
             </div>
@@ -73,7 +85,8 @@
                         $state = $stage['public_state'] ?? 'waiting';
                         $isPassed = in_array($state, ['passed', 'completed']);
                         $isFailed = $state === 'failed';
-                        $isInProgress = $state === 'in_progress' || !empty($stage['is_current']);
+                        $isCurrent = !empty($stage['is_current']);
+                        $isInProgress = $state === 'in_progress' || $isCurrent;
 
                         $cardBg = match(true) {
                             $isPassed => 'bg-emerald-50/60 border-emerald-200 ring-1 ring-emerald-200/50',
@@ -88,15 +101,27 @@
                             $isInProgress => 'bg-[#0179B5] text-white shadow-xs',
                             default => 'bg-slate-200 text-slate-700',
                         };
+
+                        // Prioritas 3: Bedakan badge Tahap Aktif dengan tahapan yang belum dimulai
+                        $stageLabel = $stage['label'] ?? 'Menunggu';
+                        $badgeClass = $stage['badge_class'] ?? 'bg-slate-100 text-slate-600 border-slate-200';
+
+                        if ($isCurrent && in_array($state, ['waiting', 'in_progress'], true)) {
+                            $stageLabel = 'Tahap Aktif';
+                            $badgeClass = 'bg-sky-50 text-[#0179B5] border-sky-300 font-bold';
+                        } elseif (! $isPassed && ! $isFailed && ! $isCurrent) {
+                            $stageLabel = 'Menunggu';
+                            $badgeClass = 'bg-slate-100 text-slate-500 border-slate-200';
+                        }
                     @endphp
-                    <div class="p-3.5 sm:p-4 rounded-xl border {{ $cardBg }} flex flex-col justify-between transition-all min-h-[125px]">
+                    <div class="p-3.5 sm:p-4 rounded-xl border {{ $cardBg }} flex flex-col justify-between transition-all min-h-[140px]">
                         <div class="space-y-2">
                             <div class="flex items-center justify-between gap-2">
                                 <span class="w-6 h-6 rounded-full {{ $stepBadgeBg }} font-bold text-xs flex items-center justify-center shrink-0">
                                     {{ $stage['sort_order'] ?? ($index + 1) }}
                                 </span>
-                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold border whitespace-nowrap shrink-0 {{ $stage['badge_class'] ?? 'bg-slate-100 text-slate-600 border-slate-200' }}">
-                                    {{ $stage['label'] ?? 'Menunggu' }}
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold border whitespace-nowrap shrink-0 {{ $badgeClass }}">
+                                    {{ $stageLabel }}
                                 </span>
                             </div>
 
@@ -111,8 +136,28 @@
                             @endif
                         </div>
 
-                        @if(!empty($stage['published_at']))
-                            <div class="mt-2 pt-2 border-t border-slate-200/50 text-[10px] text-slate-400">
+                        {{-- Prioritas 1: Rentang Tanggal Tahapan --}}
+                        @php
+                            $startAt = !empty($stage['start_at']) ? (\Carbon\Carbon::parse($stage['start_at'])) : null;
+                            $endAt = !empty($stage['end_at']) ? (\Carbon\Carbon::parse($stage['end_at'])) : null;
+                        @endphp
+                        @if($startAt || $endAt)
+                            <div class="mt-3 pt-2.5 border-t border-slate-200/60 flex items-center gap-1.5 text-[11px] text-slate-600 font-medium">
+                                <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                <span>
+                                    @if($startAt && $endAt)
+                                        {{ $startAt->translatedFormat('d M') }} &ndash; {{ $endAt->translatedFormat('d M Y') }}
+                                    @elseif($endAt)
+                                        Batas: {{ $endAt->translatedFormat('d M Y') }}
+                                    @elseif($startAt)
+                                        Mulai: {{ $startAt->translatedFormat('d M Y') }}
+                                    @endif
+                                </span>
+                            </div>
+                        @elseif(!empty($stage['published_at']))
+                            <div class="mt-3 pt-2.5 border-t border-slate-200/60 text-[10px] text-slate-400">
                                 {{ \Carbon\Carbon::parse($stage['published_at'])->locale('id')->translatedFormat('d M Y') }}
                             </div>
                         @endif
@@ -127,10 +172,10 @@
             @if ($application)
                 <div class="flex items-center justify-end pt-3 border-t border-slate-100">
                     <a
-                        href="{{ $application->status === \App\Enums\JobApplicationStatus::DRAFT ? route('portal.applications.show', $application) : ($quickAction['url'] ?? route('portal.applications.tracking', $application)) }}"
+                        href="{{ route('portal.applications.tracking', $application) }}"
                         class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-[#0179B5] hover:bg-[#016293] text-white transition-colors shadow-xs"
                     >
-                        <span>Lihat Detail</span>
+                        <span>Lihat Detail Alur Seleksi</span>
                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                         </svg>

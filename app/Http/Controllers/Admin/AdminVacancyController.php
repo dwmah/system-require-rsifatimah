@@ -242,9 +242,9 @@ class AdminVacancyController extends Controller
                 $defaultStages = [
                     'Pendaftaran Peserta Rekrutmen',
                     'Seleksi Administrasi',
-                    'Seleksi test tulis, test skill, Test Wawancara',
-                    'Seleksi test psikologi dan test kesehatan',
-                    'Masa Orientasi Magang Dokter Umum Baru (atau Karyawan Baru)',
+                    'Seleksi Tes Tertulis, Keterampilan, dan Wawancara',
+                    'Seleksi Psikotes dan Pemeriksaan Kesehatan (MCU)',
+                    'Masa Orientasi & Pembekalan Karyawan Baru',
                 ];
 
                 foreach ($defaultStages as $idx => $sName) {

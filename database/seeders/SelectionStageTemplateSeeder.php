@@ -31,7 +31,7 @@ class SelectionStageTemplateSeeder extends Seeder
             ],
             [
                 'sequence_order' => 3,
-                'name' => 'Seleksi test tulis, test skill, Test Wawancara',
+                'name' => 'Seleksi Tes Tertulis, Keterampilan, dan Wawancara',
                 'description' => 'Ujian kompetensi tulis bidang, tes keterampilan klinis/teknis, wawancara kompetensi dan etika islami, serta pengumuman kelulusan tahap berikutnya.',
                 'start_date' => now()->addDays(12)->format('Y-m-d'),
                 'end_date' => now()->addDays(17)->format('Y-m-d'),
@@ -39,7 +39,7 @@ class SelectionStageTemplateSeeder extends Seeder
             ],
             [
                 'sequence_order' => 4,
-                'name' => 'Seleksi test psikologi dan test kesehatan',
+                'name' => 'Seleksi Psikotes dan Pemeriksaan Kesehatan (MCU)',
                 'description' => 'Pemeriksaan psikotes lanjutan dan Medical Check-Up (MCU) kesehatan fisik bebas narkoba di RS serta pengumuman hasil kelulusan tahap psikologi dan kesehatan.',
                 'start_date' => now()->addDays(20)->format('Y-m-d'),
                 'end_date' => now()->addDays(24)->format('Y-m-d'),
@@ -47,7 +47,7 @@ class SelectionStageTemplateSeeder extends Seeder
             ],
             [
                 'sequence_order' => 5,
-                'name' => 'Masa Orientasi Magang Dokter Umum Baru (atau Karyawan Baru)',
+                'name' => 'Masa Orientasi & Pembekalan Karyawan Baru',
                 'description' => 'Pembekalan nilai Al-Islam & Kemuhammadiyahan, patient safety, SOP Rumah Sakit, dan penugasan orientasi kerja.',
                 'start_date' => now()->addDays(27)->format('Y-m-d'),
                 'end_date' => now()->addDays(34)->format('Y-m-d'),

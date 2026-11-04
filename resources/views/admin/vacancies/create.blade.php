@@ -76,9 +76,9 @@
                       stages: [
                           { name: 'Pendaftaran Peserta Rekrutmen', desc: 'Pendaftaran akun peserta rekrutmen dan verifikasi kelayakan biodata data diri pelamar', start_at: '{{ now()->format('Y-m-d') }}', end_at: '{{ now()->addDays(5)->format('Y-m-d') }}' },
                           { name: 'Seleksi Administrasi', desc: 'Pemeriksaan dan verifikasi keabsahan seluruh berkas dokumen persyaratan (CV, Portofolio, Ijazah, STR, dll) oleh tim SDI serta pengumuman hasil seleksi berkas', start_at: '{{ now()->addDays(6)->format('Y-m-d') }}', end_at: '{{ now()->addDays(10)->format('Y-m-d') }}' },
-                          { name: 'Seleksi test tulis, test skill, Test Wawancara', desc: 'Tes kompetensi bidang, skill tindakan medis/teknis, wawancara direksi dan pengumuman lolos tahap 3', start_at: '{{ now()->addDays(11)->format('Y-m-d') }}', end_at: '{{ now()->addDays(16)->format('Y-m-d') }}' },
-                          { name: 'Seleksi test psikologi dan test kesehatan', desc: 'Psikotes dan tes kesehatan/MCU fisik di RS serta pengumuman lolos tahap 4', start_at: '{{ now()->addDays(17)->format('Y-m-d') }}', end_at: '{{ now()->addDays(22)->format('Y-m-d') }}' },
-                          { name: 'Masa Orientasi Magang Dokter Umum Baru (atau Karyawan Baru)', desc: 'Pembekalan nilai Al-Islam, orientasi mutu dan keselamatan pasien serta penugasan orientasi kerja', start_at: '{{ now()->addDays(23)->format('Y-m-d') }}', end_at: '{{ now()->addDays(30)->format('Y-m-d') }}' }
+                          { name: 'Seleksi Tes Tertulis, Keterampilan, dan Wawancara', desc: 'Tes kompetensi bidang, skill tindakan medis/teknis, wawancara direksi dan pengumuman lolos tahap 3', start_at: '{{ now()->addDays(11)->format('Y-m-d') }}', end_at: '{{ now()->addDays(16)->format('Y-m-d') }}' },
+                          { name: 'Seleksi Psikotes dan Pemeriksaan Kesehatan (MCU)', desc: 'Psikotes dan tes kesehatan/MCU fisik di RS serta pengumuman lolos tahap 4', start_at: '{{ now()->addDays(17)->format('Y-m-d') }}', end_at: '{{ now()->addDays(22)->format('Y-m-d') }}' },
+                          { name: 'Masa Orientasi & Pembekalan Karyawan Baru', desc: 'Pembekalan nilai Al-Islam, orientasi mutu dan keselamatan pasien serta penugasan orientasi kerja', start_at: '{{ now()->addDays(23)->format('Y-m-d') }}', end_at: '{{ now()->addDays(30)->format('Y-m-d') }}' }
                       ],
                       applyStageTemplate(templateId) {
                           const tpl = this.stageTemplates.find(t => t.id == templateId);

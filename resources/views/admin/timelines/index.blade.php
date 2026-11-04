@@ -8,9 +8,9 @@
             stages: [
                 { sequence_order: 1, name: 'Pendaftaran Peserta Rekrutmen', description: 'Pendaftaran online akun peserta dan verifikasi kelayakan biodata data diri pelamar', start_date: '', end_date: '', announcement_date: '' },
                 { sequence_order: 2, name: 'Seleksi Administrasi', description: 'Pemeriksaan dan verifikasi keabsahan seluruh berkas dokumen persyaratan (CV, Portofolio, Ijazah, dll) serta pengumuman hasil seleksi berkas', start_date: '', end_date: '', announcement_date: '' },
-                { sequence_order: 3, name: 'Seleksi test tulis, test skill, Test Wawancara', description: 'Ujian teori bidang, tes skill teknis, wawancara kompetensi dan etika islami', start_date: '', end_date: '', announcement_date: '' },
-                { sequence_order: 4, name: 'Seleksi test psikologi dan test kesehatan', description: 'Pemeriksaan psikotes lanjutan dan Medical Check-Up (MCU) kesehatan fisik', start_date: '', end_date: '', announcement_date: '' },
-                { sequence_order: 5, name: 'Masa Orientasi Magang Dokter Umum Baru (atau Karyawan Baru)', description: 'Pembekalan nilai Al-Islam, orientasi SOP Rumah Sakit, dan magang', start_date: '', end_date: '', announcement_date: '' }
+                { sequence_order: 3, name: 'Seleksi Tes Tertulis, Keterampilan, dan Wawancara', description: 'Ujian teori bidang, tes skill teknis, wawancara kompetensi dan etika islami', start_date: '', end_date: '', announcement_date: '' },
+                { sequence_order: 4, name: 'Seleksi Psikotes dan Pemeriksaan Kesehatan (MCU)', description: 'Pemeriksaan psikotes lanjutan dan Medical Check-Up (MCU) kesehatan fisik', start_date: '', end_date: '', announcement_date: '' },
+                { sequence_order: 5, name: 'Masa Orientasi & Pembekalan Karyawan Baru', description: 'Pembekalan nilai Al-Islam, orientasi SOP Rumah Sakit, dan magang', start_date: '', end_date: '', announcement_date: '' }
             ]
         },
         addStage(target) {

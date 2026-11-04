@@ -220,15 +220,23 @@
                                         <h3 class="text-sm font-bold text-slate-900">
                                             {{ $stage['name'] }}
                                         </h3>
-                                        @if ($stage['is_current'])
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-sky-50 text-[#0179B5] border border-sky-200">
-                                                Tahap Aktif
-                                            </span>
-                                        @endif
                                     </div>
 
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-bold border whitespace-nowrap shrink-0 {{ $stage['badge_class'] }} self-start sm:self-auto">
-                                        {{ $stage['label'] }}
+                                    @php
+                                        $displayLabel = $stage['label'];
+                                        $displayBadgeClass = $stage['badge_class'];
+
+                                        if ($stage['is_current'] && in_array($stage['public_state'], ['waiting', 'in_progress'], true)) {
+                                            $displayLabel = 'Tahap Aktif';
+                                            $displayBadgeClass = 'bg-sky-50 text-[#0179B5] border-sky-300 font-bold';
+                                        } elseif (! $isPassed && ! $isFailed && ! $stage['is_current']) {
+                                            $displayLabel = 'Menunggu';
+                                            $displayBadgeClass = 'bg-slate-100 text-slate-500 border-slate-200';
+                                        }
+                                    @endphp
+
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-bold border whitespace-nowrap shrink-0 {{ $displayBadgeClass }} self-start sm:self-auto">
+                                        {{ $displayLabel }}
                                     </span>
                                 </div>
 
