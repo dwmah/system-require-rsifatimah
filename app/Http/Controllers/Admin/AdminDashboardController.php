@@ -9,7 +9,6 @@ use App\Http\Controllers\Controller;
 use App\Models\JobApplication;
 use App\Models\JobVacancy;
 use App\Models\RecruitmentPeriod;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -20,29 +19,38 @@ class AdminDashboardController extends Controller
      */
     public function index(Request $request): View
     {
-        $activePeriod = RecruitmentPeriod::currentlyOpen()->first()
-            ?? RecruitmentPeriod::where('status', RecruitmentPeriodStatus::OPEN)->first()
+        $activePeriod = RecruitmentPeriod::where('status', RecruitmentPeriodStatus::OPEN)->first()
+            ?? RecruitmentPeriod::currentlyOpen()->first()
             ?? RecruitmentPeriod::latest('registration_start_at')->first();
 
+        // Scope query ke periode aktif bila tersedia
+        $vacancyBaseQuery = JobVacancy::query();
+        $applicationBaseQuery = JobApplication::query();
+
+        if ($activePeriod) {
+            $vacancyBaseQuery->where('recruitment_period_id', $activePeriod->id);
+            $applicationBaseQuery->where('recruitment_period_id', $activePeriod->id);
+        }
+
         // Statistik Lowongan
-        $totalVacancies = JobVacancy::count();
-        $activeVacancies = JobVacancy::where('status', JobVacancyStatus::OPEN)->count();
-        $closedVacancies = JobVacancy::where('status', '!=', JobVacancyStatus::OPEN)->count();
+        $totalVacancies = (clone $vacancyBaseQuery)->count();
+        $activeVacancies = (clone $vacancyBaseQuery)->where('status', JobVacancyStatus::OPEN)->count();
+        $closedVacancies = (clone $vacancyBaseQuery)->where('status', '!=', JobVacancyStatus::OPEN)->count();
 
         // Statistik Pelamar
-        $totalApplicants = User::where('role', User::ROLE_APPLICANT)->count();
-        $totalApplications = JobApplication::count();
+        $totalApplicants = (clone $applicationBaseQuery)->distinct('user_id')->count('user_id');
+        $totalApplications = (clone $applicationBaseQuery)->count();
 
         // Breakdown Status Lamaran
-        $pendingVerification = JobApplication::where('status', JobApplicationStatus::SUBMITTED)->count();
-        $passedAdministration = JobApplication::where('status', JobApplicationStatus::PASSED_ADMINISTRATION)->count();
-        $inSelection = JobApplication::where('status', JobApplicationStatus::IN_SELECTION)->count();
-        $acceptedCount = JobApplication::where('status', JobApplicationStatus::ACCEPTED)->count();
-        $rejectedCount = JobApplication::where('status', JobApplicationStatus::REJECTED)->count();
-        $draftCount = JobApplication::where('status', JobApplicationStatus::DRAFT)->count();
+        $pendingVerification = (clone $applicationBaseQuery)->where('status', JobApplicationStatus::SUBMITTED)->count();
+        $passedAdministration = (clone $applicationBaseQuery)->where('status', JobApplicationStatus::PASSED_ADMINISTRATION)->count();
+        $inSelection = (clone $applicationBaseQuery)->where('status', JobApplicationStatus::IN_SELECTION)->count();
+        $acceptedCount = (clone $applicationBaseQuery)->where('status', JobApplicationStatus::ACCEPTED)->count();
+        $rejectedCount = (clone $applicationBaseQuery)->where('status', JobApplicationStatus::REJECTED)->count();
+        $draftCount = (clone $applicationBaseQuery)->where('status', JobApplicationStatus::DRAFT)->count();
 
         // Lowongan dengan statistik pelamar
-        $vacanciesWithStats = JobVacancy::withCount([
+        $vacanciesWithStats = (clone $vacancyBaseQuery)->withCount([
             'jobApplications as total_applicants',
             'jobApplications as pending_count' => function ($query) {
                 $query->where('status', JobApplicationStatus::SUBMITTED);
@@ -67,7 +75,7 @@ class AdminDashboardController extends Controller
         }
 
         // Lamaran Terbaru yang Masuk (difilter jika formasi dipilih)
-        $recentApplicationsQuery = JobApplication::with(['user.applicantProfile', 'jobVacancy'])
+        $recentApplicationsQuery = (clone $applicationBaseQuery)->with(['user.applicantProfile', 'jobVacancy'])
             ->latest('submitted_at');
 
         if ($selectedVacancyId) {

@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Enums\JobApplicationStatus;
+use App\Enums\RecruitmentPeriodStatus;
 use App\Http\Controllers\Controller;
 use App\Models\ApplicationDocument;
 use App\Models\ApplicationStageHistory;
 use App\Models\JobApplication;
 use App\Models\JobVacancy;
+use App\Models\RecruitmentPeriod;
 use App\Models\VacancySelectionStage;
 use App\Services\Export\BiodataExcelExportService;
 use App\Services\Recruitment\ApplicationVerificationService;
@@ -65,23 +67,50 @@ class AdminApplicationController extends Controller
             $query->where('status', $request->status);
         }
 
+        $activePeriod = RecruitmentPeriod::where('status', RecruitmentPeriodStatus::OPEN)->first();
+
+        // Scope otomatis ke periode aktif kecuali jika dispesifikasikan lain via query
+        if ($request->filled('period_id')) {
+            if ($request->period_id !== 'all') {
+                $query->where('recruitment_period_id', $request->period_id);
+            }
+        } elseif ($activePeriod) {
+            $query->where('recruitment_period_id', $activePeriod->id);
+        }
+
         $applications = $query->latest('submitted_at')->paginate(15)->withQueryString();
-        $vacancies = JobVacancy::orderBy('title')->get();
+
+        $vacanciesQuery = JobVacancy::orderBy('title');
+        if ($request->filled('period_id') && $request->period_id !== 'all') {
+            $vacanciesQuery->where('recruitment_period_id', $request->period_id);
+        } elseif ($activePeriod) {
+            $vacanciesQuery->where('recruitment_period_id', $activePeriod->id);
+        }
+        $vacancies = $vacanciesQuery->get();
+
+        // Base metrics scoped to active period
+        $baseMetricQuery = JobApplication::query();
+        if ($request->filled('period_id') && $request->period_id !== 'all') {
+            $baseMetricQuery->where('recruitment_period_id', $request->period_id);
+        } elseif ($activePeriod) {
+            $baseMetricQuery->where('recruitment_period_id', $activePeriod->id);
+        }
 
         // Summary metrics
         $metrics = [
-            'total' => JobApplication::count(),
-            'pending' => JobApplication::where('status', JobApplicationStatus::SUBMITTED)->count(),
-            'passed' => JobApplication::where('status', JobApplicationStatus::PASSED_ADMINISTRATION)->count(),
-            'in_selection' => JobApplication::where('status', JobApplicationStatus::IN_SELECTION)->count(),
-            'accepted' => JobApplication::where('status', JobApplicationStatus::ACCEPTED)->count(),
-            'rejected' => JobApplication::where('status', JobApplicationStatus::REJECTED)->count(),
+            'total' => (clone $baseMetricQuery)->count(),
+            'pending' => (clone $baseMetricQuery)->where('status', JobApplicationStatus::SUBMITTED)->count(),
+            'passed' => (clone $baseMetricQuery)->where('status', JobApplicationStatus::PASSED_ADMINISTRATION)->count(),
+            'in_selection' => (clone $baseMetricQuery)->where('status', JobApplicationStatus::IN_SELECTION)->count(),
+            'accepted' => (clone $baseMetricQuery)->where('status', JobApplicationStatus::ACCEPTED)->count(),
+            'rejected' => (clone $baseMetricQuery)->where('status', JobApplicationStatus::REJECTED)->count(),
         ];
 
         return view('admin.applications.index', [
             'applications' => $applications,
             'vacancies' => $vacancies,
             'metrics' => $metrics,
+            'activePeriod' => $activePeriod,
         ]);
     }
 
