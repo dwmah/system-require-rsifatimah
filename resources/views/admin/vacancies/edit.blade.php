@@ -86,7 +86,8 @@
                           } else if (type === 'umum') {
                               this.documents = [
                                   { id: null, name: 'Surat Lamaran Kerja', desc: 'Ditujukan kepada Direktur RSI Fatimah', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
-                                  { id: null, name: 'Curriculum Vitae (CV) & Portofolio', desc: 'Riwayat hidup dan bukti hasil karya / proyek (PDF atau Video MP4)', mandatory: 1, mimes: 'application/pdf,video/mp4', max_size: 20480 },
+                                  { id: null, name: 'Curriculum Vitae (CV)', desc: 'Riwayat hidup lengkap dan nomor kontak aktif', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
+                                  { id: null, name: 'Portofolio Karya', desc: 'Bukti hasil karya / proyek / portofolio pengalaman (PDF atau Video MP4)', mandatory: 1, mimes: 'application/pdf,video/mp4', max_size: 20480 },
                                   { id: null, name: 'Ijazah & Transkrip Terakhir', desc: 'Scan legalisir ijazah dan transkrip nilai', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
                                   { id: null, name: 'KTP & Kartu Keluarga', desc: 'Scan identitas kependudukan', mandatory: 1, mimes: 'application/pdf', max_size: 5120 },
                                   { id: null, name: 'Sertifikat Keahlian / Kompetensi', desc: 'Sertifikat sertifikasi IT / akuntansi / administrasi', mandatory: 0, mimes: 'application/pdf', max_size: 5120 },
