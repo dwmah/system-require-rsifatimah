@@ -81,6 +81,17 @@
                         <span>Siklus Akun / Arsip</span>
                     </div>
                 </a>
+
+                <!-- Rekap Data per Periode -->
+                <a href="{{ route('admin.recap.index') }}"
+                   class="flex items-center justify-between px-5 py-2.5 text-sm font-medium border-l-4 transition-colors {{ request()->routeIs('admin.recap*') ? 'bg-[#E6F2F8] text-[#0179B5] font-semibold border-[#0179B5]' : 'border-transparent text-slate-600 hover:text-[#0179B5] hover:bg-slate-50' }}">
+                    <div class="flex items-center gap-3">
+                        <svg class="w-4 h-4 {{ request()->routeIs('admin.recap*') ? 'text-[#0179B5]' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <span>Rekap per Periode</span>
+                    </div>
+                </a>
             </nav>
         </div>
 
