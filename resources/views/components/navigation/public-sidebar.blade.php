@@ -16,10 +16,10 @@
     $isPanduanActive = $isAlurActive || $isSyaratActive || request()->routeIs('guides.*');
 @endphp
 
-<aside {{ $attributes->merge(['class' => 'w-64 shrink-0 bg-white border-r border-slate-200 flex flex-col justify-between py-4 px-3.5 h-full overflow-hidden']) }}>
-    <div class="flex-1 overflow-y-auto space-y-5 pr-1 -mr-1 py-1">
+<aside {{ $attributes->merge(['class' => 'w-56 shrink-0 bg-white border-r border-slate-200 flex flex-col justify-between py-4 px-3 h-full overflow-hidden']) }}>
+    <div class="flex-1 overflow-y-auto space-y-5 pr-0.5 py-1">
         <div>
-            <p class="px-3 text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
+            <p class="px-2.5 text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
                 Menu Utama
             </p>
 
@@ -28,7 +28,7 @@
                 <a
                     href="{{ route('vacancies.index') }}"
                     @class([
-                        'flex items-center gap-3 px-3 py-2 text-xs font-medium rounded-lg border-l-4 transition-colors',
+                        'flex items-center gap-2.5 px-2.5 py-2 text-xs font-medium rounded-lg border-l-4 transition-colors',
                         'bg-[#E6F2F8] text-[#0179B5] font-semibold border-[#0179B5]' => $isLowonganActive,
                         'border-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900' => ! $isLowonganActive,
                     ])
@@ -45,12 +45,12 @@
                         type="button"
                         @click="open = !open"
                         @class([
-                            'w-full flex items-center justify-between px-3 py-2 text-xs font-medium rounded-lg border-l-4 transition-colors cursor-pointer',
+                            'w-full flex items-center justify-between px-2.5 py-2 text-xs font-medium rounded-lg border-l-4 transition-colors cursor-pointer',
                             'bg-[#E6F2F8] text-[#0179B5] font-semibold border-[#0179B5]' => $isPanduanActive,
                             'border-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900' => ! $isPanduanActive,
                         ])
                     >
-                        <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-2.5">
                             <svg class="w-4 h-4 shrink-0 {{ $isPanduanActive ? 'text-[#0179B5]' : 'text-slate-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                             </svg>
@@ -61,11 +61,11 @@
                         </svg>
                     </button>
 
-                    <div x-show="open" x-cloak class="pl-8 space-y-1 pr-1">
+                    <div x-show="open" x-cloak class="pl-7 space-y-1 pr-1">
                         <a
                             href="{{ route('guides.flow') }}"
                             @class([
-                                'block px-2.5 py-1.5 text-xs rounded-lg border-l-4 transition-colors',
+                                'block px-2 py-1.5 text-xs rounded-lg border-l-4 transition-colors',
                                 'bg-[#E6F2F8] text-[#0179B5] font-semibold border-[#0179B5]' => $isAlurActive,
                                 'border-transparent text-slate-500 hover:text-slate-900 hover:bg-slate-50' => ! $isAlurActive,
                             ])
@@ -76,7 +76,7 @@
                         <a
                             href="{{ route('guides.requirements') }}"
                             @class([
-                                'block px-2.5 py-1.5 text-xs rounded-lg border-l-4 transition-colors',
+                                'block px-2 py-1.5 text-xs rounded-lg border-l-4 transition-colors',
                                 'bg-[#E6F2F8] text-[#0179B5] font-semibold border-[#0179B5]' => $isSyaratActive,
                                 'border-transparent text-slate-500 hover:text-slate-900 hover:bg-slate-50' => ! $isSyaratActive,
                             ])
@@ -90,13 +90,12 @@
     </div>
 
     {{-- Contact / Help Widget (Melayang di posisi paling bawah) --}}
-    <div class="pt-3 shrink-0 sticky bottom-0 bg-white z-10">
-        <div class="p-3.5 bg-white rounded-2xl border border-slate-200/90 shadow-md hover:shadow-lg transition-all text-xs text-slate-500">
-            <p class="font-bold text-slate-800 mb-0.5 flex items-center justify-between">
-                <span>Pusat Informasi SDM</span>
-                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-sky-50 text-[#0179B5] border border-sky-200">Bantuan</span>
+    <div class="pt-2.5 shrink-0 sticky bottom-0 bg-white z-10">
+        <div class="p-3 bg-white rounded-xl border border-slate-200/90 shadow-xs hover:shadow-sm transition-all text-xs text-slate-500">
+            <p class="font-bold text-xs text-slate-800 mb-0.5">
+                Pusat Informasi SDM
             </p>
-            <p class="text-[11px] leading-relaxed text-slate-500 mb-2">
+            <p class="text-[10px] leading-relaxed text-slate-500 mb-1.5">
                 Senin - Jumat, 08.00 - 15.00 WIB
             </p>
             <a href="tel:0333421118" class="inline-flex items-center gap-1.5 text-[#0179B5] hover:text-[#015f8e] font-bold text-xs transition-colors">

@@ -35,7 +35,7 @@
                 @if ($currentUser)
                     {{-- Profile Pill & Quick Dashboard/Logout --}}
                     <div class="flex items-center gap-3">
-                        <a href="{{ $currentUser->isAdmin() ? route('admin.dashboard') : route('portal.home') }}" class="flex items-center gap-2 text-white hover:opacity-90 transition-opacity" title="Buka Dashboard">
+                        <a href="{{ $currentUser->isAdmin() ? route('admin.dashboard') : route('profile.show') }}" class="flex items-center gap-2 text-white hover:opacity-90 transition-opacity" title="{{ $currentUser->isAdmin() ? 'Buka Dashboard Admin' : 'Buka Profil Saya' }}">
                             @if(!$currentUser->isAdmin() && $currentUser->profile_photo_url)
                                 <img src="{{ $currentUser->profile_photo_url }}" alt="{{ $name }}" class="w-8 h-8 rounded-full object-cover shadow-xs border border-white/40" style="width: 32px; height: 32px; min-width: 32px; min-height: 32px; max-width: 32px; max-height: 32px; object-fit: cover; border-radius: 9999px;">
                             @else

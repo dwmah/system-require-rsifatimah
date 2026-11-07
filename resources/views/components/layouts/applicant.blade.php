@@ -44,8 +44,8 @@
     {{-- Body Shell: Applicant Sidebar + Main Content --}}
     <div class="pt-16 flex-1 flex w-full">
         {{-- Desktop Left Sidebar (Fixed with reserved space) --}}
-        <div class="hidden lg:block w-64 shrink-0">
-            <div class="fixed top-16 left-0 bottom-0 w-64 z-30">
+        <div class="hidden lg:block w-56 shrink-0">
+            <div class="fixed top-16 left-0 bottom-0 w-56 z-30">
                 <x-navigation.applicant-sidebar :active-menu="$activeMenu" class="h-full" />
             </div>
         </div>

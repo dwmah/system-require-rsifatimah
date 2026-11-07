@@ -175,7 +175,7 @@
                         href="{{ route('portal.applications.tracking', $application) }}"
                         class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-[#0179B5] hover:bg-[#016293] text-white transition-colors shadow-xs"
                     >
-                        <span>Lihat Detail Alur Seleksi</span>
+                        <span>Lihat Detail</span>
                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                         </svg>
