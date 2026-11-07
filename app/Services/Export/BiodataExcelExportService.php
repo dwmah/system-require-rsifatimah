@@ -17,7 +17,8 @@ class BiodataExcelExportService
     public function exportApplicants(
         ?int $vacancyId = null,
         ?string $status = null,
-        ?string $search = null
+        ?string $search = null,
+        ?int $recruitmentPeriodId = null
     ): BinaryFileResponse {
         $query = JobApplication::with([
             'user.applicantProfile.educations' => function ($q) {
@@ -37,6 +38,10 @@ class BiodataExcelExportService
                             ->orWhere('phone', 'like', "%{$search}%");
                     });
             });
+        }
+
+        if ($recruitmentPeriodId) {
+            $query->where('recruitment_period_id', $recruitmentPeriodId);
         }
 
         if ($vacancyId) {

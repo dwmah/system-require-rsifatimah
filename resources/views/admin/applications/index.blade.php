@@ -3,7 +3,15 @@
         <!-- Header -->
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200">
             <div>
-                <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Daftar Lamaran & Verifikasi Berkas</h1>
+                <div class="flex items-center gap-2">
+                    <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Daftar Lamaran & Verifikasi Berkas</h1>
+                    @if(isset($activePeriod) && $activePeriod)
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                            Periode Aktif: {{ $activePeriod->name }}
+                        </span>
+                    @endif
+                </div>
                 <p class="text-sm text-slate-500 mt-0.5">Monitoring berkas pendaftaran dan validasi kualifikasi calon karyawan RSI Fatimah</p>
             </div>
 

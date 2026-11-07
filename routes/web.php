@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminApplicationController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminGuideController;
 use App\Http\Controllers\Admin\AdminLifecycleController;
+use App\Http\Controllers\Admin\AdminRecapController;
 use App\Http\Controllers\Admin\AdminTimelineController;
 use App\Http\Controllers\Admin\AdminVacancyController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
@@ -250,6 +251,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::delete('/lifecycle/{user}/cleanup', [AdminLifecycleController::class, 'cleanup'])->name('lifecycle.cleanup')->withTrashed();
     Route::delete('/lifecycle/{user}/force-delete', [AdminLifecycleController::class, 'forceDelete'])->name('lifecycle.force-delete');
     Route::post('/lifecycle/cleanup-all-seen', [AdminLifecycleController::class, 'cleanupAllSeen'])->name('lifecycle.cleanup-all-seen');
+
+    // Rekap Data per Periode Rekrutmen
+    Route::get('/rekap-periode', [AdminRecapController::class, 'index'])->name('recap.index');
+    Route::get('/rekap-periode/{period}', [AdminRecapController::class, 'show'])->name('recap.show');
+    Route::get('/rekap-periode/{period}/export', [AdminRecapController::class, 'export'])->name('recap.export');
 });
 
 // Development Only: Preview Design System

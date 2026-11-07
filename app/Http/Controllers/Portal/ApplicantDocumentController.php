@@ -141,12 +141,18 @@ class ApplicantDocumentController extends Controller
         $user = Auth::user();
         $application = $document->jobApplication;
 
-        if (! $user || ($user->isApplicant() && ! $user->is_active)) {
-            abort(403, 'Akun Anda tidak aktif atau tidak memiliki izin akses.');
+        if (! $user) {
+            abort(403, 'Akses ditolak.');
         }
 
         // Cek hak akses: Pemilik dokumen ATAU Admin HRD
-        if ($user->id !== $application->user_id && ! $user->isAdmin()) {
+        if ($user->isAdmin()) {
+            // Admin selalu berhak melihat berkas dokumen (termasuk untuk akun soft-deleted / talent pool)
+        } elseif ($user->id === $application->user_id) {
+            if (! $user->is_active) {
+                abort(403, 'Akun Anda tidak aktif atau tidak memiliki izin akses.');
+            }
+        } else {
             abort(403, 'Anda tidak memiliki akses ke dokumen ini.');
         }
 
@@ -167,12 +173,18 @@ class ApplicantDocumentController extends Controller
         $user = Auth::user();
         $application = $document->jobApplication;
 
-        if (! $user || ($user->isApplicant() && ! $user->is_active)) {
-            abort(403, 'Akun Anda tidak aktif atau tidak memiliki izin akses.');
+        if (! $user) {
+            abort(403, 'Akses ditolak.');
         }
 
         // Cek hak akses: Pemilik dokumen ATAU Admin HRD
-        if ($user->id !== $application->user_id && ! $user->isAdmin()) {
+        if ($user->isAdmin()) {
+            // Admin selalu berhak mengunduh berkas dokumen (termasuk untuk akun soft-deleted / talent pool)
+        } elseif ($user->id === $application->user_id) {
+            if (! $user->is_active) {
+                abort(403, 'Akun Anda tidak aktif atau tidak memiliki izin akses.');
+            }
+        } else {
             abort(403, 'Anda tidak memiliki akses ke dokumen ini.');
         }
 

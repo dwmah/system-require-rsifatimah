@@ -249,12 +249,19 @@
                         </thead>
                         <tbody class="divide-y divide-slate-100 text-sm">
                             @forelse ($rejectedApplications as $app)
-                                @php
-                                    $isArchived = $app->user?->trashed();
-                                    $cvDoc = $app->documents->first(fn($d) => str_contains(strtolower($d->documentRequirement?->name ?? ''), 'cv') || str_contains(strtolower($d->documentRequirement?->name ?? ''), 'curriculum vitae'));
-                                    $portoDoc = $app->documents->first(fn($d) => str_contains(strtolower($d->documentRequirement?->name ?? ''), 'portofolio') || str_contains(strtolower($d->documentRequirement?->name ?? ''), 'karya'));
-                                    $otherDocs = $app->documents->filter(fn($d) => $d->id !== $cvDoc?->id && $d->id !== $portoDoc?->id);
-                                @endphp
+                                    @php
+                                        $isArchived = $app->user?->trashed();
+                                        $cvDoc = $app->documents->first(fn($d) => 
+                                            str_contains(strtolower($d->documentRequirement?->name ?? ''), 'cv') || 
+                                            str_contains(strtolower($d->documentRequirement?->name ?? ''), 'curriculum vitae')
+                                        );
+                                        $portoDoc = $app->documents->first(fn($d) => 
+                                            str_contains(strtolower($d->documentRequirement?->name ?? ''), 'portofolio') || 
+                                            str_contains(strtolower($d->documentRequirement?->name ?? ''), 'portfolio') || 
+                                            str_contains(strtolower($d->documentRequirement?->name ?? ''), 'karya')
+                                        );
+                                        $otherDocs = $app->documents->filter(fn($d) => $d->id !== $cvDoc?->id && $d->id !== $portoDoc?->id);
+                                    @endphp
                                 <tr class="hover:bg-slate-50 transition-colors {{ $isArchived ? 'bg-amber-50/20' : '' }}">
                                     <td class="py-3.5 px-4">
                                         <div class="font-bold text-slate-900">{{ $app->user->name ?? 'User Telah Dihapus' }}</div>
