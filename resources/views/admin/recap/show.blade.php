@@ -14,7 +14,7 @@
                 <p class="text-sm text-slate-500 mt-0.5">Kode: {{ $period->code }} | Rentang: {{ $period->registration_start_at?->format('d M Y') }} - {{ $period->registration_end_at?->format('d M Y') }}</p>
             </div>
 
-            <div class="flex items-center gap-2.5 shrink-0">
+            <div class="flex items-center gap-2.5 shrink-0 flex-wrap">
                 <a href="{{ route('admin.recap.export', array_merge(['period' => $period->id], request()->only(['search', 'vacancy_id', 'status']))) }}" 
                    class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs hover:shadow-md transition-all flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -22,6 +22,22 @@
                     </svg>
                     Ekspor Data Periode Ini (.xlsx)
                 </a>
+
+                @if($period->status !== \App\Enums\RecruitmentPeriodStatus::OPEN)
+                    <form action="{{ route('admin.recap.destroy', $period) }}" method="POST" class="inline"
+                          onsubmit="return confirm('PERINGATAN: Menghapus rekapan periode \'{{ $period->name }}\' akan menghapus seluruh data lamaran, lowongan, dan berkas dokumen fisik (PDF/Portofolio) terkait dari server secara permanen.\n\nApakah Anda yakin ingin melanjutkan?')">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" 
+                                class="px-4 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 hover:text-rose-800 border border-rose-200 text-xs font-bold rounded-xl transition-all flex items-center gap-2 cursor-pointer"
+                                title="Hapus rekapan periode dan berkas fisik dokumen">
+                            <svg class="w-4 h-4 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                            Hapus Rekap Periode Ini
+                        </button>
+                    </form>
+                @endif
             </div>
         </div>
 
