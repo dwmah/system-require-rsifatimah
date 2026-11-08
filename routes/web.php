@@ -256,6 +256,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/rekap-periode', [AdminRecapController::class, 'index'])->name('recap.index');
     Route::get('/rekap-periode/{period}', [AdminRecapController::class, 'show'])->name('recap.show');
     Route::get('/rekap-periode/{period}/export', [AdminRecapController::class, 'export'])->name('recap.export');
+    Route::delete('/rekap-periode/{period}', [AdminRecapController::class, 'destroy'])->name('recap.destroy');
 });
 
 // Development Only: Preview Design System

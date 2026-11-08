@@ -4,12 +4,20 @@ namespace App\Http\Controllers\Admin;
 
 use App\Enums\JobApplicationStatus;
 use App\Enums\JobVacancyStatus;
+use App\Enums\RecruitmentPeriodStatus;
 use App\Http\Controllers\Controller;
+use App\Models\ApplicationDocument;
+use App\Models\ApplicationStageHistory;
 use App\Models\JobApplication;
 use App\Models\JobVacancy;
 use App\Models\RecruitmentPeriod;
+use App\Models\VacancyDocumentRequirement;
+use App\Models\VacancySelectionStage;
 use App\Services\Export\BiodataExcelExportService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -114,5 +122,48 @@ class AdminRecapController extends Controller
             search: $search,
             recruitmentPeriodId: $period->id
         );
+    }
+
+    /**
+     * Hapus rekapan periode rekrutmen beserta seluruh lowongan, berkas lamaran, dan file fisik dokumen.
+     */
+    public function destroy(RecruitmentPeriod $period): RedirectResponse
+    {
+        // Proteksi: Periode yang sedang aktif berjalan dilarang dihapus
+        if ($period->status === RecruitmentPeriodStatus::OPEN) {
+            return redirect()->back()->with('error', 'Periode rekrutmen yang sedang aktif (OPEN) tidak dapat dihapus.');
+        }
+
+        DB::transaction(function () use ($period) {
+            // 1. Ambil seluruh ID lamaran pada periode ini
+            $applicationIds = JobApplication::where('recruitment_period_id', $period->id)->pluck('id');
+
+            // 2. Ambil seluruh dokumen fisik pelamar untuk dihapus dari storage disk
+            $documents = ApplicationDocument::whereIn('job_application_id', $applicationIds)->get();
+            foreach ($documents as $doc) {
+                if ($doc->stored_path && Storage::disk('applicant_documents')->exists($doc->stored_path)) {
+                    Storage::disk('applicant_documents')->delete($doc->stored_path);
+                }
+            }
+
+            // 3. Hapus database dokumen dan riwayat tahapan lamaran
+            ApplicationDocument::whereIn('job_application_id', $applicationIds)->delete();
+            ApplicationStageHistory::whereIn('job_application_id', $applicationIds)->delete();
+            JobApplication::where('recruitment_period_id', $period->id)->delete();
+
+            // 4. Ambil seluruh lowongan pada periode ini
+            $vacancyIds = JobVacancy::where('recruitment_period_id', $period->id)->pluck('id');
+
+            // 5. Hapus persyaratan berkas dan tahapan seleksi lowongan
+            VacancyDocumentRequirement::whereIn('job_vacancy_id', $vacancyIds)->delete();
+            VacancySelectionStage::whereIn('job_vacancy_id', $vacancyIds)->delete();
+            JobVacancy::where('recruitment_period_id', $period->id)->delete();
+
+            // 6. Hapus master periode rekrutmen
+            $period->delete();
+        });
+
+        return redirect()->route('admin.recap.index')
+            ->with('success', "Rekapan data periode '{$period->name}' beserta seluruh berkas dokumen terkait berhasil dihapus.");
     }
 }
